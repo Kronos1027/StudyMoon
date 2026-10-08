@@ -1,7 +1,9 @@
 /**
  * Sets GitHub Actions secrets for the StudyMoon repo via the REST API.
  * Values are encrypted with libsodium (sealed box) as GitHub requires.
- * Run: npx tsx scripts/set-github-secrets.ts
+ * OPS-ONLY TOOL: run `npm i --no-save libsodium-wrappers` before using
+ * (kept out of package.json on purpose; excluded from tsc).
+ * Run: GH_TOKEN=ghp_xxx npx tsx scripts/set-github-secrets.ts
  * Values come from the local .env (never printed).
  */
 import sodium from "libsodium-wrappers";

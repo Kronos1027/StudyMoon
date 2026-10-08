@@ -48,6 +48,7 @@
     "download",
     ".zscripts",
     "playwright-report",
-    "test-results"
+    "test-results",
+    "scripts/set-github-secrets.ts"
   ]
 }
