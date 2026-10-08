@@ -23,8 +23,8 @@ cp .env.example .env.local
 
 1. Acesse [supabase.com](https://supabase.com) → **New project** (plano Free). Guarde a senha do banco.
 2. No projeto, abra **Project Settings → Data API**:
-   - **Project URL** → cole em `SUPABASE_URL`
-   - Aba **API Keys** → **Publishable key** (`sb_publishable_...`) → cole em `SUPABASE_ANON_KEY`
+   - **Project URL** → cole em `NEXT_PUBLIC_SUPABASE_URL`
+   - Aba **API Keys** → **Publishable key** (`sb_publishable_...`) → cole em `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - **Secret key** (`sb_secret_...`) → cole em `SUPABASE_SECRET_KEY`
 3. Em **Project Settings → Database → Connection string → URI**: substitua `[YOUR-PASSWORD]` pela senha real → cole em `DATABASE_URL` (use a *Session pooler*, porta 5432).
 4. **Login com Google (opcional, recomendado):**
@@ -84,8 +84,8 @@ No repositório → **Settings → Secrets and variables → Actions → New rep
 
 | Secret | Valor |
 | --- | --- |
-| `SUPABASE_URL` | URL do projeto |
-| `SUPABASE_ANON_KEY` | publishable key |
+| `NEXT_PUBLIC_SUPABASE_URL` | URL do projeto |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | publishable key |
 | `SUPABASE_SECRET_KEY` | secret key |
 | `DATABASE_URL` | string de conexão (backup semanal) |
 | `CRON_SECRET` | o mesmo do `.env` |
