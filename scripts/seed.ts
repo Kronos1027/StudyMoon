@@ -12,11 +12,6 @@ import {
   questionBatchSchema,
 } from "@/lib/content/schemas";
 
-interface TopicRow {
-  id: string;
-  slug: string;
-}
-
 async function main() {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
