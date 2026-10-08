@@ -51,7 +51,10 @@ export function EssayEditor({
   const contentRef = useRef("");
   const reduced = useReducedMotion();
 
-  contentRef.current = content;
+  // Keep the ref in sync outside render (autosave reads it in callbacks).
+  useEffect(() => {
+    contentRef.current = content;
+  }, [content]);
 
   // Countdown (training mode).
   useEffect(() => {
