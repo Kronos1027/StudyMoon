@@ -10,6 +10,8 @@ interface PushMessage {
   body: string;
 }
 
+type Kind = "reminder" | "escalation" | "streak_risk" | "return";
+
 /** Gentle escalation messages (varied, short — doc section 10). */
 const MESSAGES: Record<Kind, PushMessage[]> = {
   reminder: [
@@ -31,7 +33,6 @@ const MESSAGES: Record<Kind, PushMessage[]> = {
   ],
 };
 
-type Kind = keyof typeof MESSAGES;
 
 const MAX_PER_DAY = 2;
 const QUIET_START = 22; // 22h
