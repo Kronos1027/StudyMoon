@@ -95,6 +95,9 @@ function Carousel({
 
   React.useEffect(() => {
     if (!api) return
+    // Vendored shadcn/ui carousel: one-time sync when embla initializes.
+    // Bounded single re-render per mount — acceptable upstream pattern.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     onSelect(api)
     api.on("reInit", onSelect)
     api.on("select", onSelect)
