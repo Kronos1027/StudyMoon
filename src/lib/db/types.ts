@@ -79,7 +79,7 @@ export interface Topic {
   description: string | null;
   level: number;
   enem_weight: number;
-  matrix_code: string | null;
+  matrix_codes: string[];
   demo_id: string | null;
   sort_order: number;
   created_at: string;

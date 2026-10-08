@@ -66,7 +66,7 @@ create table public.topics (
   description text,
   level smallint not null default 1 check (level between 1 and 3),
   enem_weight numeric(4,2) not null default 1.0,
-  matrix_code text,
+  matrix_codes jsonb not null default '[]'::jsonb,
   demo_id text,
   sort_order int not null default 0,
   created_at timestamptz not null default now()

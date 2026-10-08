@@ -1,0 +1,580 @@
+{
+  "version": 1,
+  "questions": [
+    {
+      "topic_slug": "mt-porcentagem-juros",
+      "difficulty": 1050,
+      "context_md": "Duas lojas vendem o mesmo televisor, cujo preço de tabela é R$ 2.000. A Loja A concede um desconto de 20% e, sobre o valor já descontado, mais 10% para pagamento à vista. A Loja B concede um único desconto de 28% sobre o preço de tabela.",
+      "statement_md": "Comparando os preços finais à vista nas duas lojas, conclui-se que",
+      "alternatives": [
+        { "key": "A", "text": "a Loja A oferece o menor preço: R$ 1.400,00." },
+        { "key": "B", "text": "a Loja B oferece o menor preço: R$ 1.440,00." },
+        { "key": "C", "text": "as duas lojas oferecem o mesmo preço: R$ 1.440,00." },
+        { "key": "D", "text": "a Loja A oferece o menor preço: R$ 1.440,00." },
+        { "key": "E", "text": "as duas lojas oferecem o mesmo preço: R$ 1.460,00." }
+      ],
+      "answer_key": "C",
+      "explanation_md": "**Passo 1 — Loja A (descontos sucessivos):** o primeiro desconto incide sobre o valor de tabela e o segundo, sobre o valor já reduzido.\n\n$$2.000 \\times 0{,}80 = 1.600 \\quad \\text{e} \\quad 1.600 \\times 0{,}90 = 1.440$$\n\n**Passo 2 — Loja B (desconto único):**\n\n$$2.000 \\times 0{,}72 = 1.440$$\n\n**Passo 3 — Comparação:** os preços coincidem em R$ 1.440,00, pois os fatores se multiplicam: $0{,}80 \\times 0{,}90 = 0{,}72$.\n\n**Resposta: C.**",
+      "hints": [
+        "Descontos sucessivos se calculam multiplicando fatores: cada desconto incide sobre o valor JÁ atualizado.",
+        "Calcule separadamente cada loja. Na Loja A: 20% sobre 2.000 e depois 10% sobre o resultado."
+      ],
+      "demo_id": "porcentagem",
+      "source": "Conceito de variações percentuais sucessivas (Matriz ENEM H3)",
+      "origin": "seed",
+      "numeric_check": { "expression": "2000*0.8*0.9 - 2000*0.72", "result": "0" }
+    },
+    {
+      "topic_slug": "mt-porcentagem-juros",
+      "difficulty": 900,
+      "context_md": null,
+      "statement_md": "O preço de um produto passou de R$ 80,00 para R$ 92,00. A variação percentual do preço foi de",
+      "alternatives": [
+        { "key": "A", "text": "12%." },
+        { "key": "B", "text": "13%." },
+        { "key": "C", "text": "15%." },
+        { "key": "D", "text": "18%." },
+        { "key": "E", "text": "20%." }
+      ],
+      "answer_key": "C",
+      "explanation_md": "A variação percentual SEMPRE se calcula sobre o valor inicial.\n\n**Passo 1 — Variação absoluta:** $92 - 80 = 12$.\n\n**Passo 2 — Variação relativa:**\n\n$$\\frac{12}{80} = 0{,}15 = 15\\%$$\n\n**Resposta: C.** O erro clássico é dividir por 92 (o valor novo), o que daria aproximadamente 13%.",
+      "hints": [
+        "Variação percentual = (valor novo − valor antigo) ÷ valor antigo × 100.",
+        "Sobre qual valor o aumento aconteceu? Sobre o preço INICIAL."
+      ],
+      "demo_id": "porcentagem",
+      "source": "Variação percentual (Matriz ENEM H3)",
+      "origin": "seed",
+      "numeric_check": { "expression": "(92-80)/80*100", "result": "15" }
+    },
+    {
+      "topic_slug": "mt-porcentagem-juros",
+      "difficulty": 1100,
+      "context_md": "Um investidor aplica R$ 1.200,00 em um produto de renda fixa que rende juros simples de 3% ao mês.",
+      "statement_md": "Após 5 meses de aplicação, o total de juros recebidos, em reais, será de",
+      "alternatives": [
+        { "key": "A", "text": "R$ 150,00." },
+        { "key": "B", "text": "R$ 180,00." },
+        { "key": "C", "text": "R$ 200,00." },
+        { "key": "D", "text": "R$ 216,00." },
+        { "key": "E", "text": "R$ 240,00." }
+      ],
+      "answer_key": "B",
+      "explanation_md": "No juros simples, a taxa incide sempre sobre o capital inicial.\n\n$$J = C \\cdot i \\cdot t = 1.200 \\times 0{,}03 \\times 5 = 180$$\n\n**Resposta: B.** O montante final seria $M = 1.200 + 180 = 1.380$, mas a pergunta é só pelos juros: R$ 180,00.",
+      "hints": [
+        "Juros simples: J = C · i · t, com i em decimal e t na mesma unidade da taxa.",
+        "Não confunda juros (o rendimento) com montante (capital + juros)."
+      ],
+      "demo_id": "porcentagem",
+      "source": "Juros simples (Matriz ENEM H6)",
+      "origin": "seed",
+      "numeric_check": { "expression": "1200*0.03*5", "result": "180" }
+    },
+    {
+      "topic_slug": "mt-porcentagem-juros",
+      "difficulty": 1250,
+      "context_md": "Dois investidores aplicam R$ 1.000,00 cada um, por 2 anos, à taxa de 20% ao ano. O primeiro escolhe juros simples; o segundo, juros compostos.",
+      "statement_md": "A diferença entre os montantes finais dos dois investimentos, em reais, é",
+      "alternatives": [
+        { "key": "A", "text": "R$ 20,00." },
+        { "key": "B", "text": "R$ 40,00." },
+        { "key": "C", "text": "R$ 44,00." },
+        { "key": "D", "text": "R$ 60,00." },
+        { "key": "E", "text": "R$ 80,00." }
+      ],
+      "answer_key": "B",
+      "explanation_md": "**Passo 1 — Juros simples:**\n\n$$M_1 = 1.000 \\times (1 + 0{,}20 \\times 2) = 1.400$$\n\n**Passo 2 — Juros compostos (juro sobre juro):**\n\n$$M_2 = 1.000 \\times (1 + 0{,}20)^2 = 1.440$$\n\n**Passo 3 — Diferença:** $1.440 - 1.400 = 40$.\n\n**Resposta: B.** No 1º ano os dois rendem 200; no 2º, o composto rende 20% de 1.200 (240) e o simples, 20% de 1.000 (200). A diferença é exatamente o juro sobre juro.",
+      "hints": [
+        "No 1º ano, juros simples e compostos coincidem. A diferença nasce no 2º.",
+        "Simples: M = C(1 + i·n). Compostos: M = C(1 + i)ⁿ."
+      ],
+      "demo_id": "porcentagem",
+      "source": "Juros simples e compostos (Matriz ENEM H6)",
+      "origin": "seed",
+      "numeric_check": { "expression": "1000*1.2^2 - 1000*(1+0.2*2)", "result": "40" }
+    },
+    {
+      "topic_slug": "mt-porcentagem-juros",
+      "difficulty": 1000,
+      "context_md": "Uma escola tem 720 alunos. Pesquisa da coordenação mostrou que 35% deles participam da oficina de robótica.",
+      "statement_md": "O número de alunos que NÃO participam da oficina de robótica é",
+      "alternatives": [
+        { "key": "A", "text": "252." },
+        { "key": "B", "text": "360." },
+        { "key": "C", "text": "414." },
+        { "key": "D", "text": "468." },
+        { "key": "E", "text": "508." }
+      ],
+      "answer_key": "D",
+      "explanation_md": "**Caminho direto (complementar):** se 35% participam, 65% ficam de fora.\n\n$$720 \\times 0{,}65 = 468$$\n\n**Conferência:** quem participa: $720 \\times 0{,}35 = 252$; não participa: $720 - 252 = 468$. ✓\n\n**Resposta: D.** A alternativa A (252) é a pegadinha: é quem PARTICIPA.",
+      "hints": [
+        "Se 35% participam, que porcentagem fica de fora?",
+        "Calcular o complementar (65%) evita responder o contrário do que a questão pede."
+      ],
+      "demo_id": "porcentagem",
+      "source": "Percentual e complementar (Matriz ENEM H3)",
+      "origin": "seed",
+      "numeric_check": { "expression": "720*(1-0.35)", "result": "468" }
+    },
+    {
+      "topic_slug": "mt-porcentagem-juros",
+      "difficulty": 1300,
+      "context_md": null,
+      "statement_md": "Após uma alta de 25%, o preço de um produto passou a ser maior que o original. Para voltar exatamente ao preço original, o desconto necessário sobre o novo preço deve ser de",
+      "alternatives": [
+        { "key": "A", "text": "15%." },
+        { "key": "B", "text": "20%." },
+        { "key": "C", "text": "25%." },
+        { "key": "D", "text": "30%." },
+        { "key": "E", "text": "35%." }
+      ],
+      "answer_key": "B",
+      "explanation_md": "Suponha o preço original R$ 100. Após a alta de 25%: R$ 125.\n\n$$125 \\times (1 - d) = 100 \\Rightarrow 1 - d = \\frac{100}{125} = 0{,}8 \\Rightarrow d = 20\\%$$\n\n**Resposta: B.** Como a base do desconto (125) é MAIOR que a base do aumento (100), o percentual de desconto precisa ser MENOR que 25%. Alta e baixa de mesmo percentual nunca se cancelam.",
+      "hints": [
+        "Use um valor de referência: 100. A alta leva a 125.",
+        "O desconto incide sobre 125, não sobre 100. Que percentual de 125 vale 25?"
+      ],
+      "demo_id": "porcentagem",
+      "source": "Variações sucessivas simétricas (Matriz ENEM H3)",
+      "origin": "seed",
+      "numeric_check": { "expression": "(1 - 100/(100*1.25))*100", "result": "20" }
+    },
+    {
+      "topic_slug": "mt-fracoes-decimais",
+      "difficulty": 950,
+      "context_md": "Um estudante organizou o tempo de estudo nas férias. No primeiro dia, estudou $\\frac{1}{4}$ do tempo planejado para a semana. No dia seguinte, estudou $\\frac{1}{3}$ do tempo que RESTAVA.",
+      "statement_md": "A fração do tempo total planejado que ainda falta estudar é",
+      "alternatives": [
+        { "key": "A", "text": "$\\frac{1}{2}$." },
+        { "key": "B", "text": "$\\frac{5}{12}$." },
+        { "key": "C", "text": "$\\frac{7}{12}$." },
+        { "key": "D", "text": "$\\frac{2}{3}$." },
+        { "key": "E", "text": "$\\frac{3}{4}$." }
+      ],
+      "answer_key": "A",
+      "explanation_md": "**Passo 1 — Resto após o primeiro dia:**\n\n$$1 - \\frac{1}{4} = \\frac{3}{4}$$\n\n**Passo 2 — Segundo dia ($\\frac{1}{3}$ do resto):**\n\n$$\\frac{1}{3} \\times \\frac{3}{4} = \\frac{1}{4}$$\n\n**Passo 3 — O que falta:**\n\n$$\\frac{3}{4} - \\frac{1}{4} = \\frac{1}{2}$$\n\n**Resposta: A.** A pegadinha é somar $\\frac{1}{4} + \\frac{1}{3}$ direto — mas o $\\frac{1}{3}$ incide sobre o que sobrou, não sobre o total.",
+      "hints": [
+        "Trabalhe sempre sobre 'o que resta': primeiro calcule o resto após o dia 1.",
+        "O 'de' em '1/3 do resto' vira multiplicação de frações."
+      ],
+      "demo_id": "fracoes",
+      "source": "Frações e parte do todo (Matriz ENEM H2)",
+      "origin": "seed",
+      "numeric_check": null
+    },
+    {
+      "topic_slug": "mt-fracoes-decimais",
+      "difficulty": 850,
+      "context_md": null,
+      "statement_md": "De um total de 200 livros de uma biblioteca comunitária, $\\frac{2}{5}$ são de literatura e, desses, $\\frac{3}{4}$ estão em bom estado de conservação. O número de livros de literatura em bom estado é",
+      "alternatives": [
+        { "key": "A", "text": "30." },
+        { "key": "B", "text": "40." },
+        { "key": "C", "text": "60." },
+        { "key": "D", "text": "80." },
+        { "key": "E", "text": "120." }
+      ],
+      "answer_key": "C",
+      "explanation_md": "**Passo 1 — Livros de literatura:**\n\n$$200 \\times \\frac{2}{5} = 80$$\n\n**Passo 2 — Desses, em bom estado:**\n\n$$80 \\times \\frac{3}{4} = 60$$\n\n**Resposta: C.** Em uma linha: $200 \\times \\frac{2}{5} \\times \\frac{3}{4} = 60$.",
+      "hints": [
+        "'desses' quer dizer: da quantidade de livros de literatura (não do total).",
+        "Fração de fração é multiplicação: 2/5 × 3/4 de 200."
+      ],
+      "demo_id": "fracoes",
+      "source": "Fração de uma quantidade (Matriz ENEM H2)",
+      "origin": "seed",
+      "numeric_check": { "expression": "200*2/5*3/4", "result": "60" }
+    },
+    {
+      "topic_slug": "mt-razao-proporcao",
+      "difficulty": 1000,
+      "context_md": "Em um mapa, a distância entre duas cidades é de 4,5 cm. A escala do mapa é 1:200.000.",
+      "statement_md": "A distância real entre as duas cidades é de",
+      "alternatives": [
+        { "key": "A", "text": "4,5 km." },
+        { "key": "B", "text": "9 km." },
+        { "key": "C", "text": "18 km." },
+        { "key": "D", "text": "45 km." },
+        { "key": "E", "text": "90 km." }
+      ],
+      "answer_key": "B",
+      "explanation_md": "Escala 1:200.000: 1 cm no mapa = 200.000 cm reais.\n\n**Passo 1 — Distância em cm:** $4{,}5 \\times 200.000 = 900.000$ cm.\n\n**Passo 2 — Converter para km** (1 km = 100.000 cm): $\\frac{900.000}{100.000} = 9$ km.\n\n**Resposta: B.** Sempre converta as unidades no final — responder em cm ou metros é o erro clássico.",
+      "hints": [
+        "Escala 1:200.000: cada centímetro do mapa vale 200.000 cm reais.",
+        "Quantos centímetros tem 1 km? 100.000. Use isso para converter."
+      ],
+      "demo_id": "razao-proporcao",
+      "source": "Escalas e proporção (Matriz ENEM H3)",
+      "origin": "seed",
+      "numeric_check": { "expression": "4.5*200000/100000", "result": "9" }
+    },
+    {
+      "topic_slug": "mt-razao-proporcao",
+      "difficulty": 1100,
+      "context_md": "Uma obra de manutenção escolar, com 6 operários, levaria 20 dias. A administração contratou mais 2 operários (8 no total), mantendo o mesmo ritmo de trabalho.",
+      "statement_md": "Com 8 operários trabalhando no mesmo ritmo, a obra ficará pronta em",
+      "alternatives": [
+        { "key": "A", "text": "12 dias." },
+        { "key": "B", "text": "15 dias." },
+        { "key": "C", "text": "16 dias." },
+        { "key": "D", "text": "18 dias." },
+        { "key": "E", "text": "25 dias." }
+      ],
+      "answer_key": "B",
+      "explanation_md": "Grandezas **inversamente proporcionais**: mais operários, menos dias. O produto se mantém:\n\n$$6 \\times 20 = 8 \\times d \\Rightarrow d = \\frac{120}{8} = 15$$\n\n**Resposta: B.** A obra dá 120 'dias-operário'; com 8 pessoas, cada uma trabalha 15 dias.",
+      "hints": [
+        "Mais gente para a MESMA tarefa: proporcionalidade direta ou inversa?",
+        "Em proporção inversa, o produto (operários × dias) é constante."
+      ],
+      "demo_id": "razao-proporcao",
+      "source": "Regra de três inversa (Matriz ENEM H3)",
+      "origin": "seed",
+      "numeric_check": { "expression": "6*20/8", "result": "15" }
+    },
+    {
+      "topic_slug": "mt-razao-proporcao",
+      "difficulty": 1150,
+      "context_md": "Um carro faz 12 km por litro de gasolina, que custa R$ 6,00 por litro. Uma família planeja uma viagem de 360 km.",
+      "statement_md": "O gasto estimado apenas com gasolina para a viagem será de",
+      "alternatives": [
+        { "key": "A", "text": "R$ 150,00." },
+        { "key": "B", "text": "R$ 160,00." },
+        { "key": "C", "text": "R$ 180,00." },
+        { "key": "D", "text": "R$ 200,00." },
+        { "key": "E", "text": "R$ 216,00." }
+      ],
+      "answer_key": "C",
+      "explanation_md": "**Passo 1 — Litros necessários:**\n\n$$\\frac{360\\ \\text{km}}{12\\ \\text{km/L}} = 30\\ \\text{L}$$\n\n**Passo 2 — Custo:** $30 \\times 6 = 180$.\n\n**Resposta: C.** Cuidado com as unidades: dividir km por km/L dá litros.",
+      "hints": [
+        "Primeiro ache os litros: distância ÷ consumo.",
+        "km ÷ (km/L) = L; depois L × R$/L = R$."
+      ],
+      "demo_id": "razao-proporcao",
+      "source": "Proporcionalidade em consumo (Matriz ENEM H3)",
+      "origin": "seed",
+      "numeric_check": { "expression": "360/12*6", "result": "180" }
+    },
+    {
+      "topic_slug": "mt-funcoes",
+      "difficulty": 1050,
+      "context_md": "O valor $C$ de uma corrida de aplicativo é dado por $C = 8 + 1{,}5x$, em que R$ 8,00 é a taxa fixa, R$ 1,50 é o preço por quilômetro e $x$ é a distância em quilômetros.",
+      "statement_md": "Se uma corrida custou R$ 35,00, a distância percorrida foi de",
+      "alternatives": [
+        { "key": "A", "text": "15 km." },
+        { "key": "B", "text": "16 km." },
+        { "key": "C", "text": "18 km." },
+        { "key": "D", "text": "20 km." },
+        { "key": "E", "text": "22 km." }
+      ],
+      "answer_key": "C",
+      "explanation_md": "**Passo 1 — Equação:** $8 + 1{,}5x = 35$.\n\n**Passo 2 — Isolar $x$:**\n\n$$1{,}5x = 27 \\Rightarrow x = 18$$\n\n**Resposta: C.** Dos R$ 35, tirando a taxa fixa (R$ 8), sobram R$ 27 só de quilometragem; a R$ 1,50/km, isso dá 18 km.",
+      "hints": [
+        "Substitua o valor pago na fórmula e isole o x.",
+        "Primeiro tire a taxa fixa (R$ 8) do total."
+      ],
+      "demo_id": "funcoes",
+      "source": "Função afim e modelagem (Matriz ENEM H7)",
+      "origin": "seed",
+      "numeric_check": { "expression": "(35-8)/1.5", "result": "18" }
+    },
+    {
+      "topic_slug": "mt-funcoes",
+      "difficulty": 1300,
+      "context_md": "O lucro mensal $L$ (em reais) de uma barraquinha de açaí em função do número $x$ de centenas de copos vendidos é modelado por $L(x) = -x^2 + 60x - 500$.",
+      "statement_md": "O lucro máximo que a barraquinha pode alcançar é de",
+      "alternatives": [
+        { "key": "A", "text": "R$ 300,00." },
+        { "key": "B", "text": "R$ 350,00." },
+        { "key": "C", "text": "R$ 400,00." },
+        { "key": "D", "text": "R$ 450,00." },
+        { "key": "E", "text": "R$ 500,00." }
+      ],
+      "answer_key": "C",
+      "explanation_md": "Parábola com $a = -1 < 0$: o **vértice é o máximo**.\n\n$$x_v = \\frac{-b}{2a} = \\frac{-60}{-2} = 30$$\n\n$$L(30) = -900 + 1.800 - 500 = 400$$\n\n**Resposta: C.** Vender 30 centenas de copos maximiza o lucro em R$ 400.",
+      "hints": [
+        "Lucro máximo em quadrática com a < 0 = valor da função no vértice.",
+        "x_v = −b/2a; depois calcule L(x_v)."
+      ],
+      "demo_id": "funcoes",
+      "source": "Função quadrática e otimização (Matriz ENEM H7)",
+      "origin": "seed",
+      "numeric_check": { "expression": "-(30^2) + 60*30 - 500", "result": "400" }
+    },
+    {
+      "topic_slug": "mt-funcoes",
+      "difficulty": 1200,
+      "context_md": "Uma cultura de bactérias dobra de tamanho a cada 2 horas, a partir de 500 indivíduos: $P(t) = 500 \\cdot 2^{t/2}$, com $t$ em horas.",
+      "statement_md": "Após 6 horas, a população dessa cultura será de",
+      "alternatives": [
+        { "key": "A", "text": "1.500 bactérias." },
+        { "key": "B", "text": "2.000 bactérias." },
+        { "key": "C", "text": "3.000 bactérias." },
+        { "key": "D", "text": "4.000 bactérias." },
+        { "key": "E", "text": "8.000 bactérias." }
+      ],
+      "answer_key": "D",
+      "explanation_md": "**Passo 1 — Substituir $t = 6$:**\n\n$$P(6) = 500 \\cdot 2^{3} = 500 \\times 8 = 4.000$$\n\n**Passo 2 — Interpretar:** em 6 horas ocorrem **3 duplicações**: $500 \\to 1.000 \\to 2.000 \\to 4.000$.\n\n**Resposta: D.** A alternativa E cai na pegadinha de contar 4 duplicações (expoente 4 em vez de 3).",
+      "hints": [
+        "Em 6 horas, quantas vezes a população dobrou?",
+        "2^(t/2) com t = 6: o expoente é 3, não 6."
+      ],
+      "demo_id": "funcoes",
+      "source": "Crescimento exponencial (Matriz ENEM H7)",
+      "origin": "seed",
+      "numeric_check": { "expression": "500*2^(6/2)", "result": "4000" }
+    },
+    {
+      "topic_slug": "mt-estatistica",
+      "difficulty": 1100,
+      "context_md": "Os salários mensais dos 5 funcionários de uma pequena empresa são: R$ 1.000, R$ 1.000, R$ 1.200, R$ 1.500 e R$ 15.000 (o dono).",
+      "statement_md": "Para descrever o salário típico dos funcionários, o valor mais representativo é",
+      "alternatives": [
+        { "key": "A", "text": "a média aritmética, pois considera todos os valores." },
+        { "key": "B", "text": "a mediana, pois a média é distorcida pelo valor extremo do dono." },
+        { "key": "C", "text": "a moda, pois R$ 1.000 aparece duas vezes." },
+        { "key": "D", "text": "a média e a mediana, pois coincidem neste caso." },
+        { "key": "E", "text": "nenhuma medida serve, pois os dados são poucos." }
+      ],
+      "answer_key": "B",
+      "explanation_md": "**Média:** $\\frac{19.700}{5} = 3.940$ — maior que 4 dos 5 salários.\n**Mediana** (valor central): R$ 1.200.\n\nA média é distorcida pelo salário extremo do dono; nenhum funcionário ganha perto de R$ 3.940. A mediana retrata o salário típico.\n\n**Resposta: B.** Por isso pesquisas de renda do IBGE usam a mediana.",
+      "hints": [
+        "Calcule a média e a mediana e compare-as com os salários reais.",
+        "Um único valor muito alto 'puxa' qual medida para cima?"
+      ],
+      "demo_id": "estatistica",
+      "source": "Média, mediana e representatividade (Matriz ENEM H16)",
+      "origin": "seed",
+      "numeric_check": null
+    },
+    {
+      "topic_slug": "mt-estatistica",
+      "difficulty": 950,
+      "context_md": "As vendas diárias de uma lanchonete passaram de 80 lanches, em janeiro, para 120 lanches, em fevereiro.",
+      "statement_md": "O crescimento percentual das vendas diárias de janeiro para fevereiro foi de",
+      "alternatives": [
+        { "key": "A", "text": "30%." },
+        { "key": "B", "text": "40%." },
+        { "key": "C", "text": "50%." },
+        { "key": "D", "text": "66%." },
+        { "key": "E", "text": "80%." }
+      ],
+      "answer_key": "C",
+      "explanation_md": "Variação percentual sobre o valor INICIAL:\n\n$$\\frac{120 - 80}{80} = \\frac{40}{80} = 50\\%$$\n\n**Resposta: C.** A alternativa D é a divisão invertida (80/120).",
+      "hints": [
+        "Percentual de crescimento = aumento ÷ valor inicial.",
+        "Sobre qual mês o aumento aconteceu?"
+      ],
+      "demo_id": "estatistica",
+      "source": "Variação percentual em dados (Matriz ENEM H16)",
+      "origin": "seed",
+      "numeric_check": { "expression": "(120-80)/80*100", "result": "50" }
+    },
+    {
+      "topic_slug": "mt-estatistica",
+      "difficulty": 1200,
+      "context_md": "Os empréstimos mensais de uma biblioteca foram: janeiro 40, fevereiro 60, março 50 e abril 70 livros.",
+      "statement_md": "A média mensal de empréstimos nesse período foi de",
+      "alternatives": [
+        { "key": "A", "text": "50." },
+        { "key": "B", "text": "53." },
+        { "key": "C", "text": "55." },
+        { "key": "D", "text": "57." },
+        { "key": "E", "text": "60." }
+      ],
+      "answer_key": "C",
+      "explanation_md": "**Soma:** $40 + 60 + 50 + 70 = 220$.\n\n**Média:** $\\frac{220}{4} = 55$.\n\n**Resposta: C.** Confira por compensação: 40 está 15 abaixo de 55, 60 está 5 acima, 50 está 5 abaixo e 70 está 15 acima — as diferenças se cancelam. ✓",
+      "hints": [
+        "Média = soma dos valores ÷ quantidade de valores.",
+        "Some os quatro meses e divida por 4."
+      ],
+      "demo_id": "estatistica",
+      "source": "Média aritmética simples (Matriz ENEM H16)",
+      "origin": "seed",
+      "numeric_check": { "expression": "(40+60+50+70)/4", "result": "55" }
+    },
+    {
+      "topic_slug": "mt-probabilidade",
+      "difficulty": 900,
+      "context_md": "Em uma urna há 4 bolas vermelhas, 3 azuis e 5 brancas, indistinguíveis ao tato. Retira-se uma bola ao acaso.",
+      "statement_md": "A probabilidade de a bola retirada ser vermelha é",
+      "alternatives": [
+        { "key": "A", "text": "$\\frac{1}{3}$." },
+        { "key": "B", "text": "$\\frac{1}{4}$." },
+        { "key": "C", "text": "$\\frac{5}{12}$." },
+        { "key": "D", "text": "$\\frac{1}{2}$." },
+        { "key": "E", "text": "$\\frac{7}{12}$." }
+      ],
+      "answer_key": "A",
+      "explanation_md": "**Total:** $4 + 3 + 5 = 12$ bolas.\n\n$$P(\\text{vermelha}) = \\frac{4}{12} = \\frac{1}{3}$$\n\n**Resposta: A.** Simplifique a fração antes de comparar as alternativas.",
+      "hints": [
+        "P = favoráveis ÷ possíveis. Conte o total de bolas primeiro.",
+        "Simplifique a fração antes de comparar com as alternativas."
+      ],
+      "demo_id": "probabilidade",
+      "source": "Probabilidade clássica (Matriz ENEM H14)",
+      "origin": "seed",
+      "numeric_check": null
+    },
+    {
+      "topic_slug": "mt-probabilidade",
+      "difficulty": 1250,
+      "context_md": "Dois dados honestos de seis faces são lançados simultaneamente.",
+      "statement_md": "A probabilidade de a soma dos pontos ser igual a 7 é",
+      "alternatives": [
+        { "key": "A", "text": "$\\frac{1}{12}$." },
+        { "key": "B", "text": "$\\frac{1}{9}$." },
+        { "key": "C", "text": "$\\frac{1}{6}$." },
+        { "key": "D", "text": "$\\frac{5}{36}$." },
+        { "key": "E", "text": "$\\frac{7}{36}$." }
+      ],
+      "answer_key": "C",
+      "explanation_md": "**Espaço amostral:** $6 \\times 6 = 36$ pares.\n\n**Pares com soma 7:** (1,6), (2,5), (3,4), (4,3), (5,2), (6,1) — 6 pares (a soma mais frequente).\n\n$$P = \\frac{6}{36} = \\frac{1}{6}$$\n\n**Resposta: C.**",
+      "hints": [
+        "Liste os pares que somam 7: comece por (1,6).",
+        "São 36 resultados possíveis no total (6 × 6)."
+      ],
+      "demo_id": "probabilidade",
+      "source": "Probabilidade com dois dados (Matriz ENEM H14)",
+      "origin": "seed",
+      "numeric_check": null
+    },
+    {
+      "topic_slug": "mt-probabilidade",
+      "difficulty": 1300,
+      "context_md": null,
+      "statement_md": "Uma moeda honesta é lançada 3 vezes seguidas. A probabilidade de aparecer PELO MENOS UMA cara é",
+      "alternatives": [
+        { "key": "A", "text": "$\\frac{1}{8}$." },
+        { "key": "B", "text": "$\\frac{1}{2}$." },
+        { "key": "C", "text": "$\\frac{3}{8}$." },
+        { "key": "D", "text": "$\\frac{7}{8}$." },
+        { "key": "E", "text": "$\\frac{3}{4}$." }
+      ],
+      "answer_key": "D",
+      "explanation_md": "Estratégia do **complementar**: 'pelo menos uma cara' é o oposto de 'nenhuma cara' (três coroas).\n\n$$P(\\text{CCC}) = \\frac{1}{2} \\times \\frac{1}{2} \\times \\frac{1}{2} = \\frac{1}{8}$$\n\n$$P(\\text{pelo menos 1 cara}) = 1 - \\frac{1}{8} = \\frac{7}{8}$$\n\n**Resposta: D.** Contar os 7 casos com cara também funciona, mas o complementar é mais rápido e mais seguro.",
+      "hints": [
+        "'Pelo menos um' quase sempre se resolve pelo complementar: 1 − P(nenhum).",
+        "Qual a chance de dar coroa nas TRÊS lançamentos?"
+      ],
+      "demo_id": "probabilidade",
+      "source": "Probabilidade do complementar (Matriz ENEM H15)",
+      "origin": "seed",
+      "numeric_check": null
+    },
+    {
+      "topic_slug": "mt-geometria-plana",
+      "difficulty": 950,
+      "context_md": "Um terreno retangular mede 20 m de frente por 30 m de fundo. O metro quadrado na região custa R$ 150,00.",
+      "statement_md": "O valor total do terreno é de",
+      "alternatives": [
+        { "key": "A", "text": "R$ 6.000,00." },
+        { "key": "B", "text": "R$ 9.000,00." },
+        { "key": "C", "text": "R$ 45.000,00." },
+        { "key": "D", "text": "R$ 90.000,00." },
+        { "key": "E", "text": "R$ 180.000,00." }
+      ],
+      "answer_key": "D",
+      "explanation_md": "**Área:** $A = 20 \\times 30 = 600$ m².\n\n**Valor:** $600 \\times 150 = 90.000$.\n\n**Resposta: D.** A alternativa B vem do erro de usar o perímetro (100 m) em vez da área — preço por m² multiplica a ÁREA.",
+      "hints": [
+        "Preço por m² multiplica a ÁREA, não o perímetro.",
+        "Área do retângulo = base × altura."
+      ],
+      "demo_id": "geometria",
+      "source": "Área de retângulo (Matriz ENEM H10)",
+      "origin": "seed",
+      "numeric_check": { "expression": "20*30*150", "result": "90000" }
+    },
+    {
+      "topic_slug": "mt-geometria-plana",
+      "difficulty": 1050,
+      "context_md": "Uma escada de 5 m está apoiada em uma parede vertical, com a base a 3 m da parede.",
+      "statement_md": "A altura em que a escada toca a parede é de",
+      "alternatives": [
+        { "key": "A", "text": "2 m." },
+        { "key": "B", "text": "3 m." },
+        { "key": "C", "text": "4 m." },
+        { "key": "D", "text": "4,5 m." },
+        { "key": "E", "text": "$\\sqrt{34}$ m." }
+      ],
+      "answer_key": "C",
+      "explanation_md": "Triângulo retângulo: escada = hipotenusa (5), base = cateto (3).\n\n$$5^2 = 3^2 + h^2 \\Rightarrow 25 = 9 + h^2 \\Rightarrow h^2 = 16 \\Rightarrow h = 4$$\n\n**Resposta: C.** É o tern pitagórico clássico (3, 4, 5).",
+      "hints": [
+        "A escada é sempre a hipotenusa do triângulo.",
+        "5² = 3² + h². Que número ao quadrado dá 16?"
+      ],
+      "demo_id": "geometria",
+      "source": "Teorema de Pitágoras (Matriz ENEM H10)",
+      "origin": "seed",
+      "numeric_check": { "expression": "sqrt(5^2 - 3^2)", "result": "4" }
+    },
+    {
+      "topic_slug": "mt-combinatoria",
+      "difficulty": 1200,
+      "context_md": "Uma empresa cria senhas com 2 letras distintas do alfabeto (26 letras) seguidas de 2 dígitos distintos (0 a 9). A ordem importa.",
+      "statement_md": "O total de senhas diferentes possíveis é",
+      "alternatives": [
+        { "key": "A", "text": "5.850." },
+        { "key": "B", "text": "6.500." },
+        { "key": "C", "text": "6.760." },
+        { "key": "D", "text": "58.500." },
+        { "key": "E", "text": "67.600." }
+      ],
+      "answer_key": "D",
+      "explanation_md": "**Letras distintas (ordem importa):** $26 \\times 25 = 650$.\n\n**Dígitos distintos:** $10 \\times 9 = 90$.\n\n**Princípio multiplicativo:**\n\n$$650 \\times 90 = 58.500$$\n\n**Resposta: D.** A alternativa E é a pegadinha com repetição ($26^2 \\times 10^2$).",
+      "hints": [
+        "Sem repetição e com ordem: multiplique as opções decrescentes (26×25 e 10×9).",
+        "Depois combine as duas partes multiplicando."
+      ],
+      "demo_id": "probabilidade",
+      "source": "Princípio multiplicativo e arranjos (Matriz ENEM H9)",
+      "origin": "seed",
+      "numeric_check": { "expression": "26*25*10*9", "result": "58500" }
+    },
+    {
+      "topic_slug": "mt-trigonometria",
+      "difficulty": 1100,
+      "context_md": "Um poste vertical projeta uma sombra de 10 m quando o Sol forma 45° com o solo.",
+      "statement_md": "A altura do poste é de",
+      "alternatives": [
+        { "key": "A", "text": "5 m." },
+        { "key": "B", "text": "$5\\sqrt{2}$ m." },
+        { "key": "C", "text": "10 m." },
+        { "key": "D", "text": "$10\\sqrt{2}$ m." },
+        { "key": "E", "text": "$10\\sqrt{3}$ m." }
+      ],
+      "answer_key": "C",
+      "explanation_md": "$$\\tan 45° = \\frac{h}{10} \\Rightarrow 1 = \\frac{h}{10} \\Rightarrow h = 10\\ \\text{m}$$\n\n**Resposta: C.** Todo triângulo retângulo com ângulo de 45° é isósceles: os catetos (altura e sombra) são iguais.",
+      "hints": [
+        "45° é o ângulo do triângulo isósceles: os catetos são iguais.",
+        "tan(45°) = 1; altura = sombra × tan(45°)."
+      ],
+      "demo_id": null,
+      "source": "Trigonometria no triângulo retângulo (Matriz ENEM H13)",
+      "origin": "seed",
+      "numeric_check": null
+    },
+    {
+      "topic_slug": "mt-sequencias",
+      "difficulty": 1050,
+      "context_md": "Um teatro tem poltronas em fileiras. A primeira fileira tem 20 poltronas e cada fileira seguinte tem 3 a mais que a anterior (PA). São 15 fileiras.",
+      "statement_md": "O número total de poltronas do teatro é",
+      "alternatives": [
+        { "key": "A", "text": "540." },
+        { "key": "B", "text": "580." },
+        { "key": "C", "text": "615." },
+        { "key": "D", "text": "620." },
+        { "key": "E", "text": "645." }
+      ],
+      "answer_key": "C",
+      "explanation_md": "**Passo 1 — Última fileira:**\n\n$$a_{15} = 20 + (15 - 1) \\times 3 = 62$$\n\n**Passo 2 — Soma:**\n\n$$S_{15} = \\frac{(20 + 62) \\times 15}{2} = \\frac{82 \\times 15}{2} = 615$$\n\n**Resposta: C.** '(primeira + última) × quantidade ÷ 2' — a soma de Gauss.",
+      "hints": [
+        "Ache a última fileira: a_n = a_1 + (n−1)·r.",
+        "Some tudo: (primeira + última) × quantidade ÷ 2."
+      ],
+      "demo_id": null,
+      "source": "PA: termo geral e soma (Matriz ENEM H7)",
+      "origin": "seed",
+      "numeric_check": { "expression": "(20 + (20+14*3))*15/2", "result": "615" }
+    }
+  ]
+}

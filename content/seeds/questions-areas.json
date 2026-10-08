@@ -1,0 +1,235 @@
+{
+  "version": 1,
+  "questions": [
+    {
+      "topic_slug": "cn-genetica",
+      "difficulty": 1150,
+      "context_md": "Em uma espécie de planta, a cor vermelha das flores (V) é dominante sobre a cor branca (v). Uma planta heterozigota foi cruzada com outra heterozigota.",
+      "statement_md": "A proporção esperada de plantas com flores BRANCAS na descendência é de",
+      "alternatives": [
+        { "key": "A", "text": "100%." },
+        { "key": "B", "text": "75%." },
+        { "key": "C", "text": "50%." },
+        { "key": "D", "text": "25%." },
+        { "key": "E", "text": "0%." }
+      ],
+      "answer_key": "D",
+      "explanation_md": "Cruzamento **Vv × Vv**. Organizando o quadro de Punnett:\n\n|  | V | v |\n| --- | --- | --- |\n| **V** | VV | Vv |\n| **v** | Vv | vv |\n\nGenótipos: 1 VV : 2 Vv : 1 vv. Como V é dominante, VV e Vv são vermelhas; apenas **vv** é branca.\n\n$$P(\\text{branca}) = \\frac{1}{4} = 25\\%$$\n\n**Resposta: D.** No fenótipo, a proporção clássica de Mendel é 3 vermelhas : 1 branca.",
+      "hints": [
+        "Monte o quadro de Punnett para Vv × Vv.",
+        "Qual genótipo produz flores brancas, sendo V dominante?"
+      ],
+      "demo_id": "biologia",
+      "source": "Leis de Mendel e quadro de Punnett (Matriz ENEM H28)",
+      "origin": "seed",
+      "numeric_check": null
+    },
+    {
+      "topic_slug": "cn-genetica",
+      "difficulty": 1300,
+      "context_md": "Na espécie humana, os grupos sanguíneos do sistema ABO são determinados por alelos múltiplos: Iᴬ e Iᴮ são codominantes entre si e dominantes sobre i. Um homem de grupo A (genótipo Iᴬi) tem filhos com uma mulher de grupo B (genótipo Iᴮi).",
+      "statement_md": "A probabilidade de um filho desse casal ser do grupo O é de",
+      "alternatives": [
+        { "key": "A", "text": "0%." },
+        { "key": "B", "text": "25%." },
+        { "key": "C", "text": "50%." },
+        { "key": "D", "text": "75%." },
+        { "key": "E", "text": "100%." }
+      ],
+      "answer_key": "B",
+      "explanation_md": "Cruzamento **Iᴬi × Iᴮi**:\n\n|  | Iᴬ | i |\n| --- | --- | --- |\n| **Iᴮ** | IᴬIᴮ (AB) | Iᴮi (B) |\n| **i** | Iᴬi (A) | ii (O) |\n\nCada combinação tem chance de 1/4. Apenas o genótipo **ii** dá grupo O.\n\n$$P(\\text{O}) = \\frac{1}{4} = 25\\%$$\n\n**Resposta: B.** Esse casal pode gerar os quatro grupos: A, B, AB e O — cada um com 25%.",
+      "hints": [
+        "Monte o Punnett com os gametas: Iᴬ/i do pai e Iᴮ/i da mãe.",
+        "Grupo O é homozigoto recessivo (ii)."
+      ],
+      "demo_id": "biologia",
+      "source": "Sistema ABO e alelos múltiplos (Matriz ENEM H28)",
+      "origin": "seed",
+      "numeric_check": null
+    },
+    {
+      "topic_slug": "cn-estequiometria",
+      "difficulty": 1250,
+      "context_md": "A síntese da água é representada pela equação balanceada $2H_2 + O_2 \\rightarrow 2H_2O$. Considere as massas molares: H₂ = 2 g/mol e H₂O = 18 g/mol.",
+      "statement_md": "A massa de água produzida na reação completa de 8 g de hidrogênio (H₂), com oxigênio em excesso, é de",
+      "alternatives": [
+        { "key": "A", "text": "36 g." },
+        { "key": "B", "text": "48 g." },
+        { "key": "C", "text": "72 g." },
+        { "key": "D", "text": "80 g." },
+        { "key": "E", "text": "90 g." }
+      ],
+      "answer_key": "C",
+      "explanation_md": "**Passo 1 — Converter o dado em mol:**\n\n$$n(H_2) = \\frac{8\\ \\text{g}}{2\\ \\text{g/mol}} = 4\\ \\text{mol}$$\n\n**Passo 2 — Proporção estequiométrica:** os coeficientes 2 (H₂) e 2 (H₂O) dam proporção 1 : 1, logo formam-se 4 mol de água.\n\n**Passo 3 — Voltar para gramas:**\n\n$$m = 4 \\times 18 = 72\\ \\text{g}$$\n\n**Resposta: C.**",
+      "hints": [
+        "Comece convertendo gramas em mol (n = m/M).",
+        "A proporção entre H₂ e H₂O é 2:2, ou seja, 1:1."
+      ],
+      "demo_id": "balanceamento",
+      "source": "Cálculos estequiométricos (Matriz ENEM H15)",
+      "origin": "seed",
+      "numeric_check": { "expression": "(8/2)*18", "result": "72" }
+    },
+    {
+      "topic_slug": "cn-eletricidade",
+      "difficulty": 1200,
+      "context_md": "Um chuveiro elétrico de potência 5.500 W é usado 30 minutos por dia. A tarifa de energia é R$ 0,80 por quilowatt-hora (kWh).",
+      "statement_md": "O custo mensal (30 dias) aproximado para operar esse chuveiro é de",
+      "alternatives": [
+        { "key": "A", "text": "R$ 44,00." },
+        { "key": "B", "text": "R$ 55,00." },
+        { "key": "C", "text": "R$ 66,00." },
+        { "key": "D", "text": "R$ 132,00." },
+        { "key": "E", "text": "R$ 220,00." }
+      ],
+      "answer_key": "C",
+      "explanation_md": "**Passo 1 — Energia diária:** potência em kW (5,5 kW) × horas (0,5 h):\n\n$$E_{dia} = 5{,}5 \\times 0{,}5 = 2{,}75\\ \\text{kWh}$$\n\n**Passo 2 — Energia mensal:**\n\n$$E_{mes} = 2{,}75 \\times 30 = 82{,}5\\ \\text{kWh}$$\n\n**Passo 3 — Custo:**\n\n$$82{,}5 \\times 0{,}80 = 66$$\n\n**Resposta: C.** A conta de luz mede kWh: potência (kW) × tempo (h).",
+      "hints": [
+        "Converta a potência para kW (5.500 W = 5,5 kW) e o tempo para horas.",
+        "Custo = kWh do mês × tarifa."
+      ],
+      "demo_id": null,
+      "source": "Potência e consumo elétrico (Matriz ENEM H10)",
+      "origin": "seed",
+      "numeric_check": { "expression": "5.5*0.5*30*0.8", "result": "66" }
+    },
+    {
+      "topic_slug": "cn-ecologia",
+      "difficulty": 1050,
+      "context_md": "Em um lago, esgoto rico em detergentes (fosfatos) foi despejado. Isso provocou uma explosão de algas na superfície e, semanas depois, uma mortandade de peixes.",
+      "statement_md": "O fenômeno descrito e sua principal consequência para os peixes são, respectivamente,",
+      "alternatives": [
+        { "key": "A", "text": "bioacumulação e intoxicação direta por detergentes." },
+        { "key": "B", "text": "eutrofização e queda do oxigênio dissolvido na água." },
+        { "key": "C", "text": "acidificação e corrosão das brânquias dos peixes." },
+        { "key": "D", "text": "bioremediação e aumento do oxigênio pela fotossíntese." },
+        { "key": "E", "text": "salinização e desidratação das células dos peixes." }
+      ],
+      "answer_key": "B",
+      "explanation_md": "O excesso de **fósforo e nitrogênio** (eutrofização) faz as algas se multiplicarem na superfície. Quando essas algas morrem, sua decomposição por bactérias aeróbias **consome o oxigênio** dissolvido — os peixes, que respiram esse oxigênio, morrem por asfixia.\n\n**Resposta: B.**\n\n- A (bioacumulação) é acúmulo ao longo da cadeia de substâncias tóxicas — outro fenômeno.\n- D é o contrário: bioremediação é USO de organismos para LIMPAR o ambiente.",
+      "hints": [
+        "O que acontece com as algas quando morrem? Quem as decompõe e o que isso consome?",
+        "Fosfato em excesso → floração de algas → nome do processo?"
+      ],
+      "demo_id": "biologia",
+      "source": "Eutrofização e ciclos de matéria (Matriz ENEM H29)",
+      "origin": "seed",
+      "numeric_check": null
+    },
+    {
+      "topic_slug": "ch-meio-ambiente",
+      "difficulty": 1100,
+      "context_md": "O gráfico de emissões globais de gases de efeito estufa mostra que a queima de combustíveis fósseis responde pela maior parte das emissões antrópicas de CO₂, seguida de mudanças no uso da terra (como desmatamento).",
+      "statement_md": "A ação humana que mais diretamente reduziria as emissões de CO₂ ligadas aos dois fatores citados é",
+      "alternatives": [
+        { "key": "A", "text": "ampliar a coleta seletiva de lixo nas grandes cidades." },
+        { "key": "B", "text": "substituir fontes fósseis por matrizes renováveis e combater o desmatamento." },
+        { "key": "C", "text": "aumentar a reciclagem de embalagens plásticas descartáveis." },
+        { "key": "D", "text": "substituir sacolas plásticas por sacolas de papel nas vendas." },
+        { "key": "E", "text": "proibir o uso de aerossóis com CFCs em todo o planeta." }
+      ],
+      "answer_key": "B",
+      "explanation_md": "O texto aponta DOIS vetores: **queima de combustíveis fósseis** e **mudança no uso da terra (desmatamento)**. A única alternativa que ataca os dois ao mesmo tempo é a transição energética para fontes renováveis + políticas de combate ao desmatamento (e reflorestamento).\n\n**Resposta: B.**\n\n- Reciclagem e sacolas (A, C, D) reduzem resíduos, mas o impacto nas emissões globais de CO₂ é marginal diante de fósseis e florestas.\n- CFCs (E) ligam-se à camada de ozônio, outro problema ambiental — o Protocolo de Montreal já os controla.",
+      "hints": [
+        "Quais são os DOIS fatores citados no texto? A resposta deve atacar os dois.",
+        "Combustíveis fósseis respondem por qual troca? E desmatamento, por qual política?"
+      ],
+      "demo_id": "mapas",
+      "source": "Mudanças climáticas e matriz energética (Matriz ENEM CH H19-H21, interárea CN)",
+      "origin": "seed",
+      "numeric_check": null
+    },
+    {
+      "topic_slug": "ch-brasil-republica",
+      "difficulty": 1150,
+      "context_md": "Durante o Estado Novo (1937-1945), o governo Vargas criou o Departamento de Imprensa e Propaganda (DIP), que censurava jornais, produzia noticiários e filmes exaltando o governo, além de difundir a imagem do trabalhador brasileiro como símbolo nacional. No mesmo período, foi promulgada a Consolidação das Leis do Trabalho (CLT, 1943).",
+      "statement_md": "O conjunto de medidas do período descrito evidencia",
+      "alternatives": [
+        { "key": "A", "text": "a promoção de eleições diretas e a ampliação do debate público." },
+        { "key": "B", "text": "um projeto de poder que combinava controle da opinião com concessões trabalhistas." },
+        { "key": "C", "text": "a extinção dos direitos trabalhistas conquistados antes de 1930." },
+        { "key": "D", "text": "a adesão integral às políticas econômicas liberais clássicas." },
+        { "key": "E", "text": "a separação completa entre Estado e meios de comunicação." }
+      ],
+      "answer_key": "B",
+      "explanation_md": "O Estado Novo é o exemplo clássico de **populismo autoritário**: por um lado, censura (DIP) e propaganda construíam consenso e silenciavam oposição; por outro, a CLT e o salário mínimo consolidavam direitos que garantiam lealdade das massas trabalhadoras às figuras de Vargas e do 'trabalhador nacional'.\n\n**Resposta: B.** Controle da opinião + concessões trabalhistas = as duas faces do mesmo projeto de poder.\n\n- A é o oposto do período (havia censura, não eleições); C contraria o texto (a CLT CONSOLIDA direitos); D e E negam o papel central do Estado naquele momento.",
+      "hints": [
+        "Repare que o texto traz duas ações aparentemente contraditórias: censura E direitos. Que conceito explica essa combinação?",
+        "Estado Novo: autoritarismo + trabalhismo."
+      ],
+      "demo_id": "linha-tempo",
+      "source": "Era Vargas: Estado Novo, DIP e CLT (Matriz ENEM CH H5-H6)",
+      "origin": "seed",
+      "numeric_check": null
+    },
+    {
+      "topic_slug": "lc-interpretacao",
+      "difficulty": 1050,
+      "context_md": "Leia o trecho de uma crônica publicada em jornal:\n\n*\"A cidade acordou mais cedo hoje. Não por escolha: o engarrafamento começou antes do sol. Nas calçadas, pessoas atravessam olhando o pequeno retângulo luminoso nas mãos, como se nele estivesse o mapa do próprio dia. O jornaleiro, esse sim, olha para todos — e sorri, porque sabe que quase ninguém o vê.\"*",
+      "statement_md": "Pela construção do texto, conclui-se que o narrador critica",
+      "alternatives": [
+        { "key": "A", "text": "o horário de início do trabalho nas grandes cidades." },
+        { "key": "B", "text": "a distração das pessoas, absortas nos celulares e alheias ao que as cerca." },
+        { "key": "C", "text": "a falta de qualidade dos mapas digitais disponíveis." },
+        { "key": "D", "text": "o isolamento do jornaleiro, que trabalha sem companhia." },
+        { "key": "E", "text": "o preço dos jornais impressos frente aos meios digitais." }
+      ],
+      "answer_key": "B",
+      "explanation_md": "A crítica está nas escolhas do texto: as pessoas atravessam **olhando o 'pequeno retângulo luminoso'** (metáfora para o celular) como se ali estivesse 'o mapa do próprio dia' — metáfora da vida guiada pela tela. O contraste final reforça: o jornaleiro 'olha para todos', mas 'quase ninguém o vê' — a desatenção ao redor.\n\n**Resposta: B.**\n\n- A aparece no texto (engarrafamento), mas é cenário, não o alvo da crítica.\n- C interpreta 'mapa' literalmente — pegadinha de leitura rasa.\n- D e E usam elementos do texto para ideias que o trecho não sustenta.",
+      "hints": [
+        "O que a metáfora 'mapa do próprio dia' sugere sobre o papel do celular na vida das pessoas?",
+        "O contraste final (quem olha e quem não é visto) reforça qual crítica?"
+      ],
+      "demo_id": "textos",
+      "source": "Interpretação e metáfora em crônica (Matriz ENEM LC H1-H3)",
+      "origin": "seed",
+      "numeric_check": null
+    },
+    {
+      "topic_slug": "lc-variacao-linguistica",
+      "difficulty": 1000,
+      "context_md": "Em uma feira do interior, um feirante anuncia: \"Chega mais, freguesa! Olha a jabuticaba fresquinha que chegô hoje, docinha que só!\". Anos depois, a neta dele criou um perfil numa rede social para vender a mesma jabuticaba e escreveu: \"Jabuticaba fresquinha colhida hoje! Docinha que só! Entregamos em toda a cidade.\"",
+      "statement_md": "Comparando as duas falas, a mudança de registro linguístico da neta ocorre principalmente em função de",
+      "alternatives": [
+        { "key": "A", "text": "uma correção dos erros de português do avô, que prejudicavam a comunicação." },
+        { "key": "B", "text": "da adequação da linguagem ao novo suporte e público do anúncio." },
+        { "key": "C", "text": "da intenção de esconder a origem rural da família." },
+        { "key": "D", "text": "da evolução natural da língua entre duas gerações." },
+        { "key": "E", "text": "da proibição legal de gírias em anúncios digitais." }
+      ],
+      "answer_key": "B",
+      "explanation_md": "A fala do avô ('chegô', 'freguesa', 'chega mais') é perfeitamente adequada à feira: proximidade com o freguês, oralidade, identidade local. A neta escreve para uma **rede social** — outro suporte, outro público, outro registro (escrito, mais formal, com informação de entrega). A mudança é de **adequação ao contexto comunicativo**, não de 'erro para certo'.\n\n**Resposta: B.**\n\n- A reproduz o preconceito linguístico: a fala do avô não tem 'erros', tem outra variedade.\n- D até descreve um fenômeno real (a língua muda no tempo), mas o texto mostra uma ESCOLHA consciente de registro, não mudança natural.",
+      "hints": [
+        "O que mudou além das palavras: o LUGAR onde a fala circula e para QUEM.",
+        "A fala do avô é 'errada' ou apenas adequada a outro contexto?"
+      ],
+      "demo_id": "textos",
+      "source": "Variação linguística e registro (Matriz ENEM LC H6-H8)",
+      "origin": "seed",
+      "numeric_check": null
+    },
+    {
+      "topic_slug": "cn-fisiologia",
+      "difficulty": 1150,
+      "context_md": "Após uma refeição rica em açúcares, o nível de glicose no sangue sobe. O pâncreas responde secretando insulina, hormônio que sinaliza às células que retirem glicose do sangue. Quando a glicose cai demais (como em um jejum prolongado), outro hormônio pancreático, o glucagon, sinaliza ao fígado que libere glicose armazenada na forma de glicogênio.",
+      "statement_md": "O conjunto dos efeitos da insulina e do glucagon sobre a glicemia exemplifica",
+      "alternatives": [
+        { "key": "A", "text": "ação exclusiva do sistema nervoso autônomo." },
+        { "key": "B", "text": "feedback negativo, mecanismo que mantém a homeostase." },
+        { "key": "C", "text": "feedback positivo, que amplia as variações internas." },
+        { "key": "D", "text": "ação antagonista inexistente em outros processos vitais." },
+        { "key": "E", "text": "imunidade ativa adquirida por vacinação." }
+      ],
+      "answer_key": "B",
+      "explanation_md": "A glicemia precisa ficar estável (homeostase). Quando sobe, a insulina **reduz** o desvio; quando cai, o glucagon **corrige** no sentido oposto. Hormônios com efeitos contrários que estabilizam uma variável = **feedback negativo**.\n\n**Resposta: B.**\n\n- C é o inverso (feedback positivo amplifica, como a ocitocina no parto).\n- A confunde regulação hormonal com nervosa; D é falso (a regulação da temperatura corporal, por exemplo, usa o mesmo esquema); E trata de sistema imunológico.",
+      "hints": [
+        "O que os dois hormônios fazem com a variação da glicose: ampliam ou corrigem?",
+        "Homeostase se mantém por qual tipo de feedback?"
+      ],
+      "demo_id": "biologia",
+      "source": "Homeostase e regulação hormonal (Matriz ENEM CN H30)",
+      "origin": "seed",
+      "numeric_check": null
+    }
+  ]
+}

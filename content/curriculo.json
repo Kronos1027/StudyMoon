@@ -1,0 +1,197 @@
+{
+  "version": 1,
+  "updated": "2026-10-09",
+  "source": "Matriz de Referência do ENEM (INEP) — estrutura por área, disciplina e tópico, com peso histórico aproximado no exame (0-10)",
+  "areas": [
+    {
+      "slug": "mt",
+      "name": "Matemática e suas Tecnologias",
+      "icon": "Sigma",
+      "sort_order": 3,
+      "disciplines": [
+        {
+          "slug": "aritmetica",
+          "name": "Aritmética",
+          "topics": [
+            { "slug": "mt-operacoes-basicas", "name": "Operações básicas e problemas", "level": 1, "enem_weight": 7, "matrix_codes": ["H1", "H2"], "demo_id": "divisao", "description": "As quatro operações com números naturais na resolução de problemas do dia a dia: compras, trocos, divisões em grupos e estimativas." },
+            { "slug": "mt-divisibilidade", "name": "Divisibilidade, múltiplos, MMC e MDC", "level": 1, "enem_weight": 6, "matrix_codes": ["H1", "H2"], "demo_id": "divisao", "description": "Critérios de divisibilidade, números primos, mínimo múltiplo comum e máximo divisor comum aplicados a situações como ciclos de ônibus e ladrilhos." },
+            { "slug": "mt-fracoes-decimais", "name": "Frações e números decimais", "level": 1, "enem_weight": 8, "matrix_codes": ["H2", "H3"], "demo_id": "fracoes", "description": "Partes de um todo, comparação, soma e subtração de frações, conversão com decimais e porcentagem simples." },
+            { "slug": "mt-razao-proporcao", "name": "Razão, proporção e regra de três", "level": 1, "enem_weight": 9, "matrix_codes": ["H3", "H6"], "demo_id": "razao-proporcao", "description": "Relações entre grandezas proporcionalidade direta e inversa, regra de três simples e composta em contextos de consumo, escala e velocidade." },
+            { "slug": "mt-porcentagem-juros", "name": "Porcentagem e juros", "level": 1, "enem_weight": 10, "matrix_codes": ["H3", "H6"], "demo_id": "porcentagem", "description": "Aumentos e descontos sucessivos, juros simples e compostos, comparação de ofertas — o tema campeão do ENEM." },
+            { "slug": "mt-grandezas-unidades", "name": "Grandezas e unidades de medida", "level": 2, "enem_weight": 6, "matrix_codes": ["H1", "H4"], "demo_id": null, "description": "Comprimento, área, volume, massa, tempo e temperatura; conversões de unidades e notação científica aplicada." }
+          ]
+        },
+        {
+          "slug": "algebra",
+          "name": "Álgebra",
+          "topics": [
+            { "slug": "mt-potencias-raizes", "name": "Potências, raízes e notação científica", "level": 2, "enem_weight": 7, "matrix_codes": ["H2", "H4"], "demo_id": null, "description": "Propriedades de potências, raízes, simplificação e notação científica para números muito grandes ou pequenos." },
+            { "slug": "mt-expressoes-equacoes", "name": "Expressões, equações e inequações", "level": 2, "enem_weight": 9, "matrix_codes": ["H5", "H6"], "demo_id": null, "description": "Equações do 1º e 2º grau, sistemas, fatoração e inequações para modelar problemas." },
+            { "slug": "mt-funcoes", "name": "Funções (afim, quadrática, exponencial, logarítmica)", "level": 2, "enem_weight": 9, "matrix_codes": ["H7", "H8"], "demo_id": "funcoes", "description": "Interpretar e construir gráficos, taxa de variação, vértice da parábola, crescimento exponencial e logaritmos em aplicações." },
+            { "slug": "mt-sequencias", "name": "Sequências: PA e PG", "level": 2, "enem_weight": 6, "matrix_codes": ["H7"], "demo_id": null, "description": "Progressões aritméticas e geométricas: termo geral, soma e aplicações em juros e padrões." },
+            { "slug": "mt-combinatoria", "name": "Análise combinatória", "level": 3, "enem_weight": 6, "matrix_codes": ["H9"], "demo_id": "probabilidade", "description": "Princípio multiplicativo, permutações, arranjos e combinações para contar possibilidades." }
+          ]
+        },
+        {
+          "slug": "geometria",
+          "name": "Geometria",
+          "topics": [
+            { "slug": "mt-geometria-plana", "name": "Geometria plana", "level": 2, "enem_weight": 8, "matrix_codes": ["H10", "H11"], "demo_id": "geometria", "description": "Ângulos, triângulos, quadriláteros, círculos; semelhança, Pitágoras e cálculo de áreas por decomposição." },
+            { "slug": "mt-geometria-espacial", "name": "Geometria espacial", "level": 2, "enem_weight": 7, "matrix_codes": ["H11", "H12"], "demo_id": "geometria", "description": "Prismas, pirâmides, cilindros, cones e esferas: planificações, áreas e volumes." },
+            { "slug": "mt-trigonometria", "name": "Trigonometria", "level": 3, "enem_weight": 7, "matrix_codes": ["H10", "H13"], "demo_id": null, "description": "Seno, cosseno e tangente no triângulo retângulo, círculo trigonométrico e leis do seno/cosseno." },
+            { "slug": "mt-geometria-analitica", "name": "Geometria analítica", "level": 3, "enem_weight": 5, "matrix_codes": ["H12", "H13"], "demo_id": "funcoes", "description": "Plano cartesiano, distância entre pontos, reta e circunferência como lugares geométricos." }
+          ]
+        },
+        {
+          "slug": "probabilidade-estatistica",
+          "name": "Probabilidade e Estatística",
+          "topics": [
+            { "slug": "mt-probabilidade", "name": "Probabilidade", "level": 2, "enem_weight": 8, "matrix_codes": ["H14", "H15"], "demo_id": "probabilidade", "description": "Espaço amostral, eventos, probabilidade condicional e independência em jogos, sorteios e previsões." },
+            { "slug": "mt-estatistica", "name": "Estatística descritiva", "level": 2, "enem_weight": 9, "matrix_codes": ["H16", "H17"], "demo_id": "estatistica", "description": "Média, moda, mediana, desvio, amplitude e interpretação crítica de pesquisas amostrais." },
+            { "slug": "mt-graficos-tabelas", "name": "Leitura de gráficos e tabelas", "level": 1, "enem_weight": 10, "matrix_codes": ["H16", "H17", "H18"], "demo_id": "estatistica", "description": "Interpretar gráficos de barras, setores, linhas e histogramas; pegadinhas de escala e variação relativa." }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "lc",
+      "name": "Linguagens, Códigos e suas Tecnologias",
+      "icon": "BookOpen",
+      "sort_order": 1,
+      "disciplines": [
+        {
+          "slug": "lingua-portuguesa",
+          "name": "Língua Portuguesa",
+          "topics": [
+            { "slug": "lc-interpretacao", "name": "Interpretação de texto", "level": 1, "enem_weight": 10, "matrix_codes": ["H1", "H2", "H3"], "demo_id": "textos", "description": "Compreensão, inferência, tema e intenção do autor em gêneros variados — a habilidade mais cobrada de todo o exame." },
+            { "slug": "lc-generos-tipos", "name": "Gêneros e tipos textuais", "level": 1, "enem_weight": 8, "matrix_codes": ["H4", "H5"], "demo_id": "textos", "description": "Reconhecer gêneros (crônica, artigo, memes, publicidade) e tipos (narração, descrição, dissertação, injunção)." },
+            { "slug": "lc-variacao-linguistica", "name": "Variação linguística", "level": 2, "enem_weight": 7, "matrix_codes": ["H6", "H7", "H8"], "demo_id": "textos", "description": "Variação histórica, regional e social; preconceito linguístico e adequação de registro." },
+            { "slug": "lc-funcoes-linguagem", "name": "Funções da linguagem", "level": 2, "enem_weight": 6, "matrix_codes": ["H6", "H9"], "demo_id": null, "description": "Referencial, emotiva, conativa, fática, metalinguística e poética na publicidade e na comunicação." },
+            { "slug": "lc-figuras-linguagem", "name": "Figuras de linguagem", "level": 2, "enem_weight": 6, "matrix_codes": ["H10", "H11"], "demo_id": "textos", "description": "Metáfora, metonímia, hipérbole, ironia e outras figuras em contextos literários e publicitários." },
+            { "slug": "lc-gramatica-aplicada", "name": "Gramática aplicada ao texto", "level": 2, "enem_weight": 8, "matrix_codes": ["H12", "H13", "H14"], "demo_id": null, "description": "Coesão e coerência, regência, concordância, pontuação e acentuação SEMPRE em contexto textual." },
+            { "slug": "lc-lingua-estrangeira", "name": "Língua estrangeira (inglês/espanhol)", "level": 1, "enem_weight": 5, "matrix_codes": ["H15", "H16", "H17"], "demo_id": null, "description": "Estratégias de leitura em inglês ou espanhol: cognatos, contexto e ideia principal." }
+          ]
+        },
+        {
+          "slug": "literatura",
+          "name": "Literatura",
+          "topics": [
+            { "slug": "lc-literatura-movimentos", "name": "Movimentos literários", "level": 2, "enem_weight": 8, "matrix_codes": ["H1", "H4", "H5"], "demo_id": "linha-tempo", "description": "Quinhentismo, Barroco, Arcadismo, Romantismo, Realismo, Naturalismo, Simbolismo, Modernismo e contemporâneos." },
+            { "slug": "lc-obras-recorrentes", "name": "Obras recorrentes no ENEM", "level": 3, "enem_weight": 6, "matrix_codes": ["H1", "H2"], "demo_id": null, "description": "Autores e obras que aparecem com frequência: de Camões e Machado de Assis a Carlos Drummond e Conceição Evaristo." },
+            { "slug": "lc-artes", "name": "Artes e multiculturalidade", "level": 2, "enem_weight": 5, "matrix_codes": ["H18", "H19"], "demo_id": null, "description": "Linguagens artísticas (teatro, cinema, música, artes visuais) e patrimônio cultural brasileiro." }
+          ]
+        },
+        {
+          "slug": "outras-linguagens",
+          "name": "Outras linguagens e tecnologias",
+          "topics": [
+            { "slug": "lc-educacao-fisica", "name": "Educação física e saúde", "level": 1, "enem_weight": 5, "matrix_codes": ["H20", "H21", "H22"], "demo_id": null, "description": "Corpo e sociedade, esporte, lutas, ginásticas e hábitos saudáveis nas questões de Linguagens." },
+            { "slug": "lc-tecnologias-comunicacao", "name": "Tecnologias da comunicação", "level": 1, "enem_weight": 6, "matrix_codes": ["H23", "H24"], "demo_id": null, "description": "Multimodalidade, leitura de imagem, redes sociais, desinformação e cidadania digital." }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "ch",
+      "name": "Ciências Humanas e suas Tecnologias",
+      "icon": "Globe2",
+      "sort_order": 2,
+      "disciplines": [
+        {
+          "slug": "historia",
+          "name": "História",
+          "topics": [
+            { "slug": "ch-brasil-colonia", "name": "Brasil colônia", "level": 1, "enem_weight": 8, "matrix_codes": ["H1", "H2"], "demo_id": "linha-tempo", "description": "Colonização portuguesa, escravidão africana e indígena, economia açucareira e aurífera, expansão territorial e revoltas coloniais." },
+            { "slug": "ch-brasil-imperio", "name": "Brasil império", "level": 2, "enem_weight": 7, "matrix_codes": ["H3", "H4"], "demo_id": "linha-tempo", "description": "Independência, Primeiro e Segundo Reinados, crise monárquica e abolição." },
+            { "slug": "ch-brasil-republica", "name": "Brasil república", "level": 2, "enem_weight": 9, "matrix_codes": ["H5", "H6"], "demo_id": "linha-tempo", "description": "República Velha, Vargas, JK, ditadura militar, redemocratização e Brasil contemporâneo." },
+            { "slug": "ch-historia-geral", "name": "História geral", "level": 2, "enem_weight": 7, "matrix_codes": ["H7", "H8", "H9"], "demo_id": "linha-tempo", "description": "Revoluções liberais, industrialização, imperialismo, guerras mundiais e Guerra Fria." },
+            { "slug": "ch-historia-cultural", "name": "Cultura, pensamento e lutas sociais", "level": 3, "enem_weight": 6, "matrix_codes": ["H10", "H11"], "demo_id": null, "description": "Movimentos culturais, direitos civis, feminismos e questões indígenas e quilombolas." }
+          ]
+        },
+        {
+          "slug": "geografia",
+          "name": "Geografia",
+          "topics": [
+            { "slug": "ch-geo-fisica", "name": "Geografia física", "level": 1, "enem_weight": 7, "matrix_codes": ["H12", "H13"], "demo_id": "mapas", "description": "Clima, relevo, solos, hidrografia, vegetação e biomas brasileiros e mundiais." },
+            { "slug": "ch-geo-humana", "name": "Geografia da população", "level": 2, "enem_weight": 8, "matrix_codes": ["H14", "H15"], "demo_id": "mapas", "description": "Crescimento populacional, transição demográfica, urbanização, migrações e cidades." },
+            { "slug": "ch-geo-economica", "name": "Geografia econômica e agrária", "level": 2, "enem_weight": 7, "matrix_codes": ["H16", "H17"], "demo_id": null, "description": "Agronegócio, industrialização, comércio mundial, blocos econômicos e nova economia." },
+            { "slug": "ch-cartografia", "name": "Cartografia", "level": 1, "enem_weight": 6, "matrix_codes": ["H12", "H18"], "demo_id": "mapas", "description": "Escalas, projeções, fusos horários, coordenadas e leitura crítica de mapas." },
+            { "slug": "ch-meio-ambiente", "name": "Meio ambiente e sustentabilidade", "level": 2, "enem_weight": 8, "matrix_codes": ["H19", "H20", "H21"], "demo_id": "mapas", "description": "Problemas ambientais, mudanças climáticas, energia e políticas de sustentabilidade." }
+          ]
+        },
+        {
+          "slug": "sociologia-filosofia",
+          "name": "Sociologia e Filosofia",
+          "topics": [
+            { "slug": "ch-sociologia", "name": "Sociologia", "level": 2, "enem_weight": 7, "matrix_codes": ["H22", "H23"], "demo_id": null, "description": "Clássicos (Durkheim, Marx, Weber), cultura e socialização, trabalho, movimentos sociais e desigualdades." },
+            { "slug": "ch-filosofia", "name": "Filosofia", "level": 2, "enem_weight": 6, "matrix_codes": ["H24", "H25"], "demo_id": null, "description": "Filosofia antiga à contemporânea, ética, política, conhecimento e questões atuais da tecnologia." },
+            { "slug": "ch-atualidades", "name": "Atualidades e cidadania", "level": 1, "enem_weight": 7, "matrix_codes": ["H26", "H27", "H28"], "demo_id": null, "description": "Direitos humanos, cidadania, mundo do trabalho e interpretação de fatos recentes." }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "cn",
+      "name": "Ciências da Natureza e suas Tecnologias",
+      "icon": "FlaskConical",
+      "sort_order": 4,
+      "disciplines": [
+        {
+          "slug": "fisica",
+          "name": "Física",
+          "topics": [
+            { "slug": "cn-mecanica", "name": "Mecânica: movimento e forças", "level": 2, "enem_weight": 9, "matrix_codes": ["H1", "H2", "H3"], "demo_id": "phet", "description": "MRU, MRUV, leis de Newton, queda livre e lançamentos em situações do cotidiano." },
+            { "slug": "cn-energia-trabalho", "name": "Trabalho, energia e potência", "level": 2, "enem_weight": 8, "matrix_codes": ["H4", "H5"], "demo_id": "phet", "description": "Energia cinética e potencial, conservação, máquinas simples e consumo de energia." },
+            { "slug": "cn-termologia", "name": "Termologia", "level": 2, "enem_weight": 7, "matrix_codes": ["H6", "H7"], "demo_id": null, "description": "Temperatura, calor, dilatação, mudanças de fase e termodinâmica simples." },
+            { "slug": "cn-ondas-optica", "name": "Ondas e óptica", "level": 2, "enem_weight": 7, "matrix_codes": ["H8", "H9"], "demo_id": "phet", "description": "Som, luz, reflexão, refração, lentes e fenômenos ondulatórios do dia a dia." },
+            { "slug": "cn-eletricidade", "name": "Eletricidade", "level": 2, "enem_weight": 8, "matrix_codes": ["H10", "H11"], "demo_id": "phet", "description": "Circuitos, lei de Ohm, potência elétrica e contas de luz — com simulações." },
+            { "slug": "cn-fontes-energia", "name": "Fontes e matriz energética", "level": 1, "enem_weight": 7, "matrix_codes": ["H12", "H13", "H14"], "demo_id": null, "description": "Renováveis e não renováveis, matriz brasileira e impacto ambiental." }
+          ]
+        },
+        {
+          "slug": "quimica",
+          "name": "Química",
+          "topics": [
+            { "slug": "cn-estequiometria", "name": "Estequiometria", "level": 2, "enem_weight": 8, "matrix_codes": ["H15", "H16"], "demo_id": "balanceamento", "description": "Mol, massa molar, cálculos estequiométricos e rendimento de reações." },
+            { "slug": "cn-solucoes", "name": "Soluções e concentração", "level": 2, "enem_weight": 7, "matrix_codes": ["H16", "H17"], "demo_id": null, "description": "Soluto e solvente, concentração comum e molar, diluição e misturas." },
+            { "slug": "cn-termo-cinetica", "name": "Termoquímica e cinética", "level": 3, "enem_weight": 6, "matrix_codes": ["H17", "H18"], "demo_id": null, "description": "Calor de reação, energia de ativação, catalisadores e velocidade das reações." },
+            { "slug": "cn-equilibrio-eletroquimica", "name": "Equilíbrio e eletroquímica", "level": 3, "enem_weight": 6, "matrix_codes": ["H18", "H19"], "demo_id": "balanceamento", "description": "Equilíbrio químico, pH, pilhas e eletrólise em contextos reais." },
+            { "slug": "cn-quimica-organica", "name": "Química orgânica", "level": 3, "enem_weight": 6, "matrix_codes": ["H20", "H21"], "demo_id": null, "description": "Hidrocarbonetos, funções orgânicas, polímeros e compostos do cotidiano." },
+            { "slug": "cn-quimica-ambiental", "name": "Química ambiental e da água", "level": 1, "enem_weight": 8, "matrix_codes": ["H22", "H23", "H24"], "demo_id": null, "description": "Ciclo da água, tratamento, poluição, chuva ácida e efeito estufa." }
+          ]
+        },
+        {
+          "slug": "biologia",
+          "name": "Biologia",
+          "topics": [
+            { "slug": "cn-citologia", "name": "Citologia", "level": 1, "enem_weight": 7, "matrix_codes": ["H25", "H26"], "demo_id": "biologia", "description": "Estrutura celular, membranas, organelas e metabolismo energético." },
+            { "slug": "cn-fotossintese", "name": "Fotossíntese e respiração", "level": 2, "enem_weight": 7, "matrix_codes": ["H26", "H27"], "demo_id": "biologia", "description": "Etapas da fotossíntese, respiração celular e balanço dos gases na atmosfera." },
+            { "slug": "cn-genetica", "name": "Genética", "level": 2, "enem_weight": 9, "matrix_codes": ["H28"], "demo_id": "biologia", "description": "Leis de Mendel, heredogramas, quadro de Punnett, mutações e biotecnologia." },
+            { "slug": "cn-evolucao", "name": "Evolução", "level": 2, "enem_weight": 6, "matrix_codes": ["H29"], "demo_id": null, "description": "Darwin, Wallace, evidências evolutivas e especiação." },
+            { "slug": "cn-ecologia", "name": "Ecologia", "level": 1, "enem_weight": 8, "matrix_codes": ["H29", "H30"], "demo_id": "biologia", "description": "Cadeias alimentares, ciclos biogeoquímicos, relações ecológicas e desequilíbrios." },
+            { "slug": "cn-fisiologia", "name": "Fisiologia humana e saúde", "level": 1, "enem_weight": 8, "matrix_codes": ["H30"], "demo_id": null, "description": "Sistemas do corpo, hormônios, saúde pública, epidemias e qualidade de vida." }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "redacao",
+      "name": "Redação",
+      "icon": "PenLine",
+      "sort_order": 5,
+      "disciplines": [
+        {
+          "slug": "redacao-temas",
+          "name": "Como escrever nota 1000",
+          "topics": [
+            { "slug": "rd-estrutura", "name": "Estrutura dissertativo-argumentativa", "level": 1, "enem_weight": 10, "matrix_codes": ["C1", "C2"], "demo_id": null, "description": "Introdução, desenvolvimento e conclusão: o esqueleto de uma redação nota 1000." },
+            { "slug": "rd-competencias", "name": "As 5 competências do ENEM", "level": 1, "enem_weight": 10, "matrix_codes": ["C1", "C2", "C3", "C4", "C5"], "demo_id": null, "description": "O que cada competência avalia, os erros que zêram e como os avaliadores pontuam." },
+            { "slug": "rd-repertorio", "name": "Repertório sociocultural", "level": 2, "enem_weight": 9, "matrix_codes": ["C2"], "demo_id": null, "description": "Como usar fatos, dados, citações e obras de arte de forma legítima na argumentação." },
+            { "slug": "rd-proposta-intervencao", "name": "Proposta de intervenção completa", "level": 2, "enem_weight": 9, "matrix_codes": ["C5"], "demo_id": null, "description": "Agente, ação, meio, finalidade e detalhamento: a fórmula da competência 5." },
+            { "slug": "rd-coesao", "name": "Coesão e conectivos", "level": 1, "enem_weight": 8, "matrix_codes": ["C4"], "demo_id": null, "description": "Operadores argumentativos para costurar parágrafos sem cair no lugar-comum." }
+          ]
+        }
+      ]
+    }
+  ]
+}

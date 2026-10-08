@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "updated": "2026-10-09",
+  "note": "Vídeos por tópico (slug) — apenas embeds oficiais via youtube-nocookie.com. Todo ID é validado pelo endpoint oEmbed (pnpm check-videos) antes de entrar no banco. Nunca inventar IDs: popular este arquivo apenas com vídeos verificados.",
+  "topics": {}
+}
