@@ -78,9 +78,11 @@ pnpm e2e       # ponta a ponta (com o dev server rodando)
 3. **Environment Variables:** cole TODAS as variáveis do seu `.env.local` (as `NEXT_PUBLIC_` só a `NEXT_PUBLIC_APP_URL`, que aqui vira a URL final, ex. `https://studymoon.vercel.app`).
 4. Deploy. Em cada push na `main` a Vercel publica automaticamente e o CI do GitHub roda lint/typecheck/testes/build.
 
-## 7. Secrets do GitHub (para CI e rotinas noturnas)
+## 7. Secrets e variáveis do GitHub (para CI e rotinas noturnas)
 
-No repositório → **Settings → Secrets and variables → Actions → New repository secret**, uma a uma:
+No repositório → **Settings → Secrets and variables → Actions**:
+
+**Secrets** (valores secretos), uma a uma:
 
 | Secret | Valor |
 | --- | --- |
@@ -92,7 +94,13 @@ No repositório → **Settings → Secrets and variables → Actions → New rep
 | `GEMINI_API_KEY` | chave do AI Studio |
 | `GROQ_API_KEY` / `OPENROUTER_API_KEY` | se tiver |
 
-> O StudyMoon já vem com workflows prontos: CI (todo push), keepalive do banco, lembretes a cada 15 min, geração noturna de conteúdo e backup semanal. Eles só acordam depois que os secrets acima existirem.
+**Variables** (não secretas) → aba *Variables*:
+
+| Variable | Valor |
+| --- | --- |
+| `APP_URL` | URL de produção (ex.: `https://studymoon.vercel.app`) — usada pelos agendadores |
+
+> O StudyMoon já vem com workflows prontos: CI (todo push), lembretes a cada 15 min, geração noturna de conteúdo, keepalive diário e backup semanal. Eles só acordam depois que os itens acima existirem.
 
 ## 8. Checklist final
 
