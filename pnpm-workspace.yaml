@@ -1,6 +1,6 @@
 # pnpm settings (single-package workspace).
-# pnpm 10+ reads build-script permissions here instead of package.json.
-onlyBuiltDependencies:
-  - esbuild
-  - sharp
-  - unrs-resolver
+# pnpm 12 build-script permissions (new `allowBuilds` map format).
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
