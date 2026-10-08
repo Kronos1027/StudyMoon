@@ -1,0 +1,37 @@
+name: Backup semanal do banco
+
+on:
+  schedule:
+    - cron: "0 4 * * 0" # domingos, 01:00 BRT
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Instalar cliente Postgres
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+
+      - name: Dump do banco (schema + dados)
+        run: |
+          mkdir -p backup
+          pg_dump "${{ secrets.DATABASE_URL }}" \
+            --no-owner --no-privileges \
+            --exclude-schema=_studymoon \
+            -f backup/studymoon-$(date +%Y-%m-%d).sql
+
+      - name: Compactar
+        run: |
+          cd backup && tar -czf ../studymoon-backup.tar.gz . && cd ..
+          ls -lh studymoon-backup.tar.gz
+
+      - name: Publicar como artefato (retenção de 90 dias)
+        uses: actions/upload-artifact@v4
+        with:
+          name: studymoon-backup-${{ github.run_id }}
+          path: studymoon-backup.tar.gz
+          retention-days: 90

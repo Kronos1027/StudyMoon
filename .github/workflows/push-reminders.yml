@@ -1,0 +1,24 @@
+name: Lembretes (a cada 15 min)
+
+on:
+  schedule:
+    # Every 15 minutes (doc section 10: precise reminders via Actions).
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: reminders
+  cancel-in-progress: false
+
+jobs:
+  reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Chamar /api/cron/reminders
+        run: |
+          curl -sS -X POST \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            "${{ vars.APP_URL }}/api/cron/reminders" \
+            --max-time 55 | tee response.json
+          grep -q '"ok":true' response.json || (echo "Resposta inesperada"; exit 1)

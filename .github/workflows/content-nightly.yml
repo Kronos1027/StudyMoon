@@ -1,0 +1,39 @@
+name: Geração noturna de conteúdo
+
+on:
+  schedule:
+    # 03:00 BRT (06:00 UTC) — generates while students sleep.
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: content-nightly
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Gerar lote 1 (2 tópicos x 5 questões)
+        run: |
+          curl -sS -X POST \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ vars.APP_URL }}/api/cron/content?topics=2&perTopic=5" \
+            --max-time 300 > batch1.json || true
+          cat batch1.json || true
+
+      - name: Gerar lote 2
+        run: |
+          sleep 30
+          curl -sS -X POST \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ vars.APP_URL }}/api/cron/content?topics=2&perTopic=5" \
+            --max-time 300 > batch2.json || true
+          cat batch2.json || true
+
+      - name: Resumo
+        run: |
+          echo "### Geração noturna" >> $GITHUB_STEP_SUMMARY
+          echo '```json' >> $GITHUB_STEP_SUMMARY
+          cat batch1.json batch2.json >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY

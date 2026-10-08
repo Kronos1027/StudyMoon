@@ -1,0 +1,16 @@
+name: Keepalive do banco
+
+on:
+  schedule:
+    - cron: "0 9 * * *" # diário
+  workflow_dispatch:
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping no banco (evita pausa do plano free)
+        run: |
+          curl -sS \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ vars.APP_URL }}/api/cron/keepalive" --max-time 30
