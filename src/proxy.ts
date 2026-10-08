@@ -3,6 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 
 const PROTECTED_PREFIXES = [
   "/painel",
+  "/teste-de-nivel",
   "/estudo",
   "/simulado",
   "/redacao",

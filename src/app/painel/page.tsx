@@ -8,6 +8,7 @@ import {
   CalendarDays,
   Flame,
   RefreshCw,
+  Rocket,
   Sparkles,
   Target,
   TrendingUp,
@@ -104,6 +105,24 @@ export default async function PainelPage() {
   return (
     <AppShell apelido={profile.apelido}>
       <div className="mx-auto w-full max-w-5xl space-y-5 px-4 py-6">
+        {!profile.level_test_completed ? (
+          <Link
+            href="/teste-de-nivel"
+            className="group flex items-center justify-between gap-3 rounded-2xl bg-brand-gradient p-4 text-white transition-transform hover:scale-[1.01]"
+          >
+            <span className="flex items-center gap-3">
+              <Rocket className="h-6 w-6 shrink-0" aria-hidden="true" />
+              <span>
+                <span className="block font-semibold">Faça o teste de nível (~16 questões)</span>
+                <span className="block text-sm text-white/85">
+                  Mapeia o que você já sabe para o plano começar no lugar certo.
+                </span>
+              </span>
+            </span>
+            <ArrowRight className="h-5 w-5 shrink-0 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+          </Link>
+        ) : null}
+
         {/* Header */}
         <header className="flex flex-wrap items-end justify-between gap-3">
           <div>
