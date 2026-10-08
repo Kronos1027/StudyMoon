@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dialog";
 import { Markdown } from "@/components/content/markdown";
 import { DemoFrame } from "@/components/demos/demo-frame";
+import { TutorDialog } from "@/components/practice/tutor-dialog";
 import { submitAttempt, reportQuestion, type AttemptResult } from "@/lib/practice/actions";
 import type { QuestionPublic } from "@/lib/db/types";
 import { cn } from "@/lib/utils";
@@ -181,15 +182,18 @@ export function QuestionCard({
         </span>
         <div className="flex items-center gap-2">
           {phase === "answering" ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setTimerOn((t) => !t)}
-              aria-pressed={timerOn}
-            >
-              <Timer className="h-4 w-4" aria-hidden="true" />
-              {timerOn ? formatTime(elapsed) : "Cronômetro"}
-            </Button>
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setTimerOn((t) => !t)}
+                aria-pressed={timerOn}
+              >
+                <Timer className="h-4 w-4" aria-hidden="true" />
+                {timerOn ? formatTime(elapsed) : "Cronômetro"}
+              </Button>
+              <TutorDialog questionId={question.id} hintsShown={hintsShown} />
+            </>
           ) : null}
           <Button variant="ghost" size="sm" onClick={() => setReportOpen(true)}>
             <Flag className="h-4 w-4" aria-hidden="true" />

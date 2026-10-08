@@ -27,6 +27,7 @@ create index idx_leaderboard_user on public.weekly_leaderboard (user_id);
 
 create index idx_essays_user on public.essays (user_id, created_at desc);
 create index idx_essay_feedback_essay on public.essay_feedback (essay_id);
+create unique index uq_essay_themes_title on public.essay_themes (title);
 
 create index idx_mock_items_exam on public.mock_exam_items (exam_id, position);
 create index idx_mock_exams_user on public.mock_exams (user_id, started_at desc);

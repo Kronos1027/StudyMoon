@@ -148,6 +148,103 @@ async function main() {
   }
   console.log("badges: 8 ok");
 
+  // ---------- upsert essay themes (original, ENEM-style) ----------
+  const themes = [
+    {
+      title: "Desafios do enfrentamento da desinformação no Brasil",
+      kind: "tecnologia",
+      texts: [
+        {
+          source: "Relatório institucional sobre estado da rede",
+          text: "A circulação de informações falsas tornou-se um dos principais desafios da comunicação digital: ao ritmo de um toque, conteúdos verificáveis e mentiras chegam juntos a milhões de pessoas, e a velocidade de compartilhamento supera a da checagem.",
+        },
+        {
+          source: "Dados de pesquisa sobre comportamento digital",
+          text: "Estudos indicam que grande parte dos jovens brasileiros recebe notícias principalmente por redes sociais e aplicativos de mensagem, ambientes em que a origem da informação frequentemente não é verificada antes do compartilhamento.",
+        },
+      ],
+    },
+    {
+      title: "Persistência da violência contra a mulher e caminhos de enfrentamento no Brasil",
+      kind: "direitos",
+      texts: [
+        {
+          source: "Anuário brasileiro de segurança pública",
+          text: "Os registros oficiais mostram que a violência doméstica e o feminicídio permanecem em patamares alarmantes no país, apesar dos marcos legais conquistados nas últimas décadas.",
+        },
+        {
+          source: "Reportagem sobre redes de apoio",
+          text: "Casas de acolhimento, delegacias especializadas e programas de renda têm sido apontados como estratégias eficazes quando combinados a políticas educativas que enfrentam a desigualdade de gênero desde a escola.",
+        },
+      ],
+    },
+    {
+      title: "Segurança hídrica e os desafios da gestão da água no Brasil",
+      kind: "meio ambiente",
+      texts: [
+        {
+          source: "Agência nacional de águas",
+          text: "O Brasil concentra parcela significativa da água doce do planeta, mas enfrenta crises de abastecimento: perdas nas redes, desperdício no consumo e disputas por usos múltiplos comprometem a segurança hídrica de regiões inteiras.",
+        },
+        {
+          source: "Nota técnica sobre consumo",
+          text: "Boa parte da água consumida no país destina-se à agricultura e à geração de energia, o que exige decisões integradas entre economia, meio ambiente e justiça social.",
+        },
+      ],
+    },
+    {
+      title: "Saúde mental na escola: desafios do acolhimento de jovens",
+      kind: "saude",
+      texts: [
+        {
+          source: "Organização mundial da saúde",
+          text: "Transtornos mentais comuns, como ansiedade e depressão, têm início frequente na adolescência, e o ambiente escolar pode ser tanto fator de risco quanto espaço de proteção.",
+        },
+        {
+          source: "Política nacional de saúde do estudante",
+          text: "Programas de promoção da saúde nas escolas prevêem ações de prevenção e acolhimento, mas a implementação esbarra na formação limitada de professores e na carência de redes de atendimento.",
+        },
+      ],
+    },
+    {
+      title: "Obesidade infantil e a promoção da alimentação saudável no Brasil",
+      kind: "saude",
+      texts: [
+        {
+          source: "Sistema de vigilância alimentar",
+          text: "O excesso de peso atinge parcela crescente das crianças brasileiras, associado à substituição da comida caseira por ultraprocessados e à redução da atividade física.",
+        },
+        {
+          source: "Marco legal de alimentação escolar",
+          text: "A legislação exige o oferecimento de alimentação adequada nas escolas e restringe a venda de produtos ultraprocessados no ambiente escolar — o desafio está em fiscalizar e educar para além da lei.",
+        },
+      ],
+    },
+    {
+      title: "Acesso à cultura como ferramenta de cidadania no Brasil",
+      kind: "sociedade",
+      texts: [
+        {
+          source: "Sistema nacional de indicadores culturais",
+          text: "O acesso a bens e serviços culturais — livros, cinemas, teatro, internet qualificada — permanece desigual entre regiões e classes sociais do país.",
+        },
+        {
+          source: "Constituição Federal, art. 215",
+          text: "O Estado garantirá a todos o pleno exercício dos direitos culturais e o acesso às fontes da cultura nacional.",
+        },
+      ],
+    },
+  ] as const;
+
+  for (const theme of themes) {
+    await sql`
+      insert into essay_themes (title, texts_motivadores, kind, status)
+      values (${theme.title}, ${JSON.stringify(theme.texts)}::jsonb, ${theme.kind}, 'validated')
+      on conflict do nothing
+    `;
+  }
+  console.log(`essay themes: ${themes.length} ok`);
+
   // ---------- upsert questions ----------
   let qOk = 0;
   const qErrors: string[] = [];
