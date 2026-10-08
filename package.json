@@ -4,6 +4,13 @@
   "private": true,
   "description": "StudyMoon — plataforma gratuita de preparação para o ENEM, do zero ao avançado",
   "packageManager": "pnpm@12.10.1",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "unrs-resolver"
+    ]
+  },
   "scripts": {
     "dev": "next dev -p 3000 2>&1 | tee dev.log",
     "build": "next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/",
