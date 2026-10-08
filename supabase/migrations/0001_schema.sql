@@ -141,6 +141,7 @@ create table public.srs_cards (
   scheduled_days int not null default 0,
   reps int not null default 0,
   lapses int not null default 0,
+  learning_steps int not null default 0,
   state text not null default 'new' check (state in ('new','learning','review','relearning')),
   last_update timestamptz not null default now(),
   unique (user_id, question_id),

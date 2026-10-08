@@ -164,6 +164,7 @@ export interface SrsCard {
   scheduled_days: number;
   reps: number;
   lapses: number;
+  learning_steps: number;
   state: SrsState;
   last_update: string;
 }
