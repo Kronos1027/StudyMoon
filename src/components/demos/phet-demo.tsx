@@ -5,15 +5,23 @@ import { useState } from "react";
 /**
  * PhET simulations embedded from the official site (CC BY, University of
  * Colorado Boulder) with guiding questions beside each (doc section 12).
+ * Aceita o parâmetro da questão `sim` (definido pelo SUBTÓPICO no catálogo
+ * src/lib/demos/subtopics.ts) para abrir já na simulação certa — ex.: a
+ * questão do chuveiro elétrico (cn-eletricidade.potencia-eletrica) abre em
+ * circuitos, não em movimento.
  */
+export interface PhetParams {
+  sim?: "motion" | "circuits" | "waves";
+}
+
 const SIMULATIONS = [
   {
     id: "motion",
-    title: "Movimento ( Energia de um Skate)",
+    title: "Energia de um skate",
     url: "https://phet.colorado.edu/sims/html/energy-skate-park/latest/energy-skate-park_pt_BR.html",
     questions: [
       "Em que ponto da pista a energia cinética é máxima? E a potencial?",
-      "O que acontece com a altura máxima quando atrito é ligado?",
+      "O que acontece com a altura máxima quando o atrito é ligado?",
     ],
   },
   {
@@ -36,8 +44,16 @@ const SIMULATIONS = [
   },
 ] as const;
 
-export function PhetDemo() {
-  const [active, setActive] = useState<string>("motion");
+const SIM_IDS = ["motion", "circuits", "waves"] as const;
+
+type SimId = (typeof SIM_IDS)[number];
+
+export function PhetDemo({ params }: { params?: PhetParams }) {
+  const initial =
+    params?.sim && (SIM_IDS as readonly string[]).includes(params.sim)
+      ? (params.sim as SimId)
+      : "motion";
+  const [active, setActive] = useState<SimId>(initial);
   const sim = SIMULATIONS.find((s) => s.id === active) ?? SIMULATIONS[0];
 
   return (

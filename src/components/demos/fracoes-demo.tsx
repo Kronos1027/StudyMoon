@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
+import { equivalentFractions } from "@/lib/demos/models";
 
 /**
  * Fractions simulator: bars that split into equal parts, with equivalences.
@@ -16,10 +17,7 @@ export function FracoesDemo() {
   const reduced = useReducedMotion();
 
   const clampedNumerator = Math.min(numerator, denominator);
-  const equivalents = [
-    { n: clampedNumerator * 2, d: denominator * 2 },
-    { n: clampedNumerator * 3, d: denominator * 3 },
-  ].filter((f) => f.d <= 24);
+  const equivalents = equivalentFractions(clampedNumerator, denominator, 24);
 
   return (
     <div className="space-y-6">

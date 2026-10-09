@@ -6,43 +6,15 @@ import { Droplets, Fish, Pause, Play, RotateCcw, StepForward } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
+import { LAKE_INITIAL, stepLake, type LakeState } from "@/lib/demos/models";
 
 // ---------------------------------------------------------------------------
-// Deterministic eutrophication model (per "week" step).
-// Indices are 0–100; dissolved oxygen (OD) is in mg/L.
+// Posições determinísticas (com seed, para SSR/CSR nunca divergirem).
+// O modelo semanal (stepLake) vive em src/lib/demos/models.ts — testado.
 // ---------------------------------------------------------------------------
 
-interface LakeState {
-  week: number;
-  nutrientes: number;
-  algas: number;
-  od: number;
-  peixesVivos: number;
-}
-
-const INITIAL: LakeState = { week: 0, nutrientes: 2, algas: 5, od: 8, peixesVivos: 10 };
 const MAX_WEEKS = 40;
 const TOTAL_FISH = 10;
-
-function stepLake(s: LakeState, carga: number): LakeState {
-  const nutrientes = Math.min(100, s.nutrientes * 0.88 + carga * 0.12);
-  const algasTarget = 4 + nutrientes * 0.9;
-  const algas = Math.min(100, s.algas + (algasTarget - s.algas) * 0.3);
-  const od = Math.min(8, Math.max(0.4, 8 - algas * 0.07 - carga * 0.02));
-  const deaths =
-    od < 4 ? Math.min(s.peixesVivos, Math.max(1, Math.round((4 - od) * 2))) : 0;
-  return {
-    week: s.week + 1,
-    nutrientes,
-    algas,
-    od,
-    peixesVivos: Math.max(0, s.peixesVivos - deaths),
-  };
-}
-
-// ---------------------------------------------------------------------------
-// Deterministic positions (seeded, so SSR/CSR never mismatch).
-// ---------------------------------------------------------------------------
 
 const ALGAE_SPOTS = Array.from({ length: 36 }, (_, i) => ({
   left: 4 + ((i * 37) % 92),
@@ -67,7 +39,7 @@ const PARTICLES = Array.from({ length: 8 }, (_, i) => ({
  */
 export function EutrofizacaoDemo() {
   const [carga, setCarga] = useState(60);
-  const [history, setHistory] = useState<LakeState[]>([INITIAL]);
+  const [history, setHistory] = useState<LakeState[]>([LAKE_INITIAL]);
   const [running, setRunning] = useState(false);
   const reduced = useReducedMotion();
 
@@ -95,7 +67,7 @@ export function EutrofizacaoDemo() {
 
   function reset() {
     setRunning(false);
-    setHistory([INITIAL]);
+    setHistory([LAKE_INITIAL]);
   }
 
   // Derived visuals.

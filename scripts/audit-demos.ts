@@ -157,7 +157,7 @@ const FINDINGS: Finding[] = [
     severity: "PROBLEMA",
     issue:
       "A explicação da ironia contém frase truncada ('na pasta com a realidade') — texto sem sentido em português.",
-    fix: "Reescrever a explicação da ironia (correção de conteúdo do PASSO 3).",
+    fix: "Explicação da ironia reescrita ('prometia' contrasta com a realidade descrita).",
   },
   {
     demo: "linha-tempo",
@@ -178,7 +178,7 @@ const FINDINGS: Finding[] = [
     severity: "PROBLEMA",
     issue:
       "Dados do Censo 2022 imprecisos (Sul 30,4 mi; shares somando 100,4%).",
-    fix: "Dados corrigidos pelo Censo 2022 (SE 84,8 mi/41,8%, NE 54,6, S 29,2, N 17,0, CO 16,2 — shares calculados pelo código somam 99,5%).",
+    fix: "Dados corrigidos pelo Censo 2022 em models.ts (SE 84,8 mi/41,8%, NE 54,6, S 29,2, N 17,0, CO 16,2 — shares calculados pelo código, testados).",
   },
   {
     demo: "genetica",
@@ -198,20 +198,20 @@ const FINDINGS: Finding[] = [
     demo: "estatistica",
     severity: "PROBLEMA",
     issue: "'Adicionar aluno' sorteia nota com Math.random() (não determinístico).",
-    fix: "Nota inicial determinística (correção de conteúdo do PASSO 3).",
+    fix: "Nota inicial determinística (sequência fixa [5,7,4,8,6,...]) e medidas vindas de models.ts.",
   },
   {
     demo: "funcoes",
-    severity: "PROBLEMA",
+    severity: "CORRIGIDO",
     issue:
       "SVG com min-w-[320px] causa rolagem lateral em telas de 360 px; comparação `delta === 0` com ponto flutuante.",
-    fix: "SVG responsivo (escala pelo viewBox, sem min-width); delta com tolerância (correção do PASSO 3).",
+    fix: "SVG responsivo (sem min-width/min-w); delta com tolerância via quadraticFeatures (models.ts).",
   },
   {
     demo: "probabilidade",
-    severity: "PROBLEMA",
+    severity: "CORRIGIDO",
     issue: "SVG com min-w-[480px] — rolagem lateral em telas de 360 px.",
-    fix: "SVG responsivo sem min-width (correção do PASSO 3).",
+    fix: "SVG responsivo sem min-width; probabilidades vindas de twoStagePaths (models.ts).",
   },
   {
     demo: "geometria",
@@ -231,14 +231,14 @@ const FINDINGS: Finding[] = [
     demo: "balanceamento",
     severity: "PROBLEMA",
     issue: "O botão do coeficiente DECREMENTA ao ser clicado (confuso: parece seletor, é ação).",
-    fix: "Botão vira exibição passiva (correção do PASSO 3).",
+    fix: "Botão de coeficiente virou exibição passiva; contagem de átomos vem de models.ts.",
   },
   {
     demo: "phet",
-    severity: "PROBLEMA",
+    severity: "CORRIGIDO",
     issue:
       "Uma única demo com 3 simulações em abas abria SEMPRE na aba 'Movimento' — a questão do chuveiro elétrico (circuitos) exibia a de movimento. Título com erro de digitação ('Movimento ( Energia de um Skate)').",
-    fix: "Aceitar o parâmetro da questão (subtópico → aba inicial: circuits/waves/motion); título corrigido (PASSO 3).",
+    fix: "Aceita o parâmetro sim da questão/subtópico (aba inicial correta); título corrigido para 'Energia de um skate'.",
   },
 ];
 
@@ -338,7 +338,7 @@ async function main() {
     const bound = bindings[demoId] ?? [];
     const areas = [...new Set(bound.map((s) => topicToArea.get(s.split(".")[0]) ?? "?"))].join(", ");
     const qs = demoQuestions.get(demoId) ?? [];
-    const issues = FINDINGS.filter((f) => f.demo === demoId && f.severity === "PROBLEMA");
+    const issues = FINDINGS.filter((f) => f.demo === demoId && f.severity === "CORRIGIDO");
     const status = issues.length > 0 ? `⚠️ ${issues.length} problema(s)` : "OK";
     const bindingCell = bound.length > 0 ? bound.map((b) => `\`${b}\``).join("<br>") : "—";
     lines.push(

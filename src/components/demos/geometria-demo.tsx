@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Slider } from "@/components/ui/slider";
+import { lShapeArea, rectMetrics } from "@/lib/demos/models";
 
 /**
  * Geometry simulator: rectangle that scales — perimeter vs area growth,
@@ -13,14 +14,13 @@ export function GeometriaDemo() {
   const [height, setHeight] = useState(3);
   const reduced = useReducedMotion();
 
-  const area = width * height;
-  const perimeter = 2 * (width + height);
+  const { area, perimeter } = rectMetrics(width, height);
   const scale = 26; // px per meter
 
-  // L-shape decomposition: big rectangle (w×h) minus corner ((w-2)×(h-1))
+  // L-shape decomposition: big rectangle (w×h) minus corner
   const cornerW = Math.max(1, Math.round(width / 2));
   const cornerH = Math.max(1, Math.round(height / 2));
-  const lArea = area - cornerW * cornerH;
+  const lArea = lShapeArea(width, height, cornerW, cornerH);
 
   return (
     <div className="space-y-6">

@@ -5,10 +5,12 @@ import { motion, useReducedMotion } from "framer-motion";
 import { RotateCcw, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { h2oAtomCounts } from "@/lib/demos/models";
 
 /**
- * Equation balancing: drag-free "atom rearrangement" — adjust coefficients
- * until both sides have equal atoms (doc section 12).
+ * Equation balancing: adjust coefficients until both sides have equal
+ * atoms (doc section 12). Contagem de átomos calculada por
+ * src/lib/demos/models.ts (h2oAtomCounts — testada).
  */
 
 export function BalanceamentoDemo() {
@@ -17,11 +19,7 @@ export function BalanceamentoDemo() {
   const [coefC, setCoefC] = useState(1); // H2O
   const reduced = useReducedMotion();
 
-  const leftH = coefA * 2;
-  const leftO = coefB * 2;
-  const rightH = coefC * 2;
-  const rightO = coefC * 1;
-  const balanced = leftH === rightH && leftO === rightO;
+  const { leftH, leftO, rightH, rightO, balanced } = h2oAtomCounts(coefA, coefB, coefC);
 
   function reset() {
     setCoefA(1);
@@ -125,24 +123,25 @@ function CoefStepper({
   return (
     <span className="inline-flex flex-col items-center">
       <button
+        type="button"
         className="rounded px-2 text-sm text-muted-foreground hover:text-foreground"
         onClick={() => onChange(Math.min(6, value + 1))}
         aria-label={`Aumentar ${label}`}
       >
         ▲
       </button>
-      <button
+      {/* exibição passiva do coeficiente atual (não é um botão) */}
+      <span
         className={cn(
-          "rounded-md px-2.5 py-0.5 font-sans font-bold",
+          "rounded-md px-2.5 py-0.5 font-sans font-bold tabular-nums",
           value > 1 ? "bg-primary text-primary-foreground" : "text-muted-foreground",
         )}
-        onClick={() => onChange(Math.max(1, value - 1))}
-        aria-label={`Diminuir ${label}`}
-        title={`coeficiente atual: ${value}`}
+        aria-label={`${label}: ${value}`}
       >
         {value}
-      </button>
+      </span>
       <button
+        type="button"
         className="rounded px-2 text-sm text-muted-foreground hover:text-foreground"
         onClick={() => onChange(Math.max(1, value - 1))}
         aria-label={`Diminuir ${label}`}

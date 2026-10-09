@@ -39,7 +39,7 @@ const FRAGMENTS: Array<{
     text: "a tecnologia que prometia libertar",
     concept: "Ironia",
     explanation:
-      "O verbo 'prometia' na pasta com a realidade descrita cria um contraste crítico: dizemos uma coisa para significar a oposta.",
+      "O verbo 'prometia' contrasta com a realidade descrita no texto: a promessa de liberdade virou escravidão digital. Diz-se uma coisa para significar a oposta — a crítica fica mais forte.",
   },
 ];
 

@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Slider } from "@/components/ui/slider";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { percentOf, successiveVariations } from "@/lib/demos/models";
 
 const TOTAL_BLOCKS = 100;
 
@@ -20,9 +21,12 @@ export function PorcentagemDemo() {
   const reduced = useReducedMotion();
 
   const filled = Math.round((percent / 100) * TOTAL_BLOCKS);
-  const valueAfterIncrease = startValue * (1 + increase / 100);
-  const finalValue = valueAfterIncrease * (1 - discount / 100);
-  const netChange = (finalValue / startValue - 1) * 100;
+  const blocksValue = percentOf(percent, 100);
+  const { afterIncrease, final, netChangePct } = successiveVariations(
+    startValue,
+    increase,
+    discount,
+  );
 
   return (
     <div className="space-y-8">
@@ -36,6 +40,9 @@ export function PorcentagemDemo() {
             {percent} blocos
           </span>
         </div>
+        <p className="mb-3 text-xs text-muted-foreground" aria-live="polite">
+          {percent}% de 100 = {percent}/100 × 100 = <strong className="text-foreground tabular-nums">{blocksValue.toString().replace(".", ",")}</strong> — a porcentagem pinta essa fração dos blocos.
+        </p>
         <div
           className="grid grid-cols-10 gap-1 sm:grid-cols-20"
           role="img"
@@ -133,29 +140,29 @@ export function PorcentagemDemo() {
                 após +{increase}%
               </span>
               <span className="tabular-nums font-medium">
-                R$ {valueAfterIncrease.toFixed(2).replace(".", ",")}
+                R$ {afterIncrease.toFixed(2).replace(".", ",")}
               </span>
             </p>
             <p className="flex justify-between border-t border-border pt-2">
               <span className="text-muted-foreground">após −{discount}%</span>
               <span className="tabular-nums text-base font-semibold">
-                R$ {finalValue.toFixed(2).replace(".", ",")}
+                R$ {final.toFixed(2).replace(".", ",")}
               </span>
             </p>
             <p
               className={cn(
                 "mt-1 rounded-lg px-2 py-1 text-center text-xs font-medium",
-                netChange > 0
+                netChangePct > 0
                   ? "bg-success/10 text-success"
-                  : netChange < 0
+                  : netChangePct < 0
                     ? "bg-destructive/10 text-destructive"
                     : "bg-muted text-muted-foreground",
               )}
             >
-              variação líquida: {netChange > 0 ? "+" : ""}
-              {netChange.toFixed(1).replace(".", ",")}%{" "}
+              variação líquida: {netChangePct > 0 ? "+" : ""}
+              {netChangePct.toFixed(1).replace(".", ",")}%{" "}
               {Math.abs(increase - discount) < 100 &&
-              netChange !== increase - discount
+              netChangePct !== increase - discount
                 ? `(não é ${increase - discount > 0 ? "+" : ""}${increase - discount}%!)`
                 : ""}
             </p>

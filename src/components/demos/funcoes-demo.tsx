@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Slider } from "@/components/ui/slider";
+import { afimRoot, quadraticFeatures } from "@/lib/demos/models";
 import { cn } from "@/lib/utils";
 
 type Mode = "afim" | "quadratica";
@@ -50,31 +51,25 @@ export function FuncoesDemo() {
     const markers: Array<{ x: number; y: number; label: string }> = [];
 
     if (isAfim) {
-      // Root where y = 0 (a != 0)
-      if (Math.abs(a) > 0.01) {
-        const root = -b / a;
-        if (root >= X_MIN && root <= X_MAX) {
-          markers.push({ x: root, y: 0, label: `raiz x = ${format(root)}` });
-        }
+      const root = afimRoot(a, b);
+      if (root !== null && root >= X_MIN && root <= X_MAX) {
+        markers.push({ x: root, y: 0, label: `raiz x = ${format(root)}` });
       }
       markers.push({ x: 0, y: b, label: `onde corta o eixo y: b = ${format(b)}` });
     } else {
-      const delta = b * b - 4 * a * c;
-      if (Math.abs(a) > 0.01) {
-        const xv = -b / (2 * a);
-        const yv = -delta / (4 * a);
-        markers.push({ x: xv, y: yv, label: `vértice (${format(xv)}, ${format(yv)})` });
-        if (delta > 0) {
-          const r1 = (-b - Math.sqrt(delta)) / (2 * a);
-          const r2 = (-b + Math.sqrt(delta)) / (2 * a);
-          for (const r of [r1, r2]) {
+      const { delta, roots, vertex } = quadraticFeatures(a, b, c);
+      if (vertex && Math.abs(a) > 0.01) {
+        markers.push({ x: vertex.x, y: vertex.y, label: `vértice (${format(vertex.x)}, ${format(vertex.y)})` });
+        if (roots && roots.length === 2) {
+          for (const r of roots) {
             if (r >= X_MIN && r <= X_MAX) {
               markers.push({ x: r, y: 0, label: `raiz x = ${format(r)}` });
             }
           }
-        } else if (delta === 0) {
-          markers.push({ x: xv, y: 0, label: `raiz dupla x = ${format(xv)}` });
+        } else if (roots && roots.length === 1) {
+          markers.push({ x: roots[0], y: 0, label: `raiz dupla x = ${format(roots[0])}` });
         }
+        void delta;
       }
     }
 
@@ -118,10 +113,10 @@ export function FuncoesDemo() {
       </div>
 
       <div className="grid gap-5 md:grid-cols-[1fr_200px]">
-        <div className="overflow-x-auto scroll-moon">
+        <div>
           <svg
             viewBox={`0 0 ${W} ${H}`}
-            className="h-auto w-full min-w-[320px] rounded-xl bg-muted/20"
+            className="h-auto w-full rounded-xl bg-muted/20"
             role="img"
             aria-label={`Gráfico de ${equation}`}
           >

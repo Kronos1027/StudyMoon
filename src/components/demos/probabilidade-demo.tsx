@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { twoStagePaths } from "@/lib/demos/models";
 
 
 /**
@@ -15,12 +16,12 @@ export function ProbabilidadeDemo() {
 
   const p = pA / 100;
   const paths = [
-    { key: "AA", label: "A e A", prob: p * p },
-    { key: "AB", label: "A e B", prob: p * (1 - p) },
-    { key: "BA", label: "B e A", prob: (1 - p) * p },
-    { key: "BB", label: "B e B", prob: (1 - p) * (1 - p) },
+    { key: "AA", label: "A e A", prob: twoStagePaths(p).AA },
+    { key: "AB", label: "A e B", prob: twoStagePaths(p).AB },
+    { key: "BA", label: "B e A", prob: twoStagePaths(p).BA },
+    { key: "BB", label: "B e B", prob: twoStagePaths(p).BB },
   ];
-  const atLeastOneA = 1 - paths[3].prob;
+  const atLeastOneA = twoStagePaths(p).atLeastOneA;
 
   return (
     <div className="space-y-6">
@@ -44,12 +45,12 @@ export function ProbabilidadeDemo() {
           </label>
         </div>
 
-        <div className="overflow-x-auto scroll-moon pb-2">
+        <div className="pb-2">
           <svg
             viewBox="0 0 520 260"
-            className="min-w-[480px]"
+            className="h-auto w-full"
             role="img"
-            aria-label={`Árvore com duas etapas; probabilidade de A é ${pA}%`}
+            aria-label={`Árvore com duas etapas; probabilidade de A é ${pA}% por etapa`}
           >
             {/* stage 1 */}
             <line x1="40" y1="130" x2="170" y2="70" stroke="var(--primary)" strokeWidth={2.5} />

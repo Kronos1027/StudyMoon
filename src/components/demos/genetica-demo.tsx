@@ -3,41 +3,34 @@
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
-
-type Genotype = "VV" | "Vv" | "vv";
-type Cross = "VV" | "Vv" | "vv";
-
-const GENOTYPES: Cross[] = ["VV", "Vv", "vv"];
-
-function cross(a: Cross, b: Cross): Genotype[] {
-  const gametesA = a.split("") as string[];
-  const gametesB = b.split("") as string[];
-  return gametesA.flatMap((ga) =>
-    gametesB.map((gb) => {
-      const pair = [ga, gb].sort((x, y) => (x === y ? 0 : x === "V" ? -1 : 1));
-      return pair.join("") as Genotype;
-    }),
-  );
-}
+import {
+  punnettCross,
+  punnettCounts,
+  type Genotype,
+} from "@/lib/demos/models";
 
 function phenotype(g: Genotype): "vermelha" | "branca" {
   return g.includes("V") ? "vermelha" : "branca";
 }
 
+type Cross = "VV" | "Vv" | "vv";
+
+const GENOTYPES: Cross[] = ["VV", "Vv", "vv"];
+
 /**
  * Genetics simulator: interactive Punnett square with selectable parents
  * (doc section 12: genética com quadro de Punnett).
- * Bound ONLY to the topic cn-genetica (registry.ts) — never to the area.
+ * Cálculo (gametas, contagens e percentuais) vem de src/lib/demos/models.ts
+ * (testado). Vinculada só a cn-genetica.cruzamentos — nunca à área.
  */
 export function GeneticaDemo() {
   const [parentA, setParentA] = useState<Cross>("Vv");
   const [parentB, setParentB] = useState<Cross>("Vv");
   const reduced = useReducedMotion();
 
-  const grid = cross(parentA, parentB);
-  const counts = new Map<Genotype, number>();
-  for (const g of grid) counts.set(g, (counts.get(g) ?? 0) + 1);
-  const white = counts.get("vv") ?? 0;
+  const grid = punnettCross(parentA, parentB);
+  const { whitePct, redPct } = punnettCounts(parentA, parentB);
+  const white = grid.filter((g) => g === "vv").length;
   const red = 4 - white;
 
   return (
@@ -101,13 +94,13 @@ export function GeneticaDemo() {
           <div className="rounded-xl bg-primary/10 p-3">
             <p className="text-xs text-muted-foreground">Flores vermelhas</p>
             <p className="text-2xl font-semibold text-primary tabular-nums">
-              {red}/4 = {(red * 25)}%
+              {red}/4 = {redPct.toString().replace(".", ",")}%
             </p>
           </div>
           <div className="rounded-xl bg-muted/50 p-3">
             <p className="text-xs text-muted-foreground">Flores brancas (vv)</p>
             <p className="text-2xl font-semibold tabular-nums">
-              {white}/4 = {(white * 25)}%
+              {white}/4 = {whitePct.toString().replace(".", ",")}%
             </p>
           </div>
         </div>

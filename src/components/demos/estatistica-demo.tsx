@@ -5,6 +5,7 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGri
 import { Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { meanMedianMode } from "@/lib/demos/models";
 
 interface Datum {
   name: string;
@@ -25,13 +26,7 @@ export function EstatisticaDemo() {
   ]);
 
   const values = data.map((d) => d.valor).sort((a, b) => a - b);
-  const n = values.length;
-  const mean = n > 0 ? values.reduce((s, v) => s + v, 0) / n : 0;
-  const median = n === 0 ? 0 : n % 2 === 1 ? values[(n - 1) / 2] : (values[n / 2 - 1] + values[n / 2]) / 2;
-  const counts = new Map<number, number>();
-  for (const v of values) counts.set(v, (counts.get(v) ?? 0) + 1);
-  const maxCount = Math.max(...counts.values());
-  const modes = [...counts.entries()].filter(([, c]) => c === maxCount && c > 1).map(([v]) => v);
+  const { mean, median, modes } = meanMedianMode(values);
 
   function changeValue(index: number, delta: number) {
     setData((d) =>
@@ -45,7 +40,10 @@ export function EstatisticaDemo() {
   function addPerson() {
     const names = ["Fábio", "Gabi", "Hugo", "Ivo", "Júlia", "Kaique", "Lia", "Marcos", "Nina", "Otávio"];
     const name = names[data.length % names.length];
-    setData((d) => [...d, { name, valor: Math.ceil(Math.random() * 10) }]);
+    // Nota inicial determinística (nada de Math.random: o mesmo clique
+    // sempre produz o mesmo estado — auditável e testável).
+    const note = [5, 7, 4, 8, 6, 5, 9, 6, 7, 8][data.length % 10];
+    setData((d) => [...d, { name, valor: note }]);
   }
 
   return (
@@ -120,7 +118,7 @@ export function EstatisticaDemo() {
                   fontSize: 12,
                 }}
               />
-              <Bar dataKey="valor" fill="var(--chart-1)" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="valor" fill="var(--chart-1)" radius={[6, 6, 0, 0]} isAnimationActive={false} />
             </BarChart>
           </ResponsiveContainer>
         </div>

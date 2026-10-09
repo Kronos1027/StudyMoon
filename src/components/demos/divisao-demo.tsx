@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Slider } from "@/components/ui/slider";
+import { divisionWithRemainder } from "@/lib/demos/models";
 
 /**
  * Division simulator: grouping objects into boxes (doc section 12).
@@ -13,8 +14,7 @@ export function DivisaoDemo() {
   const [boxSize, setBoxSize] = useState(4);
   const reduced = useReducedMotion();
 
-  const quotient = Math.floor(total / boxSize);
-  const remainder = total % boxSize;
+  const { quotient, remainder } = divisionWithRemainder(total, boxSize);
   const boxes = Array.from({ length: quotient }, (_, i) =>
     Array.from({ length: boxSize }, (_, j) => i * boxSize + j),
   );

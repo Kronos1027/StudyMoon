@@ -16,13 +16,13 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 | `eutrofizacao` | src/components/demos/eutrofizacao-demo.tsx | cn | `cn-ecologia.eutrofizacao` | 1 | OK |
 | `fracoes` | src/components/demos/fracoes-demo.tsx | mt | `mt-fracoes-decimais.fracoes` | 2 | OK |
 | `funcoes` | src/components/demos/funcoes-demo.tsx | mt | `mt-funcoes.afim`<br>`mt-funcoes.quadratica`<br>`mt-geometria-analitica.reta` | 2 | ⚠️ 1 problema(s) |
-| `genetica` | src/components/demos/genetica-demo.tsx | cn | `cn-genetica.cruzamentos` | 1 | OK |
-| `geometria` | src/components/demos/geometria-demo.tsx | mt | `mt-geometria-plana.areas-perimetros` | 1 | OK |
-| `linha-tempo` | src/components/demos/linha-tempo-demo.tsx | lc | `lc-literatura-movimentos.movimentos` | 0 | OK |
+| `genetica` | src/components/demos/genetica-demo.tsx | cn | `cn-genetica.cruzamentos` | 1 | ⚠️ 1 problema(s) |
+| `geometria` | src/components/demos/geometria-demo.tsx | mt | `mt-geometria-plana.areas-perimetros` | 1 | ⚠️ 1 problema(s) |
+| `linha-tempo` | src/components/demos/linha-tempo-demo.tsx | lc | `lc-literatura-movimentos.movimentos` | 0 | ⚠️ 1 problema(s) |
 | `mapas` | src/components/demos/mapas-demo.tsx | ch | `ch-geo-humana.populacao` | 0 | ⚠️ 1 problema(s) |
 | `phet` | src/components/demos/phet-demo.tsx | cn | `cn-eletricidade.circuitos`<br>`cn-eletricidade.potencia-eletrica`<br>`cn-energia-trabalho.fontes-transformacoes`<br>`cn-mecanica.energia-mecanica`<br>`cn-ondas-optica.ondas` | 1 | ⚠️ 1 problema(s) |
 | `porcentagem` | src/components/demos/porcentagem-demo.tsx | mt | `mt-porcentagem-juros.juros-compostos`<br>`mt-porcentagem-juros.porcentagem`<br>`mt-porcentagem-juros.variacoes-sucessivas` | 5 | OK |
-| `probabilidade` | src/components/demos/probabilidade-demo.tsx | mt | `mt-probabilidade.eventos-compostos` | 2 | ⚠️ 1 problema(s) |
+| `probabilidade` | src/components/demos/probabilidade-demo.tsx | mt | `mt-probabilidade.eventos-compostos` | 2 | ⚠️ 2 problema(s) |
 | `razao` | src/components/demos/razao-demo.tsx | mt | `mt-razao-proporcao.proporcao`<br>`mt-razao-proporcao.razao` | 0 | OK |
 | `regra-de-tres` | src/components/demos/regra-de-tres-demo.tsx | mt | `mt-razao-proporcao.regra-de-tres-direta`<br>`mt-razao-proporcao.regra-de-tres-inversa` | 2 | OK |
 | `textos` | src/components/demos/textos-demo.tsx | lc | `lc-figuras-linguagem.figuras`<br>`lc-interpretacao.interpretacao` | 1 | ⚠️ 1 problema(s) |
@@ -91,16 +91,20 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 - **CORRIGIDO:** Vinculada a cn-equilibrio-eletroquimica, mas a demo é o balanceamento molecular H₂+O₂→H₂O, sem relação com equilíbrio químico/eletroquímica.
   - **Correção:** Vinculada a cn-estequiometria.balanceamento e cn-estequiometria.calculos-estequiometricos (a equação balanceada é o passo 0 do cálculo).
 - **PROBLEMA:** O botão do coeficiente DECREMENTA ao ser clicado (confuso: parece seletor, é ação).
-  - **Correção:** Botão vira exibição passiva (correção do PASSO 3).
+  - **Correção:** Botão de coeficiente virou exibição passiva; contagem de átomos vem de models.ts.
 
-<details><summary>Textos e fórmulas exibidos (34 trechos extraídos do código)</summary>
+<details><summary>Textos e fórmulas exibidos (36 trechos extraídos do código)</summary>
 
-- ; /** * Equation balancing: drag-free
+- , count === target ?
+- , value > 1 ?
 - ; import { Button } from
 - ; import { cn } from
+- ; import { h2oAtomCounts } from
 - ; import { motion, useReducedMotion } from
 - ; import { RotateCcw, CheckCircle2 } from
 - (alvo: ${target})
+- } > ▲ </button> {/* exibição passiva do coeficiente atual (não é um botão) */} <span className={cn(
+- } > ▼ </button> </span> ); } function AtomRow({ element, count, target }: { element: string; count: number; target: number }) { return ( <p className=
 - } className=
 - /> <p className=
 - /> <span>H₂</span> <span className=
@@ -114,21 +118,19 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 - > <p className=
 - > <p>Átomos não podem aparecer nem sumir — ajuste os coeficientes.</p> <Button variant=
 - > <section aria-label=
+- > <span className=
 - > Ajuste os coeficientes até os átomos se equilibrarem </h3> <div className=
 - > Antes da seta (reagentes) </p> <AtomRow element=
 - > Depois da seta (produtos) </p> <AtomRow element=
 - > Equilibrada! 2H₂ + O₂ → 2H₂O — a mesma quantidade de átomos entra e sai. </p> </motion.div> ) : ( <div className=
+- >{element}</span> <span className={cn(
 - >→</span> <CoefStepper value={coefC} onChange={setCoefC} label=
 - >+</span> <CoefStepper value={coefB} onChange={setCoefB} label=
-- Aumentar ${label}
-- coeficiente atual: ${value}
+- className=
 - count={leftH} target={rightH} /> <AtomRow element=
 - count={leftO} target={rightO} /> </div> <div className=
 - count={rightH} target={leftH} /> <AtomRow element=
 - count={rightO} target={leftO} /> </div> </div> {balanced ? ( <motion.div className=
-- Diminuir ${label}
-- initial={reduced ? undefined : { scale: 0.95, opacity: 0 }} animate={reduced ? undefined : { scale: 1, opacity: 1 }} > <CheckCircle2 className=
-- onClick={reset}> <RotateCcw className=
 
 </details>
 
@@ -139,8 +141,9 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 - **Vinculada a (subtópicos):** `mt-divisibilidade.criterios`, `mt-operacoes-basicas.multiplicacao-divisao`
 - **Questões seed que exibem:** 0
 
-<details><summary>Textos e fórmulas exibidos (31 trechos extraídos do código)</summary>
+<details><summary>Textos e fórmulas exibidos (32 trechos extraídos do código)</summary>
 
+- ; import { divisionWithRemainder } from
 - ; import { motion, useReducedMotion } from
 - ; import { Slider } from
 - } /> ))} </div> </motion.div> ) : ( <p className=
@@ -242,7 +245,7 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 - **CORRIGIDO:** Era vinculada a mt-graficos-tabelas, cujo foco é leitura de gráficos, não média/mediana/moda.
   - **Correção:** Vinculada só a mt-estatistica.media-mediana-moda.
 - **PROBLEMA:** 'Adicionar aluno' sorteia nota com Math.random() (não determinístico).
-  - **Correção:** Nota inicial determinística (correção de conteúdo do PASSO 3).
+  - **Correção:** Nota inicial determinística (sequência fixa [5,7,4,8,6,...]) e medidas vindas de models.ts.
 
 <details><summary>Textos e fórmulas exibidos (36 trechos extraídos do código)</summary>
 
@@ -257,9 +260,9 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 - ; import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from
 - ; import { Button } from
 - ; import { cn } from
+- ; import { meanMedianMode } from
 - ; import { Minus, Plus } from
 - )} </p> </div> <div className=
-- ]; const name = names[data.length % names.length]; setData((d) => [...d, { name, valor: Math.ceil(Math.random() * 10) }]); } return ( <div className=
 - ]} contentStyle={{ background:
 - } </p> </div> </section> <p className=
 - } > + </button> </div> ))} </div> <div className=
@@ -303,11 +306,11 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 - , }; return { tone:
 - , status.tone)} > {status.text} </p> </section> {/* 3. Dissolved oxygen chart */} <section aria-label=
 - , text:
-- ; // --------------------------------------------------------------------------- // Deterministic eutrophication model (per
 - ; const status = useMemo(() => { if (current.peixesVivos === 0) return { tone:
 - ; import { Button } from
 - ; import { cn } from
 - ; import { Droplets, Fish, Pause, Play, RotateCcw, StepForward } from
+- ; import { LAKE_INITIAL, stepLake, type LakeState } from
 - ; import { motion, useReducedMotion } from
 - ; import { Slider } from
 - : current.od >= 3 ?
@@ -349,10 +352,11 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 | A fração do tempo total planejado que ainda falta estudar é… | `mt-fracoes-decimais` | `fracoes` |
 | De um total de 200 livros de uma biblioteca comunitária, $\frac{2}{5}$… | `mt-fracoes-decimais` | `fracoes` |
 
-<details><summary>Textos e fórmulas exibidos (27 trechos extraídos do código)</summary>
+<details><summary>Textos e fórmulas exibidos (28 trechos extraídos do código)</summary>
 
 - , on ?
 - ; import { cn } from
+- ; import { equivalentFractions } from
 - ; import { motion, useReducedMotion } from
 - ; import { Slider } from
 - } > {Array.from({ length: denominator }, (_, i) => { const on = i < clampedNumerator; return ( <motion.div key={
@@ -393,12 +397,13 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 | Se uma corrida custou R$ 35,00, a distância percorrida foi de… | `mt-funcoes` | `afim` |
 | O lucro máximo que a barraquinha pode alcançar é de… | `mt-funcoes` | `quadratica` |
 
-- **PROBLEMA:** SVG com min-w-[320px] causa rolagem lateral em telas de 360 px; comparação `delta === 0` com ponto flutuante.
-  - **Correção:** SVG responsivo (escala pelo viewBox, sem min-width); delta com tolerância (correção do PASSO 3).
+- **CORRIGIDO:** SVG com min-w-[320px] causa rolagem lateral em telas de 360 px; comparação `delta === 0` com ponto flutuante.
+  - **Correção:** SVG responsivo (sem min-width/min-w); delta com tolerância via quadraticFeatures (models.ts).
 
 <details><summary>Textos e fórmulas exibidos (36 trechos extraídos do código)</summary>
 
 - , mode === value ?
+- ; import { afimRoot, quadraticFeatures } from
 - ; import { cn } from
 - ; import { Slider } from
 - ; type Mode =
@@ -433,7 +438,6 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 - >{format(c)}</strong> </label> <Slider value={[c]} onValueChange={([v]) => setC(v)} min={-10} max={10} step={0.5} aria-label=
 - className=
 - fill=
-- h-auto w-full min-w-[320px] rounded-xl bg-muted/20
 
 </details>
 
@@ -455,29 +459,29 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 
 - , phenotype(g) ===
 - , value === g ?
+- ; } type Cross =
 - ; const GENOTYPES: Cross[] = [
+- ; function phenotype(g: Genotype):
 - ; import { cn } from
 - ; import { motion, useReducedMotion } from
-- ; type Cross =
-- ; type Genotype =
+- ; import { punnettCross, punnettCounts, type Genotype, } from
 - : parentA ===
-- ? -1 : 1)); return pair.join(
-- ) ?? 0; const red = 4 - white; return ( <div className=
-- ) as Genotype; }), ); } function phenotype(g: Genotype):
-- ) as string[]; const gametesB = b.split(
-- ) as string[]; return gametesA.flatMap((ga) => gametesB.map((gb) => { const pair = [ga, gb].sort((x, y) => (x === y ? 0 : x ===
 - ); const [parentB, setParentB] = useState<Cross>(
-- ); const reduced = useReducedMotion(); const grid = cross(parentA, parentB); const counts = new Map<Genotype, number>(); for (const g of grid) counts.set(g, (counts.get(g) ?? 0) + 1); const white = counts.get(
+- ); const reduced = useReducedMotion(); const grid = punnettCross(parentA, parentB); const { whitePct, redPct } = punnettCounts(parentA, parentB); const white = grid.filter((g) => g ===
+- ).length; const red = 4 - white; return ( <div className=
 - ).map((_gb, j) => { const g = grid[i * 2 + j]; return ( <motion.td key={j} className={cn(
 - ).map((g, i) => ( <th key={i} className=
 - ).map((ga, i) => ( <tr key={i}> <th className=
-- ]; function cross(a: Cross, b: Cross): Genotype[] { const gametesA = a.split(
+- )}% </p> </div> </div> <p className=
+- )}% </p> </div> <div className=
 - { return g.includes(
 - } </p> </section> </div> ); } function ParentPicker({ label, value, onChange, }: { label: string; value: Cross; onChange: (v: Cross) => void; }) { return ( <div className=
 - /> {parentB.split(
 - && parentB ===
 - > {g} </th> ))} </tr> </thead> <tbody> {parentA.split(
 - > {GENOTYPES.map((g) => ( <button key={g} role=
+- > {parentA ===
+- > {white}/4 = {whitePct.toString().replace(
 - > <h3 className=
 - > <p className=
 - > <ParentPicker label=
@@ -488,7 +492,7 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 - >{ga}</th> {parentB.split(
 - >{label}</p> <div role=
 - >×</span> <ParentPicker label=
-- || parentB ===
+- >Flores brancas (vv)</p> <p className=
 
 </details>
 
@@ -506,8 +510,9 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 - **CORRIGIDO:** Vinculada a geometria espacial (volumes), mas a demo é de áreas/perímetros planos.
   - **Correção:** Vinculada só a mt-geometria-plana.areas-perimetros; espacial fica sem demo.
 
-<details><summary>Textos e fórmulas exibidos (35 trechos extraídos do código)</summary>
+<details><summary>Textos e fórmulas exibidos (36 trechos extraídos do código)</summary>
 
+- ; import { lShapeArea, rectMetrics } from
 - ; import { motion, useReducedMotion } from
 - ; import { Slider } from
 - } > <span className=
@@ -594,40 +599,41 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 - **CORRIGIDO:** Agrupava assuntos: gráfico de população por região era vinculado a geo-física, cartografia e meio-ambiente (a questão de emissões de CO₂ exibia população do Censo).
   - **Correção:** Vinculada só a ch-geo-humana.populacao.
 - **PROBLEMA:** Dados do Censo 2022 imprecisos (Sul 30,4 mi; shares somando 100,4%).
-  - **Correção:** Dados corrigidos pelo Censo 2022 (SE 84,8 mi/41,8%, NE 54,6, S 29,2, N 17,0, CO 16,2 — shares calculados pelo código somam 99,5%).
+  - **Correção:** Dados corrigidos pelo Censo 2022 em models.ts (SE 84,8 mi/41,8%, NE 54,6, S 29,2, N 17,0, CO 16,2 — shares calculados pelo código, testados).
 
-<details><summary>Textos e fórmulas exibidos (35 trechos extraídos do código)</summary>
+<details><summary>Textos e fórmulas exibidos (36 trechos extraídos do código)</summary>
 
-- , )} > {ind.label} </button> ))} </div> </div> <div className=
-- , border:
-- , borderRadius: 12, fontSize: 12, }} /> <Bar dataKey=
-- , indicator === ind.key ?
-- , population: 17.9, share: 8.5, color:
-- , population: 30.4, share: 14.4, color:
-- , population: 57.1, share: 27.1, color:
-- , population: 89.6, share: 42.5, color:
-- ; /** * Geography data explorer: Brazil regions with a choropleth-style list and * live chart (IBGE-style open data, simplified for study purposes). */ const REGIONS = [ { id:
+- , )} > {label} </button> ))} </div> </div> <div className=
+- , }; const SHARES = regionShares( BRAZIL_REGIONS.map((r) => r.population), BRAZIL_TOTAL_MILLIONS, ); export function MapasDemo() { const [indicator, setIndicator] = useState<
+- , indicator ===
+- , indicator === key ?
 - ; import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from
+- ; import { BRAZIL_REGIONS, BRAZIL_TOTAL_MILLIONS, regionShares, } from
 - ; import { cn } from
 - ; import { motion, useReducedMotion } from
-- ]} contentStyle={{ background:
+- )} ${indicator ===
+- )} milhões de habitantes — ${activeShare.toString().replace(
+- )} milhões do país (Censo 2022). Pergunta de prova: por que o Sudeste concentra tanta gente? Industrialização histórica, emprego e serviços.
+- )} milhões). Toque em uma região para destacar.
+- )}% dos ${BRAZIL_TOTAL_MILLIONS.toString().replace(
 - } </span> </motion.button> ))} </div> </div> <p className=
-- }, ] as const; export function MapasDemo() { const [indicator, setIndicator] = useState<
-- }, ]; const INDICATORS = [ { key:
 - }} /> <Tooltip formatter={(value: number) => [
 - }} /> <YAxis tick={{ fontSize: 11, fill:
 - /> {r.name} </span> <span className=
-- % da população do Brasil
-- > {activeRegion ?
-- > {INDICATORS.map((ind) => ( <button key={ind.key} role=
-- > {r[indicator]}{indicator ===
+- % da população
+- > {activeRegion && activeShare !== null ?
+- > {indicator ===
 - > <BarChart data={data} margin={{ top: 5, right: 5, bottom: 0, left: -20 }}> <CartesianGrid stroke=
 - > <div className=
 - > <h3 className=
 - > <ResponsiveContainer width=
 - > Regiões do Brasil por população (Censo 2022, IBGE) </h3> <div role=
-- Centro-Oeste
+- ${r.population.toString().replace(
+- ${SHARES[i].toString().replace(
+- 1px solid var(--border)
 - className=
+- Dados abertos do IBGE (Censo 2022 — primeiros resultados definitivos; população do país: ${BRAZIL_TOTAL_MILLIONS.toString().replace(
+- Participação
 - População (milhões)
 - population
 - strokeDasharray=
@@ -647,16 +653,17 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 | --- | --- | --- |
 | O custo mensal (30 dias) aproximado para operar esse chuveiro é de… | `cn-eletricidade` | `potencia-eletrica` |
 
-- **PROBLEMA:** Uma única demo com 3 simulações em abas abria SEMPRE na aba 'Movimento' — a questão do chuveiro elétrico (circuitos) exibia a de movimento. Título com erro de digitação ('Movimento ( Energia de um Skate)').
-  - **Correção:** Aceitar o parâmetro da questão (subtópico → aba inicial: circuits/waves/motion); título corrigido (PASSO 3).
+- **CORRIGIDO:** Uma única demo com 3 simulações em abas abria SEMPRE na aba 'Movimento' — a questão do chuveiro elétrico (circuitos) exibia a de movimento. Título com erro de digitação ('Movimento ( Energia de um Skate)').
+  - **Correção:** Aceita o parâmetro sim da questão/subtópico (aba inicial correta); título corrigido para 'Energia de um skate'.
 
-<details><summary>Textos e fórmulas exibidos (20 trechos extraídos do código)</summary>
+<details><summary>Textos e fórmulas exibidos (21 trechos extraídos do código)</summary>
 
 - , questions: [
 - , title:
 - , url:
-- ; /** * PhET simulations embedded from the official site (CC BY, University of * Colorado Boulder) with guiding questions beside each (doc section 12). */ const SIMULATIONS = [ { id:
-- ); const sim = SIMULATIONS.find((s) => s.id === active) ?? SIMULATIONS[0]; return ( <div className=
+- ; } const SIMULATIONS = [ { id:
+- ; /** * PhET simulations embedded from the official site (CC BY, University of * Colorado Boulder) with guiding questions beside each (doc section 12). * Aceita o parâmetro da questão
+- ; const [active, setActive] = useState<SimId>(initial); const sim = SIMULATIONS.find((s) => s.id === active) ?? SIMULATIONS[0]; return ( <div className=
 - } > {s.title} </button> ))} </div> <div className=
 - } className=
 - > {sim.questions.map((q) => ( <li key={q}>{q}</li> ))} </ul> </aside> </div> <p className=
@@ -671,7 +678,7 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 - Aumente a tensão da pilha: o que muda na corrente?
 - className=
 - loading=
-- O que acontece com a altura máxima quando atrito é ligado?
+- O que acontece com a altura máxima quando o atrito é ligado?
 
 </details>
 
@@ -692,19 +699,21 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 
 <details><summary>Textos e fórmulas exibidos (36 trechos extraídos do código)</summary>
 
-- , )} > variação líquida: {netChange > 0 ?
-- , netChange > 0 ?
+- , )} > variação líquida: {netChangePct > 0 ?
+- , netChangePct > 0 ?
 - , on ?
 - ; import { cn } from
 - ; import { motion, useReducedMotion } from
+- ; import { percentOf, successiveVariations } from
 - ; import { Slider } from
 - ; import { TrendingDown, TrendingUp } from
-- : netChange < 0 ?
+- : netChangePct < 0 ?
 - )} </label> <Slider id=
 - )} </span> </p> <p className=
 - )} </span> </p> <p className={cn(
-- } {Math.abs(increase - discount) < 100 && netChange !== increase - discount ?
-- } {netChange.toFixed(1).replace(
+- )}</strong> — a porcentagem pinta essa fração dos blocos. </p> <div className=
+- } {Math.abs(increase - discount) < 100 && netChangePct !== increase - discount ?
+- } {netChangePct.toFixed(1).replace(
 - } > {Array.from({ length: TOTAL_BLOCKS }, (_, i) => { const on = i < filled; return ( <motion.span key={i} className={cn(
 - /> </div> <div className=
 - /> <div className=
@@ -712,7 +721,8 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 - /> Aumento: {increase}% </label> <Slider id=
 - /> Desconto depois: {discount}% </label> <Slider id=
 - > {/* Part 1: blocks */} <section aria-label=
-- > {percent} blocos </span> </div> <div className=
+- > {percent} blocos </span> </div> <p className=
+- > {percent}% de 100 = {percent}/100 × 100 = <strong className=
 - > <div className=
 - > <h3 className=
 - > <label htmlFor=
@@ -724,10 +734,7 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 - > após +{increase}% </span> <span className=
 - > Aumento e depois desconto <span className=
 - > Quantos são {percent}% de 100? </h3> <span className=
-- > R$ {finalValue.toFixed(2).replace(
-- > R$ {startValue.toLocaleString(
-- > R$ {valueAfterIncrease.toFixed(2).replace(
-- > Valor inicial: R$ {startValue.toLocaleString(
+- > R$ {afterIncrease.toFixed(2).replace(
 
 </details>
 
@@ -745,16 +752,17 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 
 - **CORRIGIDO:** Agrupava assuntos: vinculada a mt-probabilidade E mt-combinatoria. A questão de senhas (princípio multiplicativo — contagem) exibia a árvore de probabilidades, que não ensina contagem.
   - **Correção:** Vinculação por subtópico: apenas eventos compostos (mt-probabilidade.eventos-compostos); combinatoria fica sem demo.
-- **PROBLEMA:** SVG com min-w-[480px] — rolagem lateral em telas de 360 px.
-  - **Correção:** SVG responsivo sem min-width (correção do PASSO 3).
+- **CORRIGIDO:** SVG com min-w-[480px] — rolagem lateral em telas de 360 px.
+  - **Correção:** SVG responsivo sem min-width; probabilidades vindas de twoStagePaths (models.ts).
 
-<details><summary>Textos e fórmulas exibidos (30 trechos extraídos do código)</summary>
+<details><summary>Textos e fórmulas exibidos (31 trechos extraídos do código)</summary>
 
-- , prob: (1 - p) * (1 - p) }, ]; const atLeastOneA = 1 - paths[3].prob; return ( <div className=
-- , prob: (1 - p) * p }, { key:
-- , prob: p * (1 - p) }, { key:
-- , prob: p * p }, { key:
+- , prob: twoStagePaths(p).AA }, { key:
+- , prob: twoStagePaths(p).AB }, { key:
+- , prob: twoStagePaths(p).BA }, { key:
+- , prob: twoStagePaths(p).BB }, ]; const atLeastOneA = twoStagePaths(p).atLeastOneA; return ( <div className=
 - ; import { motion, useReducedMotion } from
+- ; import { twoStagePaths } from
 - ? 4 : 2} /> <line x1=
 - ? 4 : 2} /> <text x=
 - ) </span> <span className=
@@ -898,7 +906,7 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 - **CORRIGIDO:** Agrupava assuntos: vinculada a 4 tópicos de Linguagens, incluindo gêneros textuais e variação linguística, que a anotação de figuras/funções não ensina.
   - **Correção:** Vinculada só a lc-interpretacao.interpretacao e lc-figuras-linguagem.figuras.
 - **PROBLEMA:** A explicação da ironia contém frase truncada ('na pasta com a realidade') — texto sem sentido em português.
-  - **Correção:** Reescrever a explicação da ironia (correção de conteúdo do PASSO 3).
+  - **Correção:** Explicação da ironia reescrita ('prometia' contrasta com a realidade descrita).
 
 <details><summary>Textos e fórmulas exibidos (28 trechos extraídos do código)</summary>
 
@@ -928,7 +936,7 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 - > Toque nos trechos destacados para revelar o conceito de linguagem </h3> <blockquote className=
 - a notificação de celular é um chicote silencioso
 - bilhões de vezes por dia
-- na pasta com a realidade descrita cria um contraste crítico: dizemos uma coisa para significar a oposta.
+- contrasta com a realidade descrita no texto: a promessa de liberdade virou escravidão digital. Diz-se uma coisa para significar a oposta — a crítica fica mais forte.
 - tabIndex={0} onClick={onClick} onKeyDown={(e) => e.key ===
 
 </details>

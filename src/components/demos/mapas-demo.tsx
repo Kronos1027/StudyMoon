@@ -4,35 +4,45 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
 import { cn } from "@/lib/utils";
+import {
+  BRAZIL_REGIONS,
+  BRAZIL_TOTAL_MILLIONS,
+  regionShares,
+} from "@/lib/demos/models";
 
 /**
- * Geography data explorer: Brazil regions with a choropleth-style list and
- * live chart (IBGE-style open data, simplified for study purposes).
+ * Geography data explorer: Brazil regions population (Censo 2022, IBGE —
+ * primeiros resultados definitivos) with a live chart. Dados e participações
+ * percentuais vêm de src/lib/demos/models.ts (regionShares — testado:
+ * shares somam ~99,5% do total do país). Vinculada só a
+ * ch-geo-humana.populacao (nunca a geo-física/cartografia/meio-ambiente).
  */
-const REGIONS = [
-  { id: "N", name: "Norte", population: 17.9, share: 8.5, color: "#22d3ee" },
-  { id: "NE", name: "Nordeste", population: 57.1, share: 27.1, color: "#6d5dfc" },
-  { id: "SE", name: "Sudeste", population: 89.6, share: 42.5, color: "#f472b6" },
-  { id: "S", name: "Sul", population: 30.4, share: 14.4, color: "#34d399" },
-  { id: "CO", name: "Centro-Oeste", population: 16.6, share: 7.9, color: "#fbbf24" },
-];
+const REGION_COLORS: Record<string, string> = {
+  N: "#22d3ee",
+  NE: "#6d5dfc",
+  SE: "#f472b6",
+  S: "#34d399",
+  CO: "#fbbf24",
+};
 
-const INDICATORS = [
-  { key: "population", label: "População (milhões)", unit: "mi" },
-  { key: "share", label: "% da população do Brasil", unit: "%" },
-] as const;
+const SHARES = regionShares(
+  BRAZIL_REGIONS.map((r) => r.population),
+  BRAZIL_TOTAL_MILLIONS,
+);
 
 export function MapasDemo() {
   const [indicator, setIndicator] = useState<"population" | "share">("population");
   const [selected, setSelected] = useState<string | null>(null);
   const reduced = useReducedMotion();
 
-  const data = REGIONS.map((r) => ({
+  const data = BRAZIL_REGIONS.map((r, i) => ({
     name: r.name,
-    value: r[indicator],
+    value: indicator === "population" ? r.population : SHARES[i],
   }));
 
-  const activeRegion = REGIONS.find((r) => r.id === selected);
+  const activeIndex = BRAZIL_REGIONS.findIndex((r) => r.id === selected);
+  const activeRegion = activeIndex >= 0 ? BRAZIL_REGIONS[activeIndex] : null;
+  const activeShare = activeIndex >= 0 ? SHARES[activeIndex] : null;
 
   return (
     <div className="space-y-5">
@@ -41,34 +51,42 @@ export function MapasDemo() {
           Regiões do Brasil por população (Censo 2022, IBGE)
         </h3>
         <div role="tablist" aria-label="Indicador" className="flex rounded-lg border border-border p-1">
-          {INDICATORS.map((ind) => (
+          {(
+            [
+              ["population", "População (milhões)"],
+              ["share", "% da população"],
+            ] as const
+          ).map(([key, label]) => (
             <button
-              key={ind.key}
+              key={key}
               role="tab"
-              aria-selected={indicator === ind.key}
-              onClick={() => setIndicator(ind.key)}
+              aria-selected={indicator === key}
+              onClick={() => setIndicator(key)}
               className={cn(
                 "rounded-md px-2.5 py-1 text-xs transition-colors",
-                indicator === ind.key
+                indicator === key
                   ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
-              {ind.label}
+              {label}
             </button>
           ))}
         </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-[1fr_200px]">
-        <div className="h-48" role="img" aria-label="Gráfico de barras por região">
+        <div className="h-48" role="img" aria-label="Gráfico de barras da população por região">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} margin={{ top: 5, right: 5, bottom: 0, left: -20 }}>
               <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="name" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} />
               <YAxis tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} />
               <Tooltip
-                formatter={(value: number) => [`${value} ${indicator === "population" ? "mi" : "%"}`, "População"]}
+                formatter={(value: number) => [
+                  `${value.toLocaleString("pt-BR")} ${indicator === "population" ? "milhões" : "%"}`,
+                  indicator === "population" ? "População" : "Participação",
+                ]}
                 contentStyle={{
                   background: "var(--popover)",
                   border: "1px solid var(--border)",
@@ -76,9 +94,9 @@ export function MapasDemo() {
                   fontSize: 12,
                 }}
               />
-              <Bar dataKey="value" radius={[6, 6, 0, 0]}>
-                {REGIONS.map((r) => (
-                  <Cell key={r.id} fill={r.color} />
+              <Bar dataKey="value" radius={[6, 6, 0, 0]} isAnimationActive={false}>
+                {BRAZIL_REGIONS.map((r) => (
+                  <Cell key={r.id} fill={REGION_COLORS[r.id]} />
                 ))}
               </Bar>
             </BarChart>
@@ -86,7 +104,7 @@ export function MapasDemo() {
         </div>
 
         <div className="space-y-1.5">
-          {REGIONS.map((r) => (
+          {BRAZIL_REGIONS.map((r, i) => (
             <motion.button
               key={r.id}
               onClick={() => setSelected(selected === r.id ? null : r.id)}
@@ -99,21 +117,21 @@ export function MapasDemo() {
               aria-pressed={selected === r.id}
             >
               <span className="flex items-center gap-2">
-                <span className="h-3 w-3 rounded-sm" style={{ background: r.color }} aria-hidden="true" />
+                <span className="h-3 w-3 rounded-sm" style={{ background: REGION_COLORS[r.id] }} aria-hidden="true" />
                 {r.name}
               </span>
               <span className="tabular-nums text-muted-foreground">
-                {r[indicator]}{indicator === "share" ? "%" : " mi"}
+                {indicator === "share" ? `${SHARES[i].toString().replace(".", ",")}%` : `${r.population.toString().replace(".", ",")} mi`}
               </span>
             </motion.button>
           ))}
         </div>
       </div>
 
-      <p className="text-xs leading-relaxed text-muted-foreground">
-        {activeRegion
-          ? `A região ${activeRegion.name} concentra ${activeRegion.share}% da população brasileira — ${activeRegion.population} milhões de habitantes. Pergunta de prova: por que o Sudeste concentra tanta gente? (industrialização histórica + emprego + serviços)`
-          : "Dados abertos do IBGE (Censo 2022). Toque em uma região para destacar."}
+      <p className="text-xs leading-relaxed text-muted-foreground" aria-live="polite">
+        {activeRegion && activeShare !== null
+          ? `A região ${activeRegion.name} tem ${activeRegion.population.toString().replace(".", ",")} milhões de habitantes — ${activeShare.toString().replace(".", ",")}% dos ${BRAZIL_TOTAL_MILLIONS.toString().replace(".", ",")} milhões do país (Censo 2022). Pergunta de prova: por que o Sudeste concentra tanta gente? Industrialização histórica, emprego e serviços.`
+          : `Dados abertos do IBGE (Censo 2022 — primeiros resultados definitivos; população do país: ${BRAZIL_TOTAL_MILLIONS.toString().replace(".", ",")} milhões). Toque em uma região para destacar.`}
       </p>
     </div>
   );
