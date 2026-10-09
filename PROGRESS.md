@@ -1,6 +1,6 @@
 # PROGRESS.md — StudyMoon
 
-Última atualização: 2026-10-09 (sessão 4 — **GitHub sincronizado + secrets + CI verde + IA ao vivo**: OpenRouter validado em cascata real, pipeline noturno gerou 2 questões validadas em produção)
+Última atualização: 2026-10-09 (sessão 4b — **PRODUÇÃO VALIDADA**: deploy Vercel ativo, env vars corrigidas, auth round-trip real, cron protegido, Lighthouse desktop 100/mobile 93)
 
 Se o contexto for reiniciado: leia este arquivo + `docs/DECISIONS.md` + `docs/KNOWN_ISSUES.md` e retome de onde parou.
 
@@ -17,7 +17,7 @@ Se o contexto for reiniciado: leia este arquivo + `docs/DECISIONS.md` + `docs/KN
 | 6 — IA e motor de conteúdo | ✅ concluída | roteador com fallback + circuit breaker (8 testes), cache, tutor socrático com rate limit, pipeline noturno com validação em 4 camadas |
 | 7 — Redação e simulados | ✅ concluída | 6 temas originais, editor com timer 30min/ modo prova, correção pela rubrica (5×200, degraus de 40), simulados parcial/dia1/dia2 com relatório |
 | 8 — Cuidado e engajamento | ✅ concluída | push VAPID + escalada gentil (máx 2/dia, silêncio 22h-7h), XP antifraude, ligas, 8 medalhas, workflows Actions |
-| 9 — Robustez e entrega | 🔶 parcial | keepalive + backup semanal + offline + privacidade/LGPD + exportar/apagar + **gitleaks no CI (histórico limpo)** ok; **pende: Lighthouse pós-deploy, notificação em aparelho real** |
+| 9 — Robustez e entrega | ✅ concluída | keepalive + backup semanal + offline + privacidade/LGPD + exportar/apagar + gitleaks no CI + **deploy Vercel validado** (auth real, cron, guard) + **Lighthouse desktop 100/100/96/100 e mobile 93/100/96/100**; push em aparelho real ainda pendente (exige usuário) |
 
 ## Aceites verificados nesta sessão (2)
 
@@ -41,7 +41,7 @@ Se o contexto for reiniciado: leia este arquivo + `docs/DECISIONS.md` + `docs/KN
 1. **BLOQUEADO na senha do banco**: o usuário mandou a Connection string com `[YOUR-PASSWORD]` (placeholder do dashboard). Quando a senha real chegar: `.env` → `pnpm setup` (no sandbox: `node --experimental-strip-types scripts/migrate.ts` etc., ver KI-010) → `pnpm db:test-rls` → e2e de cadastro/login → seed de vídeos nas lições
 2. ~~Popular `content/videos.json`~~ **FEITO** (66/66 via `scripts/fill-videos.py` + oEmbed; trocas pontuais: `--only <slug>`)
 3. ~~Integrar a agenda do planejador no painel~~ **FEITO** (card "Agenda de hoje")
-4. Deploy na Vercel → Lighthouse (meta ≥90) → notificação em aparelho real (Android + iPhone PWA) → configurar Site URL no Supabase (KI-011)
+4. ~~Deploy na Vercel → Lighthouse (meta ≥90)~~ **FEITO** (sessão 4b: desktop 100/100/96/100, mobile 93/100/96/100; falta só configurar Site URL no Supabase e testar push em aparelho real)
 5. ~~Adicionar gitleaks ao CI~~ **FEITO** (job `gitleaks` no ci.yml; histórico verificado localmente: 0 leaks)
 6. ~~Disparar 1 rodada do pipeline noturno e conferir as questões geradas~~ **FEITO** (sessão 4: 2/2 validadas via OpenRouter real)
 7. Expansões da seção 19, na ordem
@@ -81,9 +81,17 @@ Ver `docs/KNOWN_ISSUES.md`.
 - **PIPELINE NOTURNO REAL**: `POST /api/cron/content?topics=1&perTopic=2` → **2 geradas, 2 validadas (4 camadas), 0 rejeitadas** — questões em `mt-operacoes-basicas` com contexto brasileiro real e matemática correta (173÷8 → resto 5, gabarito C)
 - Ferramentas novas: `scripts/test-ai-providers.mjs` (sonda), `bench-openrouter.mjs` (comparador), `test-ai-router.ts` (cascata E2E), `inspect-ai-questions.ts` (auditoria do que a IA inseriu)
 
+## Produção validada (sessão 4b)
+
+- URL: **https://study-moon-eight.vercel.app** — splash, login, redirects e guard verificados no navegador (agent-browser), sem erros de console
+- Variáveis `NEXT_PUBLIC_*` corrigidas no build (checado inline nos chunks do navegador) após o usuário reclassificar como Config mantendo o prefixo
+- Cron: `GET /api/cron/keepalive` → 401 sem segredo / `{"ok":true}` com CRON_SECRET (prova também o SUPABASE_SECRET_KEY e o acesso ao banco)
+- Round-trip de auth real: credenciais inválidas → mensagem amigável PT-BR vinda do GoTrue de verdade
+- **Lighthouse ≥90 nos dois formatos**: desktop 100/100/96/100 (FCP 256ms, LCP 475ms, CLS 0.000) e mobile 93/100/96/100 — relatórios em `download/lighthouse-*.json`
+- `APP_URL` configurada como Actions **variable** (não secret) → 4 workflows agendados desbloqueados
+
 ## Pendências da sessão 4 (todas exigem ação do usuário)
 
-1. **Vercel**: conectar o repo `Kronos1027/StudyMoon` → importar as mesmas env vars do `.env` (menos `DATABASE_URL`, que a Vercel preenche — usar o pooler) → deploy → configurar **Site URL** no Supabase Auth (KI-011) → rodar Lighthouse (meta ≥ 90)
-2. Repo variable **`APP_URL`** (Settings → Secrets and variables → Actions → **Variables**, não secrets) com a URL de produção — desbloqueia os 4 workflows agendados (reminders, content, keepalive, backup)
-3. Teste de notificação push em aparelho real (Android + iPhone PWA) após o deploy
-4. Expansões da seção 19 do documento mestre, na ordem
+1. **Supabase Auth → URL Configuration**: Site URL `https://study-moon-eight.vercel.app` + Redirect URL `https://study-moon-eight.vercel.app/**` (links de confirmação de e-mail apontando pro deploy)
+2. Teste de notificação push em aparelho real (Android + iPhone PWA) após o deploy
+3. Expansões da seção 19 do documento mestre, na ordem
