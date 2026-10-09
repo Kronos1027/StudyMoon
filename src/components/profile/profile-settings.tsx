@@ -167,7 +167,12 @@ export function ProfileSettings({ initial, streakLongest }: ProfileSettingsProps
   );
 }
 
-ProfileSettings.DeleteAccount = function DeleteAccount() {
+/**
+ * LGPD account deletion (doc section 16): typed confirmation + server action.
+ * Exported as its own named component — static properties on client
+ * references are not serializable across the RSC boundary.
+ */
+export function DeleteAccount() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [confirmText, setConfirmText] = useState("");

@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { Award, Bell, Download, ShieldAlert, User } from "lucide-react";
 import { AppShell } from "@/components/app/app-shell";
-import { ProfileSettings } from "@/components/profile/profile-settings";
+import { ProfileSettings, DeleteAccount } from "@/components/profile/profile-settings";
 import { getSupabaseServerClient } from "@/lib/db/server";
 
 export const metadata: Metadata = { title: "Perfil" };
@@ -132,7 +132,7 @@ export default async function PerfilPage() {
                 Apaga permanentemente seu perfil, tentativas, redações,
                 notificações e progresso. Não há como desfazer.
               </p>
-              <ProfileSettings.DeleteAccount />
+              <DeleteAccount />
             </div>
           </section>
 
