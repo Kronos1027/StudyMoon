@@ -32,8 +32,8 @@ O fluxo push (VAPID + service worker + escalada gentil) está implementado; a va
 ## KI-008 — Pontuações de simulado são estimativas simples
 O relatório usa percentual × 1000 (rotulado como estimativa, não TRI). Uma modelagem TRI-like é melhoria futura; o rótulo honesto já está em todas as telas.
 
-## KI-009 — e2e do Playwright no CI ainda é smoke
-O CI roda o smoke (renderização + manifest). O fluxo completo (cadastro → … → redação) exige as variáveis do Supabase como secrets do CI — adicionar na sessão 2 junto com o provisionamento.
+## KI-009 — e2e do Playwright no CI: RESOLVIDO PARCIALMENTE (auditoria de demos)
+O CI continua rodando o smoke + agora os 25 testes da galeria /demos (regressões de subtópico, snapshots visuais e 360 px sem rolagem lateral). O fluxo completo autenticado (cadastro → … → redação) continua dependendo das variáveis do Supabase como secrets do CI.
 
 ## KI-010 — tsx/esbuild quebra no sandbox de desenvolvimento (EPIPE)
 **Impacto:** `npx tsx` (usado por `pnpm setup`, `pnpm check-videos`, `pnpm content:validate`) falha no sandbox com `The service was stopped: write EPIPE` (esbuild 0.28 × Node 24.21 do ambiente). Não afeta o CI (GitHub runners executam tsx normalmente).

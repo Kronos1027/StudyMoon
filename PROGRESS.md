@@ -1,8 +1,18 @@
 # PROGRESS.md — StudyMoon
 
-Última atualização: 2026-10-09 (sessão 4b — **PRODUÇÃO VALIDADA**: deploy Vercel ativo, env vars corrigidas, auth round-trip real, cron protegido, Lighthouse desktop 100/mobile 93)
+Última atualização: 2026-10-10 (sessão 6 — **AUDITORIA COMPLETA DE SIMULADORES**: vínculo por subtópico, demos separadas, modelos numéricos testados, auditoria às cegas das 35 questões, E2E de regressão + snapshots)
 
 Se o contexto for reiniciado: leia este arquivo + `docs/DECISIONS.md` + `docs/KNOWN_ISSUES.md` e retome de onde parou.
+
+## Sessão 6 — Auditoria de simuladores (2026-10-10)
+
+Causa raiz do bug "demo desligada do assunto" corrigida em definitivo: o vínculo agora é por **SUBTÓPICO** (`src/lib/demos/subtopics.ts` — catálogo em código; `questions.subtopic` → `resolveDemoForQuestion`), nunca por tópico/área. Subtópico sem simulador ⇒ nenhuma demo.
+
+- **Demos:** 15 → **18** (criadas `escala-mapa`, `razao`, `regra-de-tres`, `alavanca` — física; **removida** `razao-proporcao`, que misturava alavanca de física + arroz fixo e quebrou na questão de escala). Detalhes e justificativas: `docs/DEMO_AUDIT.md` (`bun scripts/audit-demos.ts`).
+- **Matemática dos simuladores:** toda conta vem de `src/lib/demos/models.ts` (61 testes de invariantes, incl. 3×4=6×2 ⇒ alavanca horizontal e 4,5 cm @ 1:200.000 ⇒ 9 km).
+- **Questões:** 35/35 aprovadas na auditoria às cegas (2º modelo GLM via z-ai-web-dev-sdk + mathjs + parecer com raciocínio; 24 com checagem numérica, 5 em atenção documentada) — `docs/QUESTION_AUDIT.md` (`bun scripts/audit-questions.ts [--db]`).
+- **Regressões:** 21 testes de binding subtópico+área (unit) e 25 E2E na galeria `/demos` (fluxo por subtópico, snapshots padrão/extremo, 360 px sem rolagem lateral). Pipeline IA etiqueta subtópicos; migração 0006 (subtopic/demo_params/numeric_expr); sync + auditoria de banco no workflow manual.
+- **Regra permanente (D-011):** nenhum simulador novo sem (1) vínculo a subtópico, (2) testes numéricos e (3) entrada no DEMO_AUDIT.md.
 
 ## Fases
 

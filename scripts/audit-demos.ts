@@ -154,7 +154,7 @@ const FINDINGS: Finding[] = [
   },
   {
     demo: "textos",
-    severity: "PROBLEMA",
+    severity: "CORRIGIDO",
     issue:
       "A explicação da ironia contém frase truncada ('na pasta com a realidade') — texto sem sentido em português.",
     fix: "Explicação da ironia reescrita ('prometia' contrasta com a realidade descrita).",
@@ -175,7 +175,7 @@ const FINDINGS: Finding[] = [
   },
   {
     demo: "mapas",
-    severity: "PROBLEMA",
+    severity: "CORRIGIDO",
     issue:
       "Dados do Censo 2022 imprecisos (Sul 30,4 mi; shares somando 100,4%).",
     fix: "Dados corrigidos pelo Censo 2022 em models.ts (SE 84,8 mi/41,8%, NE 54,6, S 29,2, N 17,0, CO 16,2 — shares calculados pelo código, testados).",
@@ -196,7 +196,7 @@ const FINDINGS: Finding[] = [
   },
   {
     demo: "estatistica",
-    severity: "PROBLEMA",
+    severity: "CORRIGIDO",
     issue: "'Adicionar aluno' sorteia nota com Math.random() (não determinístico).",
     fix: "Nota inicial determinística (sequência fixa [5,7,4,8,6,...]) e medidas vindas de models.ts.",
   },
@@ -229,7 +229,7 @@ const FINDINGS: Finding[] = [
   },
   {
     demo: "balanceamento",
-    severity: "PROBLEMA",
+    severity: "CORRIGIDO",
     issue: "O botão do coeficiente DECREMENTA ao ser clicado (confuso: parece seletor, é ação).",
     fix: "Botão de coeficiente virou exibição passiva; contagem de átomos vem de models.ts.",
   },
@@ -338,8 +338,14 @@ async function main() {
     const bound = bindings[demoId] ?? [];
     const areas = [...new Set(bound.map((s) => topicToArea.get(s.split(".")[0]) ?? "?"))].join(", ");
     const qs = demoQuestions.get(demoId) ?? [];
-    const issues = FINDINGS.filter((f) => f.demo === demoId && f.severity === "CORRIGIDO");
-    const status = issues.length > 0 ? `⚠️ ${issues.length} problema(s)` : "OK";
+    const openIssues = FINDINGS.filter((f) => f.demo === demoId && f.severity === "PROBLEMA");
+    const fixedIssues = FINDINGS.filter((f) => f.demo === demoId && f.severity === "CORRIGIDO");
+    const status =
+      openIssues.length > 0
+        ? `⚠️ ${openIssues.length} problema(s)`
+        : fixedIssues.length > 0
+          ? `✓ ${fixedIssues.length} corrigido(s) na auditoria`
+          : "OK";
     const bindingCell = bound.length > 0 ? bound.map((b) => `\`${b}\``).join("<br>") : "—";
     lines.push(
       `| \`${demoId}\` | ${files.get(demoId) ?? "?"} | ${areas || "—"} | ${bindingCell} | ${qs.length} | ${status} |`,
@@ -377,7 +383,7 @@ async function main() {
     if (findings.length > 0) {
       lines.push("");
       for (const f of findings) {
-        lines.push(`- **${f.severity}:** ${f.issue}`);
+        lines.push(`- **${f.severity === "CORRIGIDO" ? "✓ CORRIGIDO" : "⚠️ PROBLEMA"}:** ${f.issue}`);
         if (f.fix) lines.push(`  - **Correção:** ${f.fix}`);
       }
     }

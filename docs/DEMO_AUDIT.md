@@ -9,23 +9,23 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 | Simulador | Arquivo | Área | Vínculo | Questões que exibem | Status |
 | --- | --- | --- | --- | --- | --- |
 | `alavanca` | src/components/demos/alavanca-demo.tsx | cn | `cn-mecanica.alavanca` | 0 | OK |
-| `balanceamento` | src/components/demos/balanceamento-demo.tsx | cn | `cn-estequiometria.balanceamento`<br>`cn-estequiometria.calculos-estequiometricos` | 1 | ⚠️ 1 problema(s) |
+| `balanceamento` | src/components/demos/balanceamento-demo.tsx | cn | `cn-estequiometria.balanceamento`<br>`cn-estequiometria.calculos-estequiometricos` | 1 | ✓ 2 corrigido(s) na auditoria |
 | `divisao` | src/components/demos/divisao-demo.tsx | mt | `mt-divisibilidade.criterios`<br>`mt-operacoes-basicas.multiplicacao-divisao` | 0 | OK |
 | `escala-mapa` | src/components/demos/escala-mapa-demo.tsx | mt | `mt-razao-proporcao.escala` | 1 | OK |
-| `estatistica` | src/components/demos/estatistica-demo.tsx | mt | `mt-estatistica.media-mediana-moda` | 2 | ⚠️ 1 problema(s) |
+| `estatistica` | src/components/demos/estatistica-demo.tsx | mt | `mt-estatistica.media-mediana-moda` | 2 | ✓ 2 corrigido(s) na auditoria |
 | `eutrofizacao` | src/components/demos/eutrofizacao-demo.tsx | cn | `cn-ecologia.eutrofizacao` | 1 | OK |
 | `fracoes` | src/components/demos/fracoes-demo.tsx | mt | `mt-fracoes-decimais.fracoes` | 2 | OK |
-| `funcoes` | src/components/demos/funcoes-demo.tsx | mt | `mt-funcoes.afim`<br>`mt-funcoes.quadratica`<br>`mt-geometria-analitica.reta` | 2 | ⚠️ 1 problema(s) |
-| `genetica` | src/components/demos/genetica-demo.tsx | cn | `cn-genetica.cruzamentos` | 1 | ⚠️ 1 problema(s) |
-| `geometria` | src/components/demos/geometria-demo.tsx | mt | `mt-geometria-plana.areas-perimetros` | 1 | ⚠️ 1 problema(s) |
-| `linha-tempo` | src/components/demos/linha-tempo-demo.tsx | lc | `lc-literatura-movimentos.movimentos` | 0 | ⚠️ 1 problema(s) |
-| `mapas` | src/components/demos/mapas-demo.tsx | ch | `ch-geo-humana.populacao` | 0 | ⚠️ 1 problema(s) |
-| `phet` | src/components/demos/phet-demo.tsx | cn | `cn-eletricidade.circuitos`<br>`cn-eletricidade.potencia-eletrica`<br>`cn-energia-trabalho.fontes-transformacoes`<br>`cn-mecanica.energia-mecanica`<br>`cn-ondas-optica.ondas` | 1 | ⚠️ 1 problema(s) |
+| `funcoes` | src/components/demos/funcoes-demo.tsx | mt | `mt-funcoes.afim`<br>`mt-funcoes.quadratica`<br>`mt-geometria-analitica.reta` | 2 | ✓ 1 corrigido(s) na auditoria |
+| `genetica` | src/components/demos/genetica-demo.tsx | cn | `cn-genetica.cruzamentos` | 1 | ✓ 1 corrigido(s) na auditoria |
+| `geometria` | src/components/demos/geometria-demo.tsx | mt | `mt-geometria-plana.areas-perimetros` | 1 | ✓ 1 corrigido(s) na auditoria |
+| `linha-tempo` | src/components/demos/linha-tempo-demo.tsx | lc | `lc-literatura-movimentos.movimentos` | 0 | ✓ 1 corrigido(s) na auditoria |
+| `mapas` | src/components/demos/mapas-demo.tsx | ch | `ch-geo-humana.populacao` | 0 | ✓ 2 corrigido(s) na auditoria |
+| `phet` | src/components/demos/phet-demo.tsx | cn | `cn-eletricidade.circuitos`<br>`cn-eletricidade.potencia-eletrica`<br>`cn-energia-trabalho.fontes-transformacoes`<br>`cn-mecanica.energia-mecanica`<br>`cn-ondas-optica.ondas` | 1 | ✓ 1 corrigido(s) na auditoria |
 | `porcentagem` | src/components/demos/porcentagem-demo.tsx | mt | `mt-porcentagem-juros.juros-compostos`<br>`mt-porcentagem-juros.porcentagem`<br>`mt-porcentagem-juros.variacoes-sucessivas` | 5 | OK |
-| `probabilidade` | src/components/demos/probabilidade-demo.tsx | mt | `mt-probabilidade.eventos-compostos` | 2 | ⚠️ 2 problema(s) |
+| `probabilidade` | src/components/demos/probabilidade-demo.tsx | mt | `mt-probabilidade.eventos-compostos` | 2 | ✓ 2 corrigido(s) na auditoria |
 | `razao` | src/components/demos/razao-demo.tsx | mt | `mt-razao-proporcao.proporcao`<br>`mt-razao-proporcao.razao` | 0 | OK |
 | `regra-de-tres` | src/components/demos/regra-de-tres-demo.tsx | mt | `mt-razao-proporcao.regra-de-tres-direta`<br>`mt-razao-proporcao.regra-de-tres-inversa` | 2 | OK |
-| `textos` | src/components/demos/textos-demo.tsx | lc | `lc-figuras-linguagem.figuras`<br>`lc-interpretacao.interpretacao` | 1 | ⚠️ 1 problema(s) |
+| `textos` | src/components/demos/textos-demo.tsx | lc | `lc-figuras-linguagem.figuras`<br>`lc-interpretacao.interpretacao` | 1 | ✓ 2 corrigido(s) na auditoria |
 
 ## Detalhe por simulador
 
@@ -88,9 +88,9 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 | --- | --- | --- |
 | A massa de água produzida na reação completa de 8 g de hidrogênio (H₂)… | `cn-estequiometria` | `calculos-estequiometricos` |
 
-- **CORRIGIDO:** Vinculada a cn-equilibrio-eletroquimica, mas a demo é o balanceamento molecular H₂+O₂→H₂O, sem relação com equilíbrio químico/eletroquímica.
+- **✓ CORRIGIDO:** Vinculada a cn-equilibrio-eletroquimica, mas a demo é o balanceamento molecular H₂+O₂→H₂O, sem relação com equilíbrio químico/eletroquímica.
   - **Correção:** Vinculada a cn-estequiometria.balanceamento e cn-estequiometria.calculos-estequiometricos (a equação balanceada é o passo 0 do cálculo).
-- **PROBLEMA:** O botão do coeficiente DECREMENTA ao ser clicado (confuso: parece seletor, é ação).
+- **✓ CORRIGIDO:** O botão do coeficiente DECREMENTA ao ser clicado (confuso: parece seletor, é ação).
   - **Correção:** Botão de coeficiente virou exibição passiva; contagem de átomos vem de models.ts.
 
 <details><summary>Textos e fórmulas exibidos (36 trechos extraídos do código)</summary>
@@ -242,9 +242,9 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 | Para descrever o salário típico dos funcionários, o valor mais represe… | `mt-estatistica` | `media-mediana-moda` |
 | A média mensal de empréstimos nesse período foi de… | `mt-estatistica` | `media-mediana-moda` |
 
-- **CORRIGIDO:** Era vinculada a mt-graficos-tabelas, cujo foco é leitura de gráficos, não média/mediana/moda.
+- **✓ CORRIGIDO:** Era vinculada a mt-graficos-tabelas, cujo foco é leitura de gráficos, não média/mediana/moda.
   - **Correção:** Vinculada só a mt-estatistica.media-mediana-moda.
-- **PROBLEMA:** 'Adicionar aluno' sorteia nota com Math.random() (não determinístico).
+- **✓ CORRIGIDO:** 'Adicionar aluno' sorteia nota com Math.random() (não determinístico).
   - **Correção:** Nota inicial determinística (sequência fixa [5,7,4,8,6,...]) e medidas vindas de models.ts.
 
 <details><summary>Textos e fórmulas exibidos (36 trechos extraídos do código)</summary>
@@ -397,7 +397,7 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 | Se uma corrida custou R$ 35,00, a distância percorrida foi de… | `mt-funcoes` | `afim` |
 | O lucro máximo que a barraquinha pode alcançar é de… | `mt-funcoes` | `quadratica` |
 
-- **CORRIGIDO:** SVG com min-w-[320px] causa rolagem lateral em telas de 360 px; comparação `delta === 0` com ponto flutuante.
+- **✓ CORRIGIDO:** SVG com min-w-[320px] causa rolagem lateral em telas de 360 px; comparação `delta === 0` com ponto flutuante.
   - **Correção:** SVG responsivo (sem min-width/min-w); delta com tolerância via quadraticFeatures (models.ts).
 
 <details><summary>Textos e fórmulas exibidos (36 trechos extraídos do código)</summary>
@@ -452,7 +452,7 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 | --- | --- | --- |
 | A proporção esperada de plantas com flores BRANCAS na descendência é d… | `cn-genetica` | `cruzamentos` |
 
-- **CORRIGIDO:** Granularidade: o quadro de Punnett (1 alelo, dominância V/v) era exibido na questão do sistema ABO (alelos múltiplos e co-dominância) — conceito diferente.
+- **✓ CORRIGIDO:** Granularidade: o quadro de Punnett (1 alelo, dominância V/v) era exibido na questão do sistema ABO (alelos múltiplos e co-dominância) — conceito diferente.
   - **Correção:** Vinculada só ao subtópico de cruzamentos monohíbridos (cn-genetica.cruzamentos); ABO fica sem demo.
 
 <details><summary>Textos e fórmulas exibidos (36 trechos extraídos do código)</summary>
@@ -507,7 +507,7 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 | --- | --- | --- |
 | O valor total do terreno é de… | `mt-geometria-plana` | `areas-perimetros` |
 
-- **CORRIGIDO:** Vinculada a geometria espacial (volumes), mas a demo é de áreas/perímetros planos.
+- **✓ CORRIGIDO:** Vinculada a geometria espacial (volumes), mas a demo é de áreas/perímetros planos.
   - **Correção:** Vinculada só a mt-geometria-plana.areas-perimetros; espacial fica sem demo.
 
 <details><summary>Textos e fórmulas exibidos (36 trechos extraídos do código)</summary>
@@ -558,7 +558,7 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 - **Vinculada a (subtópicos):** `lc-literatura-movimentos.movimentos`
 - **Questões seed que exibem:** 0
 
-- **CORRIGIDO:** Agrupava assuntos: a linha do tempo é de MOVIMENTOS LITERÁRIOS brasileiros, mas era vinculada a 4 tópicos de História (colônia, império, república, história geral). Questão da Era Vargas exibia eras literárias.
+- **✓ CORRIGIDO:** Agrupava assuntos: a linha do tempo é de MOVIMENTOS LITERÁRIOS brasileiros, mas era vinculada a 4 tópicos de História (colônia, império, república, história geral). Questão da Era Vargas exibia eras literárias.
   - **Correção:** Vinculada só a lc-literatura-movimentos.movimentos; tópicos de História ficam sem demo.
 
 <details><summary>Textos e fórmulas exibidos (23 trechos extraídos do código)</summary>
@@ -596,9 +596,9 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 - **Vinculada a (subtópicos):** `ch-geo-humana.populacao`
 - **Questões seed que exibem:** 0
 
-- **CORRIGIDO:** Agrupava assuntos: gráfico de população por região era vinculado a geo-física, cartografia e meio-ambiente (a questão de emissões de CO₂ exibia população do Censo).
+- **✓ CORRIGIDO:** Agrupava assuntos: gráfico de população por região era vinculado a geo-física, cartografia e meio-ambiente (a questão de emissões de CO₂ exibia população do Censo).
   - **Correção:** Vinculada só a ch-geo-humana.populacao.
-- **PROBLEMA:** Dados do Censo 2022 imprecisos (Sul 30,4 mi; shares somando 100,4%).
+- **✓ CORRIGIDO:** Dados do Censo 2022 imprecisos (Sul 30,4 mi; shares somando 100,4%).
   - **Correção:** Dados corrigidos pelo Censo 2022 em models.ts (SE 84,8 mi/41,8%, NE 54,6, S 29,2, N 17,0, CO 16,2 — shares calculados pelo código, testados).
 
 <details><summary>Textos e fórmulas exibidos (36 trechos extraídos do código)</summary>
@@ -653,7 +653,7 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 | --- | --- | --- |
 | O custo mensal (30 dias) aproximado para operar esse chuveiro é de… | `cn-eletricidade` | `potencia-eletrica` |
 
-- **CORRIGIDO:** Uma única demo com 3 simulações em abas abria SEMPRE na aba 'Movimento' — a questão do chuveiro elétrico (circuitos) exibia a de movimento. Título com erro de digitação ('Movimento ( Energia de um Skate)').
+- **✓ CORRIGIDO:** Uma única demo com 3 simulações em abas abria SEMPRE na aba 'Movimento' — a questão do chuveiro elétrico (circuitos) exibia a de movimento. Título com erro de digitação ('Movimento ( Energia de um Skate)').
   - **Correção:** Aceita o parâmetro sim da questão/subtópico (aba inicial correta); título corrigido para 'Energia de um skate'.
 
 <details><summary>Textos e fórmulas exibidos (21 trechos extraídos do código)</summary>
@@ -750,9 +750,9 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 | A probabilidade de a soma dos pontos ser igual a 7 é… | `mt-probabilidade` | `eventos-compostos` |
 | Uma moeda honesta é lançada 3 vezes seguidas. A probabilidade de apare… | `mt-probabilidade` | `eventos-compostos` |
 
-- **CORRIGIDO:** Agrupava assuntos: vinculada a mt-probabilidade E mt-combinatoria. A questão de senhas (princípio multiplicativo — contagem) exibia a árvore de probabilidades, que não ensina contagem.
+- **✓ CORRIGIDO:** Agrupava assuntos: vinculada a mt-probabilidade E mt-combinatoria. A questão de senhas (princípio multiplicativo — contagem) exibia a árvore de probabilidades, que não ensina contagem.
   - **Correção:** Vinculação por subtópico: apenas eventos compostos (mt-probabilidade.eventos-compostos); combinatoria fica sem demo.
-- **CORRIGIDO:** SVG com min-w-[480px] — rolagem lateral em telas de 360 px.
+- **✓ CORRIGIDO:** SVG com min-w-[480px] — rolagem lateral em telas de 360 px.
   - **Correção:** SVG responsivo sem min-width; probabilidades vindas de twoStagePaths (models.ts).
 
 <details><summary>Textos e fórmulas exibidos (31 trechos extraídos do código)</summary>
@@ -903,9 +903,9 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico**
 | --- | --- | --- |
 | Pela construção do texto, conclui-se que o narrador critica… | `lc-interpretacao` | `interpretacao` |
 
-- **CORRIGIDO:** Agrupava assuntos: vinculada a 4 tópicos de Linguagens, incluindo gêneros textuais e variação linguística, que a anotação de figuras/funções não ensina.
+- **✓ CORRIGIDO:** Agrupava assuntos: vinculada a 4 tópicos de Linguagens, incluindo gêneros textuais e variação linguística, que a anotação de figuras/funções não ensina.
   - **Correção:** Vinculada só a lc-interpretacao.interpretacao e lc-figuras-linguagem.figuras.
-- **PROBLEMA:** A explicação da ironia contém frase truncada ('na pasta com a realidade') — texto sem sentido em português.
+- **✓ CORRIGIDO:** A explicação da ironia contém frase truncada ('na pasta com a realidade') — texto sem sentido em português.
   - **Correção:** Explicação da ironia reescrita ('prometia' contrasta com a realidade descrita).
 
 <details><summary>Textos e fórmulas exibidos (28 trechos extraídos do código)</summary>
