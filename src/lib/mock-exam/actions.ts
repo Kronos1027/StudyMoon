@@ -6,13 +6,7 @@ import { getSupabaseServerClient } from "@/lib/db/server";
 import { getSupabaseAdmin } from "@/lib/db/admin";
 import type { QuestionPublic } from "@/lib/db/types";
 
-export const EXAM_CONFIG = {
-  partial: { areas: ["mt", "lc", "ch", "cn"], questionsPerArea: 3, label: "Simulado parcial", timeLimitMin: 25 },
-  day1: { areas: ["lc", "ch"], questionsPerArea: 10, label: "Dia 1 — Linguagens + Humanas", timeLimitMin: 45 },
-  day2: { areas: ["cn", "mt"], questionsPerArea: 10, label: "Dia 2 — Natureza + Matemática", timeLimitMin: 45 },
-} as const;
-
-export type ExamKind = keyof typeof EXAM_CONFIG;
+import { EXAM_CONFIG } from "./config";
 
 const startSchema = z.object({
   kind: z.enum(["partial", "day1", "day2"]),

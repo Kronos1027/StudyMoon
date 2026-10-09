@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { getSupabaseServerClient } from "@/lib/db/server";
 import { getSupabaseAdmin } from "@/lib/db/admin";
-import { updateMastery, expectedScore, clampRating } from "@/lib/elo";
+import { updateMastery, expectedScore } from "@/lib/elo";
 import type { Area, QuestionPublic } from "@/lib/db/types";
 
 const ROUNDS = 4; // 4 questions per area
@@ -237,12 +237,3 @@ async function finishLevelTest(userId: string) {
     .update({ level_test_completed: true, updated_at: new Date().toISOString() })
     .eq("id", userId);
 }
-
-/** Level band summary for the dashboard welcome back. */
-export function levelBand(elo: number): "iniciante" | "intermediário" | "avançado" {
-  if (elo < 1000) return "iniciante";
-  if (elo < 1500) return "intermediário";
-  return "avançado";
-}
-
-export { clampRating };
