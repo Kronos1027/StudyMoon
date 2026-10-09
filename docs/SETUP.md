@@ -34,6 +34,7 @@ cp .env.example .env.local
    - No [Google Cloud Console](https://console.cloud.google.com), crie um projeto → **APIs & Services → OAuth consent screen** (External) → **Credentials → Create OAuth client ID → Web application**.
    - Authorized redirect URI: `https://SEU-PROJETO.supabase.co/auth/v1/callback`
    - Copie o **Client ID** e o **Client Secret** → no Supabase: **Authentication → Providers → Google** → cole e salve.
+   - Nota: o botão "Entrar com Google" só aparece quando o provedor está ativado no Supabase (o app consulta `GET /auth/v1/settings` com cache de 5 min) — ativou, ele aparece sozinho.
    - Em **Authentication → URL Configuration**: Site URL = URL de produção; Redirect URLs = `http://localhost:3000/**` e a URL de produção.
 5. Rode a mágica:
 

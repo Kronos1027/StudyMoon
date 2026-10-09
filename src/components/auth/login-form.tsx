@@ -33,7 +33,7 @@ function GoogleIcon() {
   );
 }
 
-export function LoginForm() {
+export function LoginForm({ googleEnabled = false }: { googleEnabled?: boolean }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = getSupabaseBrowserClient();
@@ -89,6 +89,10 @@ export function LoginForm() {
       setGoogleLoading(false);
     }
   }
+
+  // OAuth area (divider + Google button) only when the provider is
+  // actually enabled on the GoTrue server — see lib/auth/providers.
+  const showOAuth = googleEnabled && supabase !== null;
 
   return (
     <AuthShell
@@ -172,29 +176,33 @@ export function LoginForm() {
         </Button>
       </form>
 
-      <div className="relative my-5">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-border" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-card px-2 text-muted-foreground">ou</span>
-        </div>
-      </div>
+      {showOAuth ? (
+        <>
+          <div className="relative my-5">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">ou</span>
+            </div>
+          </div>
 
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full"
-        onClick={signInWithGoogle}
-        disabled={googleLoading || !supabase}
-      >
-        {googleLoading ? (
-          <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-        ) : (
-          <GoogleIcon />
-        )}
-        Entrar com Google
-      </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={signInWithGoogle}
+            disabled={googleLoading || !supabase}
+          >
+            {googleLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+            ) : (
+              <GoogleIcon />
+            )}
+            Entrar com Google
+          </Button>
+        </>
+      ) : null}
     </AuthShell>
   );
 }
