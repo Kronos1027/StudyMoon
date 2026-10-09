@@ -2,5 +2,468 @@
   "version": 1,
   "updated": "2026-10-09",
   "note": "Vídeos por tópico (slug) — apenas embeds oficiais via youtube-nocookie.com. Todo ID é validado pelo endpoint oEmbed (pnpm check-videos) antes de entrar no banco. Nunca inventar IDs: popular este arquivo apenas com vídeos verificados.",
-  "topics": {}
+  "topics": {
+    "mt-operacoes-basicas": [
+      {
+        "id": "az6OYFS7AUA",
+        "title": "Matemática Básica - Aula 1 - Adição",
+        "channel": "Professor Ferretto | ENEM e Vestibulares"
+      }
+    ],
+    "mt-divisibilidade": [
+      {
+        "id": "vfN9QFSzQTg",
+        "title": "APRENDA MÍNIMO MÚLTIPLO COMUM | MMC",
+        "channel": "Dicasdemat Sandro Curió"
+      }
+    ],
+    "mt-fracoes-decimais": [
+      {
+        "id": "i2GEeGSrZ_E",
+        "title": "Matemática Básica - Aula 13 - Frações (parte 1)",
+        "channel": "Professor Ferretto | ENEM e Vestibulares"
+      }
+    ],
+    "mt-razao-proporcao": [
+      {
+        "id": "wnHd-ofn-os",
+        "title": "Matemática Básica - Aula 24 - Razão e Proporção (parte 1)",
+        "channel": "Professor Ferretto | ENEM e Vestibulares"
+      }
+    ],
+    "mt-porcentagem-juros": [
+      {
+        "id": "J3lwBTutjaw",
+        "title": "Matemática Básica - Aula 27 - Porcentagem (parte 1)",
+        "channel": "Professor Ferretto | ENEM e Vestibulares"
+      }
+    ],
+    "mt-grandezas-unidades": [
+      {
+        "id": "MLEZI03kUkE",
+        "title": "Física Total - Aula 01 - Grandezas Físicas, Notação Padrão e Ordem de Grandeza",
+        "channel": "FISICATOTAL"
+      }
+    ],
+    "mt-potencias-raizes": [
+      {
+        "id": "4Vfw1XiHTpM",
+        "title": "POTENCIAÇÃO: Definição e Propriedades | Matemática Básica - Aula 6",
+        "channel": "Professor Ferretto | ENEM e Vestibulares"
+      }
+    ],
+    "mt-expressoes-equacoes": [
+      {
+        "id": "0lbhe16At_A",
+        "title": "Matematica Básica - Aula 35 - Equação do 1° Grau",
+        "channel": "Professor Ferretto | ENEM e Vestibulares"
+      }
+    ],
+    "mt-funcoes": [
+      {
+        "id": "SPZqQ5qn3P0",
+        "title": "Funções: Noções Básicas (Aula 1 de 15)",
+        "channel": "Professor Ferretto | ENEM e Vestibulares"
+      }
+    ],
+    "mt-sequencias": [
+      {
+        "id": "yfmhfoB0kVA",
+        "title": "Progressão Aritmética PA: Termo Geral (aula 2 de 6)",
+        "channel": "Professor Ferretto | ENEM e Vestibulares"
+      }
+    ],
+    "mt-combinatoria": [
+      {
+        "id": "qsZQg6-UMSk",
+        "title": "Arranjos | Análise Combinatória",
+        "channel": "Professor Ferretto | ENEM e Vestibulares"
+      }
+    ],
+    "mt-geometria-plana": [
+      {
+        "id": "gZsfA88Yar0",
+        "title": "Geometria Plana: Áreas Semelhantes (Aula 28 - Última)",
+        "channel": "Professor Ferretto | ENEM e Vestibulares"
+      }
+    ],
+    "mt-geometria-espacial": [
+      {
+        "id": "GMWEiRH0PLI",
+        "title": "Sólidos de Revolução - Geometria Espacial",
+        "channel": "Professor Ferretto | ENEM e Vestibulares"
+      }
+    ],
+    "mt-trigonometria": [
+      {
+        "id": "RJGs8uCj8XQ",
+        "title": "Razões Trigonométricas na Circunferência | Trigonometria: Aula 02",
+        "channel": "Professor Ferretto | ENEM e Vestibulares"
+      }
+    ],
+    "mt-geometria-analitica": [
+      {
+        "id": "eXQc-t6_TZs",
+        "title": "Áreas e alinhamento de pontos | Geometria Analítica: Aula 3",
+        "channel": "Professor Ferretto | ENEM e Vestibulares"
+      }
+    ],
+    "mt-probabilidade": [
+      {
+        "id": "HWlZtfp-TKQ",
+        "title": "Probabilidade - Como calcular?",
+        "channel": "Professor Ferretto | ENEM e Vestibulares"
+      }
+    ],
+    "mt-estatistica": [
+      {
+        "id": "2KjlM-5FVqA",
+        "title": "Estatística - Média, Moda e Mediana",
+        "channel": "Professor Ferretto | ENEM e Vestibulares"
+      }
+    ],
+    "mt-graficos-tabelas": [
+      {
+        "id": "XzZGAwfKs_k",
+        "title": "Matemática | Gráficos e Tabelas para o ENEM | Semana da matemática",
+        "channel": "Dicasdemat Sandro Curió"
+      }
+    ],
+    "lc-interpretacao": [
+      {
+        "id": "OxTNN-IKcEQ",
+        "title": "Interpretação de Textos: Guia COMPLETO para Você ARRASAR na Interpretação!",
+        "channel": "Português sem Enrolação - Professora Lis"
+      }
+    ],
+    "lc-generos-tipos": [
+      {
+        "id": "51Vj6uzsdaA",
+        "title": "Tipos e Gêneros Textuais – Revisão Enem com Prof. Noslen",
+        "channel": "Professor Noslen"
+      }
+    ],
+    "lc-variacao-linguistica": [
+      {
+        "id": "Aqh32VzKvqo",
+        "title": "Variação Linguística – Revisão Enem com Prof. Noslen",
+        "channel": "Professor Noslen"
+      }
+    ],
+    "lc-funcoes-linguagem": [
+      {
+        "id": "c4yBSJzIqmg",
+        "title": "FUNÇÕES da LINGUAGEM – Referencial, Emotiva, Poética, Fática, Conativa e Metalinguística",
+        "channel": "Português com Letícia"
+      }
+    ],
+    "lc-figuras-linguagem": [
+      {
+        "id": "xfjSzZf6JA4",
+        "title": "FIGURAS DE LINGUAGEM PARA O ENEM | QUER QUE DESENHE?",
+        "channel": "Descomplica"
+      }
+    ],
+    "lc-gramatica-aplicada": [
+      {
+        "id": "4ZJnTqTk4_Y",
+        "title": "Concordância Verbal - Aula 01 [Prof Noslen]",
+        "channel": "Professor Noslen"
+      }
+    ],
+    "lc-lingua-estrangeira": [
+      {
+        "id": "PXfPzk81WTc",
+        "title": "GABARITANDO O INGLÊS NO ENEM – Aulão inFlux",
+        "channel": "inFlux Brasil"
+      }
+    ],
+    "lc-literatura-movimentos": [
+      {
+        "id": "nzNytK7yVD4",
+        "title": "As 5 principais escolas literárias que caem no ENEM! - Com Professor Noslen",
+        "channel": "Professor Noslen"
+      }
+    ],
+    "lc-obras-recorrentes": [
+      {
+        "id": "23SV4BxZesU",
+        "title": "Tudo sobre Literatura: Obras que Mais Caem",
+        "channel": "Descomplica"
+      }
+    ],
+    "lc-artes": [
+      {
+        "id": "W_DxNzFc_jg",
+        "title": "Respondendo o ENEM - Artes. [Prof. Noslen]",
+        "channel": "Professor Noslen"
+      }
+    ],
+    "lc-educacao-fisica": [
+      {
+        "id": "hQk9ngNnDb0",
+        "title": "AO VIVO | EDUCAÇÃO FÍSICA NO ENEM",
+        "channel": "Aulalivre - Enem e vestibulares"
+      }
+    ],
+    "lc-tecnologias-comunicacao": [
+      {
+        "id": "9qvd06Ldg9k",
+        "title": "ENEM | TECNOLOGIAS DA INFORMAÇÃO E DA COMUNICAÇÃO",
+        "channel": "O Garrancho"
+      }
+    ],
+    "ch-brasil-colonia": [
+      {
+        "id": "9MYdJ_19xyA",
+        "title": "História do Brasil: Brasil Colônia - Sistema Colonial",
+        "channel": "Profa Anelize"
+      }
+    ],
+    "ch-brasil-imperio": [
+      {
+        "id": "eERlMeLvQlI",
+        "title": "BRASIL IMPÉRIO | O que Aconteceu Depois do Grito da Independência?",
+        "channel": "Toda Matéria"
+      }
+    ],
+    "ch-brasil-republica": [
+      {
+        "id": "aml2TtqWgY0",
+        "title": "A PRIMEIRA REPÚBLICA",
+        "channel": "Parabólica"
+      }
+    ],
+    "ch-historia-geral": [
+      {
+        "id": "0CDimPjAG1E",
+        "title": "História Geral: Revolução Industrial",
+        "channel": "Profa Anelize"
+      }
+    ],
+    "ch-historia-cultural": [
+      {
+        "id": "nu505BvywsU",
+        "title": "Movimentos Sociais",
+        "channel": "Descomplica"
+      }
+    ],
+    "ch-geo-fisica": [
+      {
+        "id": "kOU5eNdtc4k",
+        "title": "Aula 1 - Geomorfologia (Relevo) - Semana Geografia Física Enem",
+        "channel": "Professor Ricardo Marcílio"
+      }
+    ],
+    "ch-geo-humana": [
+      {
+        "id": "qmi1QtLqxkE",
+        "title": "A População mundial: conceitos demográficos​ - Geografia - Ensino Médio",
+        "channel": "Canal Futura"
+      }
+    ],
+    "ch-geo-economica": [
+      {
+        "id": "w7InvPgAWCw",
+        "title": "GEOGRAFIA AGRÁRIA: Cortes dos Aulões do Enem | Geografia | Raphael Carrieri de Souza",
+        "channel": "Curso Enem Gratuito"
+      }
+    ],
+    "ch-cartografia": [
+      {
+        "id": "x0B7Wv6bCfU",
+        "title": "CARTOGRAFIA | AULA COMPLETA | GEOGRAFIA",
+        "channel": "Prof. JeanGrafia | GabaritaGeo |"
+      }
+    ],
+    "ch-meio-ambiente": [
+      {
+        "id": "F-GgPGvyTek",
+        "title": "Impactos Ambientais e Sustentabilidade",
+        "channel": "Descomplica"
+      }
+    ],
+    "ch-sociologia": [
+      {
+        "id": "u0C3F1Fq32E",
+        "title": "TUDO de SOCIOLOGIA para o ENEM em 50 MINUTOS",
+        "channel": "Vinícius Oliveira | ENEM 2026"
+      }
+    ],
+    "ch-filosofia": [
+      {
+        "id": "UK6OKSsastQ",
+        "title": "TUDO de FILOSOFIA para o ENEM em 40 MINUTOS",
+        "channel": "Vinícius Oliveira | ENEM 2026"
+      }
+    ],
+    "ch-atualidades": [
+      {
+        "id": "7OAfUoAUhlE",
+        "title": "Como estudar Atualidades para o Enem e vestibulares: dicas valiosas! (Legendado)",
+        "channel": "História Online"
+      }
+    ],
+    "cn-mecanica": [
+      {
+        "id": "kbaN17Z41ZM",
+        "title": "RESUMÃO: cinemática | Proenem",
+        "channel": "Proenem - Enem 2026"
+      }
+    ],
+    "cn-energia-trabalho": [
+      {
+        "id": "eiOw1fmwx5g",
+        "title": "COMO CALCULAR O TRABALHO DE UMA FORÇA? - [FÍSICA DO ZERO]",
+        "channel": "Eureka Matemática"
+      }
+    ],
+    "cn-termologia": [
+      {
+        "id": "nLn5BxL4Cn4",
+        "title": "Termologia - Conceitos Iniciais -  Aula 01",
+        "channel": "Davi Oliveira - Física 2.0"
+      }
+    ],
+    "cn-ondas-optica": [
+      {
+        "id": "REKqDSPAuww",
+        "title": "Aula 01 - Óptica Geométrica - Conceitos Iniciais",
+        "channel": "Davi Oliveira - Física 2.0"
+      }
+    ],
+    "cn-eletricidade": [
+      {
+        "id": "2h9vDmzYmig",
+        "title": "CIRCUITOS ELÉTRICOS no ENEM - ELETRODINÂMICA (TEORIA + EXERCÍCIOS) - MEGA REVISÃO",
+        "channel": "Professor Boaro"
+      }
+    ],
+    "cn-fontes-energia": [
+      {
+        "id": "6cVmzpG_iqM",
+        "title": "Matriz energética brasileira​ - Geografia - Ensino Médio",
+        "channel": "Canal Futura"
+      }
+    ],
+    "cn-estequiometria": [
+      {
+        "id": "cNC7cUdyqV0",
+        "title": "SUPERAULA DE QUÍMICA: ESTEQUIOMETRIA | DESCOMPLICA",
+        "channel": "Descomplica"
+      }
+    ],
+    "cn-solucoes": [
+      {
+        "id": "4n_t_w2pBoo",
+        "title": "Soluções: Unidades de Concentração - AULA COMPLETA",
+        "channel": "Professor Gabriel Cabral"
+      }
+    ],
+    "cn-termo-cinetica": [
+      {
+        "id": "zytBSQMYxxg",
+        "title": "Termoquímica",
+        "channel": "Descomplica"
+      }
+    ],
+    "cn-equilibrio-eletroquimica": [
+      {
+        "id": "QKKd1lB-zOg",
+        "title": "EQUILÍBRIO QUÍMICO: Kc e Kp",
+        "channel": "Professor Gabriel Cabral"
+      }
+    ],
+    "cn-quimica-organica": [
+      {
+        "id": "o1zyNaogsRo",
+        "title": "INTRODUÇÃO A QUÍMICA ORGÂNICA",
+        "channel": "Professor Gabriel Cabral"
+      }
+    ],
+    "cn-quimica-ambiental": [
+      {
+        "id": "A8J07TaDiDA",
+        "title": "Química Ambiental",
+        "channel": "Descomplica"
+      }
+    ],
+    "cn-citologia": [
+      {
+        "id": "9Nf0EJtwxn0",
+        "title": "MEMBRANA PLASMÁTICA - CÉLULA - Citologia | Biologia com Samuel Cunha",
+        "channel": "Biologia com Samuel Cunha"
+      }
+    ],
+    "cn-fotossintese": [
+      {
+        "id": "fHC6M7xncds",
+        "title": "RESUMO sobre FOTOSSÍNTESE | Biologia com Samuel Cunha",
+        "channel": "Biologia com Samuel Cunha"
+      }
+    ],
+    "cn-genetica": [
+      {
+        "id": "tUtj4HIg4Wo",
+        "title": "INTRODUÇÃO À GENÉTICA - Genética | Biologia com Samuel Cunha",
+        "channel": "Biologia com Samuel Cunha"
+      }
+    ],
+    "cn-evolucao": [
+      {
+        "id": "piRSx5SvYv8",
+        "title": "EVOLUÇÃO - DARWIN E LAMARCK - TEORIAS EVOLUTIVAS | Biologia com Samuel Cunha",
+        "channel": "Biologia com Samuel Cunha"
+      }
+    ],
+    "cn-ecologia": [
+      {
+        "id": "Z5cll6n3hHw",
+        "title": "ECOLOGIA - INTRODUÇÃO E CONCEITOS | Biologia com Samuel Cunha",
+        "channel": "Biologia com Samuel Cunha"
+      }
+    ],
+    "cn-fisiologia": [
+      {
+        "id": "gz9BSAnNjKE",
+        "title": "SISTEMAS DO CORPO HUMANO - Resumo de Fisiologia | Biologia com Samuel Cunha",
+        "channel": "Biologia com Samuel Cunha"
+      }
+    ],
+    "rd-estrutura": [
+      {
+        "id": "OkTqVz8h42g",
+        "title": "Estrutura da Redação ENEM: Domine o Texto Dissertativo!",
+        "channel": "Descomplica"
+      }
+    ],
+    "rd-competencias": [
+      {
+        "id": "pcdh_83ur4M",
+        "title": "Análise das 5 competências da redação Enem: onde você mais perde ponto? | Enem 2026",
+        "channel": "Descomplica"
+      }
+    ],
+    "rd-repertorio": [
+      {
+        "id": "R8OAOyQLzYs",
+        "title": "O QUE É REPERTÓRIO SOCIOCULTURAL?",
+        "channel": "Português Fácil"
+      }
+    ],
+    "rd-proposta-intervencao": [
+      {
+        "id": "zU0sC6SeJz8",
+        "title": "COMO ESCREVER A PROPOSTA DE INTERVENÇÃO NA REDAÇÃO DO ENEM",
+        "channel": "Curso Enem Gratuito"
+      }
+    ],
+    "rd-coesao": [
+      {
+        "id": "cHcFDNkxpmQ",
+        "title": "COESÃO e COERÊNCIA | Qualidade ESSENCIAIS de um TEXTO COESO e COERENTE! || Português do Zero",
+        "channel": "Português com Letícia"
+      }
+    ]
+  }
 }
