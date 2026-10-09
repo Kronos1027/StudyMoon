@@ -95,3 +95,14 @@ Ver `docs/KNOWN_ISSUES.md`.
 1. **Supabase Auth → URL Configuration**: Site URL `https://study-moon-eight.vercel.app` + Redirect URL `https://study-moon-eight.vercel.app/**` (links de confirmação de e-mail apontando pro deploy)
 2. Teste de notificação push em aparelho real (Android + iPhone PWA) após o deploy
 3. Expansões da seção 19 do documento mestre, na ordem
+
+## Bugfix da demo desligada do assunto (sessão 5)
+
+- **Bug**: "Veja o conceito em movimento" exibia simulador de outro assunto — questão de eutrofização (`cn-ecologia`) mostrava o **quadro de Punnett** (demo de nível de **área** chamada `biologia`, vinculada a 4 tópicos)
+- **Correção estrutural**: demos agora são vinculadas a **tópico**, nunca a área. O `demo_id` exibido com uma questão vem do **join `topics(demo_id)`** em `practice`, `mock-exam` e `level-test` — estruturalmente impossível exibir demo de outro tópico. Tópico sem simulador → **nenhuma demo** (nada melhor que demo errada)
+- Demo `biologia` extinta: quadro de Punnett renomeado para **`genetica`** (só `cn-genetica`); `cn-citologia` e `cn-fotossintese` ficam sem demo; `cn-ecologia` ganha o novo simulador
+- **Novo simulador `eutrofizacao`**: slider de carga de esgoto → nutrientes entrando no lago (partículas animadas) → floração de algas → gráfico de oxigênio dissolvido com limiar crítico de 3 mg/L → mortandade de peixes (modelo determinístico calibrado: ≤50% o lago sobrevive, 60% mortandade em curso, 80%+ colapso; reduzir a carga recupera o lago)
+- `registry.ts` ganha **`demoTopicBindings`** (demo → tópicos válidos, espelhando o curriculo)
+- **Teste de regressão** `tests/unit/demo-topic-binding.test.ts` (9 casos): falha se qualquer questão exibir simulador de tópico diferente; trava curriculo ↔ registry ↔ seeds; pegou de bônus 1 seed divergente (chuveiro elétrico sem demo do tópico)
+- `scripts/sync-demo-bindings.ts` + workflow manual `sync-demo-bindings.yml`: sincroniza `topics.demo_id` do curriculo e espelha `questions.demo_id` no banco (idempotente)
+- `pnpm verify` verde: lint 0 errors, typecheck limpo, **84/84 testes**
