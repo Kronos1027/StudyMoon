@@ -1,6 +1,6 @@
 # PROGRESS.md — StudyMoon
 
-Última atualização: 2026-10-09 (sessão 3 — **BANCO ATIVO**: migrações + seed + RLS 10/10 + E2E completo com dados reais; 2 bugs corrigidos)
+Última atualização: 2026-10-09 (sessão 4 — **GitHub sincronizado + secrets + CI verde + IA ao vivo**: OpenRouter validado em cascata real, pipeline noturno gerou 2 questões validadas em produção)
 
 Se o contexto for reiniciado: leia este arquivo + `docs/DECISIONS.md` + `docs/KNOWN_ISSUES.md` e retome de onde parou.
 
@@ -43,16 +43,16 @@ Se o contexto for reiniciado: leia este arquivo + `docs/DECISIONS.md` + `docs/KN
 3. ~~Integrar a agenda do planejador no painel~~ **FEITO** (card "Agenda de hoje")
 4. Deploy na Vercel → Lighthouse (meta ≥90) → notificação em aparelho real (Android + iPhone PWA) → configurar Site URL no Supabase (KI-011)
 5. ~~Adicionar gitleaks ao CI~~ **FEITO** (job `gitleaks` no ci.yml; histórico verificado localmente: 0 leaks)
-6. Disparar 1 rodada do pipeline noturno e conferir as questões geradas (exige banco provisionado)
+6. ~~Disparar 1 rodada do pipeline noturno e conferir as questões geradas~~ **FEITO** (sessão 4: 2/2 validadas via OpenRouter real)
 7. Expansões da seção 19, na ordem
 
 ## Pendências do usuário (ver docs/KNOWN_ISSUES.md)
 
-- **SENHA do banco Postgres** (único bloqueio do `pnpm setup`) — Project Settings → Database → Reset database password, ou colar a Connection string completa com a senha real (o dashboard sempre mostra `[YOUR-PASSWORD]` como placeholder)
+- ~~SENHA do banco Postgres~~ **RECEBIDA E VALIDADA** (2026-10-09, sessão 3 — banco 100% ativo)
 - ~~URL do projeto Supabase + publishable key~~ **RECEBIDOS E VALIDADOS** (2026-10-09)
-- Reenviar o token do GitHub quando quiser push das alterações da sessão 2 (o token da sessão 1 não fica salvo no ambiente)
-- Chave OpenRouter (opcional, para teste ao vivo da IA no desenvolvimento)
-- Conectar o repo na Vercel + definir a variável `APP_URL` (Settings → Secrets and variables → Actions → Variables) com a URL de produção
+- ~~Token do GitHub~~ **RECEBIDO E USADO** (2026-10-09, sessão 4 — push + secrets concluídos)
+- ~~Chave OpenRouter~~ **RECEBIDA E VALIDADA AO VIVO** (2026-10-09, sessão 4)
+- **Conectar o repo na Vercel** + definir a variável `APP_URL` (Settings → Secrets and variables → Actions → Variables) com a URL de produção
 
 ## Erros conhecidos
 
@@ -70,9 +70,20 @@ Ver `docs/KNOWN_ISSUES.md`.
 - Screenshots: `download/painel-e2e.png` (desktop) e `download/painel-e2e-mobile.png` (375px)
 - Banco deixado limpo: usuários de teste removidos (auth.users=0), só conteúdo semeado
 
-## Pendências da sessão 3
+## Aceites verificados nesta sessão (4) — push, secrets e IA ao vivo
 
-1. **Push para o GitHub**: o token foi perdido na compactação da sessão 2 — 5 commits locais aguardando (`dff0e83`..`c657eef`). Pedir o token de novo (fine-grained, Contents: Read and Write) OU o usuário conecta o repo manualmente
-2. Atualizar secrets do GitHub (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SECRET_KEY, DATABASE_URL) via `scripts/set-github-secrets.ts` — exige o token acima
-3. Vercel: conectar repo → env vars → deploy → Site URL no Supabase (Auth) → Lighthouse ≥ 90 → PWA push em aparelho real
-4. Repo variable `APP_URL` para os 4 workflows agendados
+- **Push concluído**: `4aba9d6..473feaa` fast-forward (7 commits: planejador, vídeos, gitleaks, fixes de DB/perfil, docs, IA) → repo `Kronos1027/StudyMoon` atualizado
+- **10 secrets sincronizados** via `scripts/set-github-secrets.ts` (Supabase URL/anon/secret, DATABASE_URL, GEMINI/GROQ/OPENROUTER, CRON_SECRET, VAPID par)
+- **CI verde no 473feaa**: verify + gitleaks + E2E Playwright, todos success
+- **OpenRouter validado ao vivo**: slug antigo `meta-llama/llama-3.3-70b-instruct:free` morreu; bench de 4 `:free` atuais elegeu **`nvidia/nemotron-3-super-120b-a12b:free`** (JSON válido, 5 alternativas, ~124ms)
+- **Cascata real do roteador**: gemini (400 geo-block HK) → groq (403 geo) → **openrouter atende com JSON correto** (`{"capital": "Brasília"}`); na Vercel (saída EUA) o Gemini atende em 1º lugar
+- **`gemini-3.8-flash` confirmado como modelo atual** via catálogo (a menção do usuário a "gemini-1.5-flash" é só a origem antiga da chave; 1.5 foi aposentado)
+- **PIPELINE NOTURNO REAL**: `POST /api/cron/content?topics=1&perTopic=2` → **2 geradas, 2 validadas (4 camadas), 0 rejeitadas** — questões em `mt-operacoes-basicas` com contexto brasileiro real e matemática correta (173÷8 → resto 5, gabarito C)
+- Ferramentas novas: `scripts/test-ai-providers.mjs` (sonda), `bench-openrouter.mjs` (comparador), `test-ai-router.ts` (cascata E2E), `inspect-ai-questions.ts` (auditoria do que a IA inseriu)
+
+## Pendências da sessão 4 (todas exigem ação do usuário)
+
+1. **Vercel**: conectar o repo `Kronos1027/StudyMoon` → importar as mesmas env vars do `.env` (menos `DATABASE_URL`, que a Vercel preenche — usar o pooler) → deploy → configurar **Site URL** no Supabase Auth (KI-011) → rodar Lighthouse (meta ≥ 90)
+2. Repo variable **`APP_URL`** (Settings → Secrets and variables → Actions → **Variables**, não secrets) com a URL de produção — desbloqueia os 4 workflows agendados (reminders, content, keepalive, backup)
+3. Teste de notificação push em aparelho real (Android + iPhone PWA) após o deploy
+4. Expansões da seção 19 do documento mestre, na ordem
