@@ -22,6 +22,7 @@ import { ConsistencyMap } from "@/components/dashboard/consistency-map";
 import { MasteryBars } from "@/components/dashboard/mastery-bars";
 import { AccuracyLine } from "@/components/dashboard/accuracy-line";
 import { AnimatedNumber } from "@/components/dashboard/animated-number";
+import { TodayPlan } from "@/components/dashboard/today-plan";
 import { Button } from "@/components/ui/button";
 import { getSupabaseServerClient } from "@/lib/db/server";
 import { getDashboardData } from "@/lib/dashboard/queries";
@@ -220,6 +221,14 @@ export default async function PainelPage() {
             </div>
           </div>
         </section>
+
+        {/* Row 1.5: today's plan (planner) */}
+        <TodayPlan
+          plan={data.todayPlan}
+          slugById={data.topicSlugById}
+          hasExamDate={Boolean(profile.target_exam_date)}
+          daysLeft={daysLeft}
+        />
 
         {/* Row 2: consistency map */}
         <section className="rounded-2xl border border-border bg-card p-5" aria-label="Mapa de constância">

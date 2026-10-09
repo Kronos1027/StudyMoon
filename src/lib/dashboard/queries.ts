@@ -1,5 +1,12 @@
 import "server-only";
 import { getSupabaseServerClient } from "@/lib/db/server";
+import {
+  generatePlan,
+  planForDate,
+  toKey as planDateKey,
+  type DayPlan,
+} from "@/lib/planner";
+import type { TopicMasteryLike } from "@/lib/practice/selection";
 import type {
   Area,
   Profile,
@@ -31,6 +38,10 @@ export interface DashboardData {
   ranking: WeeklyLeaderboardRow[];
   reviewsDue: number;
   xpToday: number;
+  /** Planner output for today (null when the user has no exam date). */
+  todayPlan: DayPlan | null;
+  /** topic id -> slug, used to deep-link plan blocks. */
+  topicSlugById: Record<string, string>;
 }
 
 /** Maps an Elo rating (400..1800) to a readable mastery percent. */
@@ -77,7 +88,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData | 
       .eq("user_id", userId)
       .gte("created_at", since84),
     supabase.from("topic_mastery").select("*").eq("user_id", userId),
-    supabase.from("topics").select("id, name, area_id, slug, level").not("parent_id", "is", null),
+    supabase.from("topics").select("id, name, area_id, slug, level, enem_weight").not("parent_id", "is", null),
     supabase.from("areas").select("*"),
     supabase
       .from("weekly_leaderboard")
@@ -88,7 +99,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData | 
       .from("srs_cards")
       .select("id, due")
       .eq("user_id", userId)
-      .lte("due", new Date().toISOString()),
+      .lte("due", new Date(Date.now() + 7 * 86400000).toISOString()),
     supabase
       .from("xp_events")
       .select("amount")
@@ -162,6 +173,42 @@ export async function getDashboardData(userId: string): Promise<DashboardData | 
     .sort((a, b) => a.mastery.elo - b.mastery.elo)
     .slice(0, 4);
 
+  // ----- today's plan (planner, doc section 7.4) -----
+  // The due queue was fetched with a 7-day window: cards due now (review
+  // priority) plus the weekly load estimate the planner uses for pacing.
+  const dueWindow = dueCards ?? [];
+  const reviewsDue = dueWindow.filter(
+    (c) => new Date(c.due as string).getTime() <= Date.now(),
+  ).length;
+  const reviewsPerDay = Math.ceil(dueWindow.length / 7);
+
+  const topicSlugById: Record<string, string> = {};
+  for (const topic of topics) topicSlugById[topic.id] = topic.slug;
+
+  let todayPlan: DayPlan | null = null;
+  if (profile.target_exam_date) {
+    const masteryLike: TopicMasteryLike[] = (masteryRows ?? []).map((m) => ({
+      topicId: m.topic_id,
+      elo: m.elo,
+      confidence: m.confidence ?? 0,
+    }));
+    const plans = generatePlan({
+      today: new Date(),
+      examDate: profile.target_exam_date,
+      dailyHours: Number(profile.daily_hours ?? 2),
+      topics: topics.map((t) => ({
+        id: t.id,
+        name: t.name,
+        areaId: t.area_id,
+        enemWeight: t.enem_weight,
+        level: t.level,
+      })),
+      mastery: masteryLike,
+      reviewsPerDay,
+    });
+    todayPlan = planForDate(plans, planDateKey(new Date()));
+  }
+
   // ----- goal -----
   const targetQuestions = goalRow?.target_questions ?? 10;
   const targetMinutes = goalRow?.target_minutes ?? Math.round(Number(profile.daily_hours ?? 2) * 60);
@@ -189,7 +236,9 @@ export async function getDashboardData(userId: string): Promise<DashboardData | 
     masteryByArea,
     weaknesses,
     ranking: (ranking ?? []) as WeeklyLeaderboardRow[],
-    reviewsDue: (dueCards ?? []).length,
+    reviewsDue,
     xpToday: (xpTodayRows ?? []).reduce((sum, r) => sum + r.amount, 0),
+    todayPlan,
+    topicSlugById,
   };
 }

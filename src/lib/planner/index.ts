@@ -55,7 +55,8 @@ export interface PlanInput {
 const FOCUS_BLOCK_MIN = 25;
 const REVIEW_MIN_PER_CARD = 1.2; // ~50 cards/hour with friction
 
-function toKey(date: Date): string {
+/** Local-time calendar key (yyyy-mm-dd) — also used by the dashboard card. */
+export function toKey(date: Date): string {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
   const d = String(date.getDate()).padStart(2, "0");
