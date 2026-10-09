@@ -149,7 +149,7 @@ export function defaultProviders(): LLMProvider[] {
     "openrouter",
     "https://openrouter.ai/api/v1",
     process.env.OPENROUTER_API_KEY ?? "",
-    process.env.OPENROUTER_MODEL ?? "meta-llama/llama-3.3-70b-instruct:free",
+    process.env.OPENROUTER_MODEL ?? "nvidia/nemotron-3-super-120b-a12b:free",
   );
   if (openrouter.isConfigured()) providers.push(openrouter);
 
