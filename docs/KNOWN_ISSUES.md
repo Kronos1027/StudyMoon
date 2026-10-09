@@ -9,19 +9,19 @@ Itens ativos, impacto e solução de contorno. Atualizado em 2026-10-09.
 **Contorno:** provider `mock` nos testes unitários; pipeline testado com validação determinística. Validação ao vivo acontece após o deploy.
 **Status:** resolvido por design (fallback em cascata); teste ao vivo pendente de deploy.
 
-## KI-002 — Banco real ainda não provisionado (aguardando o usuário)
-**Impacto:** o app roda em modo "configuração pendente" (banner honesto nas telas de login); as migrations não foram aplicadas; nenhuma conta existe.
-**Contorno:** todo o fluxo foi construído e o script `pnpm setup` faz tudo em um comando quando `DATABASE_URL` chegar.
-**O que falta do usuário:** (1) `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` (publishable); (2) `DATABASE_URL` (Connection string/URI).
+## KI-002 — Banco real ainda não provisionado (aguardando a SENHA do banco)
+**Impacto:** `NEXT_PUBLIC_SUPABASE_URL` e a publishable key já estão configurados e validados (auth ao vivo testada: cadastro, login inválido, admin API). Falta apenas a **senha real** do Postgres — o dashboard sempre exibe `[YOUR-PASSWORD]` como placeholder na Connection string, nunca a senha em si.
+**Contorno:** quando a senha chegar, atualizar `DATABASE_URL` no `.env` e rodar `pnpm setup`. **Importante:** o host direto `db.<ref>.supabase.co` resolve apenas IPv6; em ambientes sem saída IPv6 usar o **Session Pooler** (`aws-0-<região>.pooler.supabase.com:5432`, usuário `postgres.<ref>`), que tem IPv4.
+**O que falta do usuário:** a senha do banco (Project Settings → Database → Reset database password, ou colar a string completa com a senha real).
 
 ## KI-003 — Google OAuth exige configuração manual no Supabase
 O login com Google precisa de credenciais OAuth do Google Cloud coladas no dashboard do Supabase (Authentication → Providers → Google). Passo a passo no `docs/SETUP.md` § 2.4. Até lá, o botão aparece desabilitado com explicação (comportamento intencional).
 
-## KI-004 — Vídeos das lições ainda não populados
-O mecanismo existe (`content/videos.json` + `pnpm check-videos` via oEmbed), mas a lista começa vazia por decisão de integridade: **nunca inventar ID de vídeo**. Sessão 2: buscar vídeos reais de canais educacionais brasileiros e validar cada um antes de listar.
+## KI-004 — Vídeos das lições: RESOLVIDO (66/66 tópicos)
+Populado na sessão 2 com `scripts/fill-videos.py`: busca no YouTube por tópicos com canais reconhecidos (Ferretto, Dicasdemat, Noslen, Biologia com Samuel, Gabriel Cabral, Descomplica etc.), filtro de relevância por palavra-chave + validação **oEmbed obrigatória** de cada ID (`pnpm check-videos`: 66 verificados, 0 removidos). Reexecutar `python3 scripts/fill-videos.py --only <slug>` para trocar o vídeo de um tópico específico.
 
-## KI-005 — Planejador: agenda diária ainda não aparece no painel
-O algoritmo (`generatePlan`) está implementado e coberto por testes (perfis forte/fraco geram planos distintos), mas o card "Agenda" do painel ainda não consome esses blocos. Próxima sessão.
+## KI-005 — Planejador no painel: RESOLVIDO (sessão 2)
+O card "Agenda de hoje" no `/painel` consome `generatePlan` com dados reais (domínio por tópico, fila FSRS de 7 dias, data da prova, horas diárias), com deep-links por bloco (revisão, aula nova, prática, simulado de domingo, redação de sábado) e estados vazios honestos (sem data da prova → CTA para o perfil).
 
 ## KI-006 — Workflows dependem da variável APP_URL
 `push-reminders.yml`, `content-nightly.yml` e `keepalive.yml` chamam `${{ vars.APP_URL }}/api/cron/...`. Após o deploy na Vercel, definir **APP_URL** (Repository → Settings → Secrets and variables → Actions → *Variables*) com a URL de produção. Sem isso, os jobs falham silenciosamente (sem segredo em jogo).
@@ -34,3 +34,11 @@ O relatório usa percentual × 1000 (rotulado como estimativa, não TRI). Uma mo
 
 ## KI-009 — e2e do Playwright no CI ainda é smoke
 O CI roda o smoke (renderização + manifest). O fluxo completo (cadastro → … → redação) exige as variáveis do Supabase como secrets do CI — adicionar na sessão 2 junto com o provisionamento.
+
+## KI-010 — tsx/esbuild quebra no sandbox de desenvolvimento (EPIPE)
+**Impacto:** `npx tsx` (usado por `pnpm setup`, `pnpm check-videos`, `pnpm content:validate`) falha no sandbox com `The service was stopped: write EPIPE` (esbuild 0.28 × Node 24.21 do ambiente). Não afeta o CI (GitHub runners executam tsx normalmente).
+**Contorno no sandbox:** `node --experimental-strip-types scripts/<script>.ts` executa os mesmos scripts com o Node 24 nativo (validado com `check-videos.ts`).
+
+## KI-011 — SMTP da Supabase tem limite de 2 e-mails/hora
+O cadastro com confirmação por e-mail está ATIVO no projeto (padrão Supabase). O SMTP embutido (gratuito) limita ~2 e-mails/hora e os links de confirmação apontam para a Site URL configurada no dashboard. **Após o deploy:** (1) definir Site URL em Authentication → URL Configuration com a URL de produção; (2) para uso real, configurar SMTP próprio (ex.: Resend) ou desligar "Confirm email" em Authentication → Providers → Email.
+**Status:** espera configuração pós-deploy; cadastro/login por senha testados ao vivo e funcionando.
