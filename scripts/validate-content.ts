@@ -12,6 +12,7 @@ import {
   questionBatchSchema,
   validateQuestionFormat,
 } from "@/lib/content/schemas";
+import { resolveDemoForQuestion, getSubtopic } from "@/lib/demos/subtopics";
 
 const math = create(all, {});
 const evaluate = math.evaluate as (expr: string) => unknown;
@@ -81,6 +82,26 @@ async function main() {
           );
           continue;
         }
+      }
+
+      // Layer c2 — subtopic binding (demo só pode vir do subtópico da questão)
+      if (q.subtopic) {
+        if (!getSubtopic(q.topic_slug, q.subtopic)) {
+          problems.push(
+            `${label} SUBTÓPICO: "${q.subtopic}" não existe no tópico ${q.topic_slug} (catálogo src/lib/demos/subtopics.ts)`,
+          );
+          continue;
+        }
+        const resolution = resolveDemoForQuestion(q.topic_slug, q.subtopic, q.demo_params ?? null);
+        if ((q.demo_id ?? null) !== (resolution?.demoId ?? null)) {
+          problems.push(
+            `${label} DEMO: demo_id "${q.demo_id}" != resolvido do subtópico "${resolution?.demoId ?? null}"`,
+          );
+          continue;
+        }
+      } else if (q.demo_id) {
+        problems.push(`${label} DEMO: questão sem subtópico não pode ter demo`);
+        continue;
       }
 
       // Layer d (deterministic subset) — quality guards

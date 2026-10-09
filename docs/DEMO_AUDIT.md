@@ -1,6 +1,6 @@
 # DEMO_AUDIT.md — Auditoria dos simuladores interativos
 
-Gerado por `scripts/audit-demos.ts` em 2026-10-09 · modo de vínculo: **tópico** · 15 simuladores · 35 questões seed · 32 questões com demo no estado atual.
+Gerado por `scripts/audit-demos.ts` em 2026-10-09 · vínculo por **subtópico** · 18 simuladores · 35 questões seed · 22 questões com demo no estado atual.
 
 > Regra permanente (docs/DECISIONS.md): nenhum simulador novo pode ser criado sem (1) vínculo a um subtópico, (2) testes numéricos e (3) entrada neste documento. Demo errada é pior que nenhuma demo.
 
@@ -8,37 +8,90 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · modo de vínculo: **tópico
 
 | Simulador | Arquivo | Área | Vínculo | Questões que exibem | Status |
 | --- | --- | --- | --- | --- | --- |
-| `balanceamento` | src/components/demos/balanceamento-demo.tsx | cn | `cn-estequiometria`<br>`cn-equilibrio-eletroquimica` | 1 | ⚠️ 1 problema(s) |
-| `divisao` | src/components/demos/divisao-demo.tsx | mt | `mt-operacoes-basicas`<br>`mt-divisibilidade` | 0 | OK |
-| `estatistica` | src/components/demos/estatistica-demo.tsx | mt | `mt-estatistica`<br>`mt-graficos-tabelas` | 3 | ⚠️ 1 problema(s) |
-| `eutrofizacao` | src/components/demos/eutrofizacao-demo.tsx | cn | `cn-ecologia` | 1 | OK |
-| `fracoes` | src/components/demos/fracoes-demo.tsx | mt | `mt-fracoes-decimais` | 2 | OK |
-| `funcoes` | src/components/demos/funcoes-demo.tsx | mt | `mt-funcoes`<br>`mt-geometria-analitica` | 3 | ⚠️ 1 problema(s) |
-| `genetica` | src/components/demos/genetica-demo.tsx | cn | `cn-genetica` | 2 | ⚠️ 1 problema(s) |
-| `geometria` | src/components/demos/geometria-demo.tsx | mt | `mt-geometria-plana`<br>`mt-geometria-espacial` | 2 | ⚠️ 1 problema(s) |
-| `linha-tempo` | src/components/demos/linha-tempo-demo.tsx | lc, ch | `lc-literatura-movimentos`<br>`ch-brasil-colonia`<br>`ch-brasil-imperio`<br>`ch-brasil-republica`<br>`ch-historia-geral` | 1 | ⚠️ 1 problema(s) |
-| `mapas` | src/components/demos/mapas-demo.tsx | ch | `ch-geo-fisica`<br>`ch-geo-humana`<br>`ch-cartografia`<br>`ch-meio-ambiente` | 1 | ⚠️ 1 problema(s) |
-| `phet` | src/components/demos/phet-demo.tsx | cn | `cn-mecanica`<br>`cn-energia-trabalho`<br>`cn-ondas-optica`<br>`cn-eletricidade` | 1 | ⚠️ 1 problema(s) |
-| `porcentagem` | src/components/demos/porcentagem-demo.tsx | mt | `mt-porcentagem-juros` | 6 | OK |
-| `probabilidade` | src/components/demos/probabilidade-demo.tsx | mt | `mt-probabilidade`<br>`mt-combinatoria` | 4 | ⚠️ 2 problema(s) |
-| `razao-proporcao` | src/components/demos/razao-proporcao-demo.tsx | mt | `mt-razao-proporcao` | 3 | ⚠️ 2 problema(s) |
-| `textos` | src/components/demos/textos-demo.tsx | lc | `lc-interpretacao`<br>`lc-generos-tipos`<br>`lc-variacao-linguistica`<br>`lc-figuras-linguagem` | 2 | ⚠️ 1 problema(s) |
+| `alavanca` | src/components/demos/alavanca-demo.tsx | cn | `cn-mecanica.alavanca` | 0 | OK |
+| `balanceamento` | src/components/demos/balanceamento-demo.tsx | cn | `cn-estequiometria.balanceamento`<br>`cn-estequiometria.calculos-estequiometricos` | 1 | ⚠️ 1 problema(s) |
+| `divisao` | src/components/demos/divisao-demo.tsx | mt | `mt-divisibilidade.criterios`<br>`mt-operacoes-basicas.multiplicacao-divisao` | 0 | OK |
+| `escala-mapa` | src/components/demos/escala-mapa-demo.tsx | mt | `mt-razao-proporcao.escala` | 1 | OK |
+| `estatistica` | src/components/demos/estatistica-demo.tsx | mt | `mt-estatistica.media-mediana-moda` | 2 | ⚠️ 1 problema(s) |
+| `eutrofizacao` | src/components/demos/eutrofizacao-demo.tsx | cn | `cn-ecologia.eutrofizacao` | 1 | OK |
+| `fracoes` | src/components/demos/fracoes-demo.tsx | mt | `mt-fracoes-decimais.fracoes` | 2 | OK |
+| `funcoes` | src/components/demos/funcoes-demo.tsx | mt | `mt-funcoes.afim`<br>`mt-funcoes.quadratica`<br>`mt-geometria-analitica.reta` | 2 | ⚠️ 1 problema(s) |
+| `genetica` | src/components/demos/genetica-demo.tsx | cn | `cn-genetica.cruzamentos` | 1 | OK |
+| `geometria` | src/components/demos/geometria-demo.tsx | mt | `mt-geometria-plana.areas-perimetros` | 1 | OK |
+| `linha-tempo` | src/components/demos/linha-tempo-demo.tsx | lc | `lc-literatura-movimentos.movimentos` | 0 | OK |
+| `mapas` | src/components/demos/mapas-demo.tsx | ch | `ch-geo-humana.populacao` | 0 | ⚠️ 1 problema(s) |
+| `phet` | src/components/demos/phet-demo.tsx | cn | `cn-eletricidade.circuitos`<br>`cn-eletricidade.potencia-eletrica`<br>`cn-energia-trabalho.fontes-transformacoes`<br>`cn-mecanica.energia-mecanica`<br>`cn-ondas-optica.ondas` | 1 | ⚠️ 1 problema(s) |
+| `porcentagem` | src/components/demos/porcentagem-demo.tsx | mt | `mt-porcentagem-juros.juros-compostos`<br>`mt-porcentagem-juros.porcentagem`<br>`mt-porcentagem-juros.variacoes-sucessivas` | 5 | OK |
+| `probabilidade` | src/components/demos/probabilidade-demo.tsx | mt | `mt-probabilidade.eventos-compostos` | 2 | ⚠️ 1 problema(s) |
+| `razao` | src/components/demos/razao-demo.tsx | mt | `mt-razao-proporcao.proporcao`<br>`mt-razao-proporcao.razao` | 0 | OK |
+| `regra-de-tres` | src/components/demos/regra-de-tres-demo.tsx | mt | `mt-razao-proporcao.regra-de-tres-direta`<br>`mt-razao-proporcao.regra-de-tres-inversa` | 2 | OK |
+| `textos` | src/components/demos/textos-demo.tsx | lc | `lc-figuras-linguagem.figuras`<br>`lc-interpretacao.interpretacao` | 1 | ⚠️ 1 problema(s) |
 
 ## Detalhe por simulador
+
+### `alavanca`
+
+- **Arquivo:** `src/components/demos/alavanca-demo.tsx`
+- **Área:** cn
+- **Vinculada a (subtópicos):** `cn-mecanica.alavanca`
+- **Questões seed que exibem:** 0
+
+<details><summary>Textos e fórmulas exibidos (36 trechos extraídos do código)</summary>
+
+- , )} > {mass} kg </span> <span className=
+- , side ===
+- , state.balanced ?
+- , stiffness: 120, damping: 14 }} > {/* marcas de distância (1 m a 6 m de cada lado) */} {Array.from({ length: MAX_DISTANCE }, (_, i) => i + 1).map((m) => ( <span key={
+- , transformOrigin:
+- ; import { cn } from
+- ; import { leverState } from
+- ; import { motion, useReducedMotion } from
+- ; import { Slider } from
+- ; mass: number; distance: number; rotation: number; }) { const px = distToPx(distance); const left = side ===
+- ? -state.tiltDeg : state.tiltDeg; return ( <div className=
+- )} graus para o lado ${state.heavierSide ===
+- } {fmt(rightDistance)} m = <strong>{fmt(state.rightTorque)} kg·m</strong> </p> <div className=
+- } </p> <div className=
+- } <strong>{fmt(state.leftTorque)} kg·m</strong> · Direita: {rightMass} kg ×{
+- } > {/* apoio (fulcro) */} <div className=
+- } className=
+- } contra <span className=
+- } é maior, e a barra pende para esse lado (${state.tiltDeg.toFixed(1).replace(
+- }} animate={{ rotate: barRotation }} transition={reduced ? { duration: 0 } : { type:
+- }} aria-hidden=
+- /> ))} {Array.from({ length: MAX_DISTANCE }, (_, i) => i + 1).map((m) => ( <span key={
+- /> ))} <Pan side=
+- /> {/* prato com o peso */} <span className={cn(
+- /> </div> {/* barra que gira em torno do centro (apoio) */} <motion.div className=
+- /> </div> </div> </section> <section aria-label=
+- /> </div> <div> <label htmlFor=
+- /> <div className=
+- /> <label htmlFor=
+- > <div className=
+- > <div> <label htmlFor=
+- > <h3 className=
+- > <section aria-label=
+- > A alavanca equilibra quando os torques (peso × distância) são iguais </h3> <p className=
+- > Distância direita: <strong className=
+- > Distância esquerda: <strong className=
+
+</details>
 
 ### `balanceamento`
 
 - **Arquivo:** `src/components/demos/balanceamento-demo.tsx`
 - **Área:** cn
-- **Vinculada a (tópico):** `cn-estequiometria`, `cn-equilibrio-eletroquimica`
+- **Vinculada a (subtópicos):** `cn-estequiometria.balanceamento`, `cn-estequiometria.calculos-estequiometricos`
 - **Questões seed que exibem:** 1
 
 | Questão (início do enunciado) | Tópico | Subtópico |
 | --- | --- | --- |
-| A massa de água produzida na reação completa de 8 g de hidrogênio (H₂)… | `cn-estequiometria` | — |
+| A massa de água produzida na reação completa de 8 g de hidrogênio (H₂)… | `cn-estequiometria` | `calculos-estequiometricos` |
 
-- **PROBLEMA:** Vinculada a cn-equilibrio-eletroquimica, mas a demo é o balanceamento molecular H₂+O₂→H₂O, sem relação com equilíbrio químico/eletroquímica. O botão do coeficiente também DECREMENTA ao ser clicado (confuso).
-  - **Correção:** Vinculada a cn-estequiometria.balanceamento e cn-estequiometria.calculos-estequiometricos; botão vira exibição.
+- **CORRIGIDO:** Vinculada a cn-equilibrio-eletroquimica, mas a demo é o balanceamento molecular H₂+O₂→H₂O, sem relação com equilíbrio químico/eletroquímica.
+  - **Correção:** Vinculada a cn-estequiometria.balanceamento e cn-estequiometria.calculos-estequiometricos (a equação balanceada é o passo 0 do cálculo).
+- **PROBLEMA:** O botão do coeficiente DECREMENTA ao ser clicado (confuso: parece seletor, é ação).
+  - **Correção:** Botão vira exibição passiva (correção do PASSO 3).
 
 <details><summary>Textos e fórmulas exibidos (34 trechos extraídos do código)</summary>
 
@@ -83,7 +136,7 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · modo de vínculo: **tópico
 
 - **Arquivo:** `src/components/demos/divisao-demo.tsx`
 - **Área:** mt
-- **Vinculada a (tópico):** `mt-operacoes-basicas`, `mt-divisibilidade`
+- **Vinculada a (subtópicos):** `mt-divisibilidade.criterios`, `mt-operacoes-basicas.multiplicacao-divisao`
 - **Questões seed que exibem:** 0
 
 <details><summary>Textos e fórmulas exibidos (31 trechos extraídos do código)</summary>
@@ -122,21 +175,74 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · modo de vínculo: **tópico
 
 </details>
 
+### `escala-mapa`
+
+- **Arquivo:** `src/components/demos/escala-mapa-demo.tsx`
+- **Área:** mt
+- **Vinculada a (subtópicos):** `mt-razao-proporcao.escala`
+- **Questões seed que exibem:** 1
+
+| Questão (início do enunciado) | Tópico | Subtópico |
+| --- | --- | --- |
+| A distância real entre as duas cidades é de… | `mt-razao-proporcao` | `escala` |
+
+<details><summary>Textos e fórmulas exibidos (36 trechos extraídos do código)</summary>
+
+- , { minimumFractionDigits: 0, maximumFractionDigits: digits, }); } function fmtInt(n: number): string { return Math.round(n).toLocaleString(
+- , step >= 1 ?
+- , step >= 2 ?
+- , step >= 3 ?
+- ; import { cn, } from
+- ; import { convertMapScale, MAP_SCALE_DENOMINATORS, CM_PER_KM, type MapScaleConversion, } from
+- ; import { motion, useReducedMotion } from
+- ; import { Slider } from
+- ? params.distanceCm : 4.5; const askedScale = typeof params?.scale ===
+- ); } export function EscalaMapaDemo({ params }: { params?: EscalaMapaParams }) { const askedDistance = typeof params?.distanceCm ===
+- )} × {fmtInt(scale)} = {fmtInt(conv.realCm)} cm </span> </li> <li className={cn(
+- )} centímetros no papel.
+- )} cm no mapa </text> {/* régua embaixo */} <g> <line x1=
+- )} cm no mapa, na escala ${scaleLabel}, correspondem a ${fmt(conv.realKm, 2).replace(
+- )} cm</strong> </label> <Slider id=
+- )} km </span> </li> </ol> <p aria-live=
+- )} km reais.
+- )} km) </option> ))} </select> </div> </div> </section> <section aria-label=
+- )} km). </p> <div className=
+- /> ); })} <text x=
+- /> {/* cidades */} <g> <circle cx={mapLine.x1} cy={mapLine.y} r=
+- /> {/* rios e estradas decorativos */} <path d=
+- /> {Array.from({ length: 12 }, (_, i) => { const x = 24 + (i * 272) / 11; return ( <line key={i} x1={x} y1=
+- /> </div> <div> <label htmlFor=
+- /> <path d=
+- /> <rect x=
+- /> <text x={mapLine.x1} y={mapLine.y - 12} fontSize=
+- /> <text x={mapLine.x2} y={mapLine.y - 12} fontSize=
+- > {fmt(distanceCm, 1).replace(
+- > {MAP_SCALE_DENOMINATORS.map((d) => ( <option key={d} value={d}> 1:{fmtInt(d)} &nbsp;(1 cm = {fmt(d / CM_PER_KM, 1).replace(
+- > <div> <label htmlFor=
+- > <h3 className=
+- > <li className={cn(
+- > <section aria-label=
+- > <svg viewBox=
+- > Cidade Nova </text> <circle cx={mapLine.x2} cy={mapLine.y} r=
+
+</details>
+
 ### `estatistica`
 
 - **Arquivo:** `src/components/demos/estatistica-demo.tsx`
 - **Área:** mt
-- **Vinculada a (tópico):** `mt-estatistica`, `mt-graficos-tabelas`
-- **Questões seed que exibem:** 3
+- **Vinculada a (subtópicos):** `mt-estatistica.media-mediana-moda`
+- **Questões seed que exibem:** 2
 
 | Questão (início do enunciado) | Tópico | Subtópico |
 | --- | --- | --- |
-| Para descrever o salário típico dos funcionários, o valor mais represe… | `mt-estatistica` | — |
-| O crescimento percentual das vendas diárias de janeiro para fevereiro … | `mt-estatistica` | — |
-| A média mensal de empréstimos nesse período foi de… | `mt-estatistica` | — |
+| Para descrever o salário típico dos funcionários, o valor mais represe… | `mt-estatistica` | `media-mediana-moda` |
+| A média mensal de empréstimos nesse período foi de… | `mt-estatistica` | `media-mediana-moda` |
 
-- **PROBLEMA:** 'Adicionar aluno' sorteia nota com Math.random() (não determinístico) e a demo era vinculada a mt-graficos-tabelas, cujo foco é leitura de gráficos, não média/mediana/moda.
-  - **Correção:** Nota inicial determinística; vinculação só a mt-estatistica.media-mediana-moda.
+- **CORRIGIDO:** Era vinculada a mt-graficos-tabelas, cujo foco é leitura de gráficos, não média/mediana/moda.
+  - **Correção:** Vinculada só a mt-estatistica.media-mediana-moda.
+- **PROBLEMA:** 'Adicionar aluno' sorteia nota com Math.random() (não determinístico).
+  - **Correção:** Nota inicial determinística (correção de conteúdo do PASSO 3).
 
 <details><summary>Textos e fórmulas exibidos (36 trechos extraídos do código)</summary>
 
@@ -183,12 +289,12 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · modo de vínculo: **tópico
 
 - **Arquivo:** `src/components/demos/eutrofizacao-demo.tsx`
 - **Área:** cn
-- **Vinculada a (tópico):** `cn-ecologia`
+- **Vinculada a (subtópicos):** `cn-ecologia.eutrofizacao`
 - **Questões seed que exibem:** 1
 
 | Questão (início do enunciado) | Tópico | Subtópico |
 | --- | --- | --- |
-| O fenômeno descrito e sua principal consequência para os peixes são, r… | `cn-ecologia` | — |
+| O fenômeno descrito e sua principal consequência para os peixes são, r… | `cn-ecologia` | `eutrofizacao` |
 
 <details><summary>Textos e fórmulas exibidos (36 trechos extraídos do código)</summary>
 
@@ -235,13 +341,13 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · modo de vínculo: **tópico
 
 - **Arquivo:** `src/components/demos/fracoes-demo.tsx`
 - **Área:** mt
-- **Vinculada a (tópico):** `mt-fracoes-decimais`
+- **Vinculada a (subtópicos):** `mt-fracoes-decimais.fracoes`
 - **Questões seed que exibem:** 2
 
 | Questão (início do enunciado) | Tópico | Subtópico |
 | --- | --- | --- |
-| A fração do tempo total planejado que ainda falta estudar é… | `mt-fracoes-decimais` | — |
-| De um total de 200 livros de uma biblioteca comunitária, $\frac{2}{5}$… | `mt-fracoes-decimais` | — |
+| A fração do tempo total planejado que ainda falta estudar é… | `mt-fracoes-decimais` | `fracoes` |
+| De um total de 200 livros de uma biblioteca comunitária, $\frac{2}{5}$… | `mt-fracoes-decimais` | `fracoes` |
 
 <details><summary>Textos e fórmulas exibidos (27 trechos extraídos do código)</summary>
 
@@ -279,17 +385,16 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · modo de vínculo: **tópico
 
 - **Arquivo:** `src/components/demos/funcoes-demo.tsx`
 - **Área:** mt
-- **Vinculada a (tópico):** `mt-funcoes`, `mt-geometria-analitica`
-- **Questões seed que exibem:** 3
+- **Vinculada a (subtópicos):** `mt-funcoes.afim`, `mt-funcoes.quadratica`, `mt-geometria-analitica.reta`
+- **Questões seed que exibem:** 2
 
 | Questão (início do enunciado) | Tópico | Subtópico |
 | --- | --- | --- |
-| Se uma corrida custou R$ 35,00, a distância percorrida foi de… | `mt-funcoes` | — |
-| O lucro máximo que a barraquinha pode alcançar é de… | `mt-funcoes` | — |
-| Após 6 horas, a população dessa cultura será de… | `mt-funcoes` | — |
+| Se uma corrida custou R$ 35,00, a distância percorrida foi de… | `mt-funcoes` | `afim` |
+| O lucro máximo que a barraquinha pode alcançar é de… | `mt-funcoes` | `quadratica` |
 
-- **PROBLEMA:** SVG com min-w-[320px] e a demo era exibida também para geometria analítica sem recorte; em 360 px causa rolagem lateral; comparação `delta === 0` com ponto flutuante.
-  - **Correção:** SVG responsivo (escala pelo viewBox, sem min-width); delta com tolerância; vínculo por subtópicos afim/quadrática + reta.
+- **PROBLEMA:** SVG com min-w-[320px] causa rolagem lateral em telas de 360 px; comparação `delta === 0` com ponto flutuante.
+  - **Correção:** SVG responsivo (escala pelo viewBox, sem min-width); delta com tolerância (correção do PASSO 3).
 
 <details><summary>Textos e fórmulas exibidos (36 trechos extraídos do código)</summary>
 
@@ -336,15 +441,14 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · modo de vínculo: **tópico
 
 - **Arquivo:** `src/components/demos/genetica-demo.tsx`
 - **Área:** cn
-- **Vinculada a (tópico):** `cn-genetica`
-- **Questões seed que exibem:** 2
+- **Vinculada a (subtópicos):** `cn-genetica.cruzamentos`
+- **Questões seed que exibem:** 1
 
 | Questão (início do enunciado) | Tópico | Subtópico |
 | --- | --- | --- |
-| A proporção esperada de plantas com flores BRANCAS na descendência é d… | `cn-genetica` | — |
-| A probabilidade de um filho desse casal ser do grupo O é de… | `cn-genetica` | — |
+| A proporção esperada de plantas com flores BRANCAS na descendência é d… | `cn-genetica` | `cruzamentos` |
 
-- **PROBLEMA:** Granularidade: o quadro de Punnett (1 alelo, dominância V/v) era exibido na questão do sistema ABO (alelos múltiplos e co-dominância) — conceito diferente.
+- **CORRIGIDO:** Granularidade: o quadro de Punnett (1 alelo, dominância V/v) era exibido na questão do sistema ABO (alelos múltiplos e co-dominância) — conceito diferente.
   - **Correção:** Vinculada só ao subtópico de cruzamentos monohíbridos (cn-genetica.cruzamentos); ABO fica sem demo.
 
 <details><summary>Textos e fórmulas exibidos (36 trechos extraídos do código)</summary>
@@ -392,15 +496,14 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · modo de vínculo: **tópico
 
 - **Arquivo:** `src/components/demos/geometria-demo.tsx`
 - **Área:** mt
-- **Vinculada a (tópico):** `mt-geometria-plana`, `mt-geometria-espacial`
-- **Questões seed que exibem:** 2
+- **Vinculada a (subtópicos):** `mt-geometria-plana.areas-perimetros`
+- **Questões seed que exibem:** 1
 
 | Questão (início do enunciado) | Tópico | Subtópico |
 | --- | --- | --- |
-| O valor total do terreno é de… | `mt-geometria-plana` | — |
-| A altura em que a escada toca a parede é de… | `mt-geometria-plana` | — |
+| O valor total do terreno é de… | `mt-geometria-plana` | `areas-perimetros` |
 
-- **PROBLEMA:** Vinculada a geometria espacial (volumes), mas a demo é de áreas/perímetros planos.
+- **CORRIGIDO:** Vinculada a geometria espacial (volumes), mas a demo é de áreas/perímetros planos.
   - **Correção:** Vinculada só a mt-geometria-plana.areas-perimetros; espacial fica sem demo.
 
 <details><summary>Textos e fórmulas exibidos (35 trechos extraídos do código)</summary>
@@ -446,15 +549,11 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · modo de vínculo: **tópico
 ### `linha-tempo`
 
 - **Arquivo:** `src/components/demos/linha-tempo-demo.tsx`
-- **Área:** lc, ch
-- **Vinculada a (tópico):** `lc-literatura-movimentos`, `ch-brasil-colonia`, `ch-brasil-imperio`, `ch-brasil-republica`, `ch-historia-geral`
-- **Questões seed que exibem:** 1
+- **Área:** lc
+- **Vinculada a (subtópicos):** `lc-literatura-movimentos.movimentos`
+- **Questões seed que exibem:** 0
 
-| Questão (início do enunciado) | Tópico | Subtópico |
-| --- | --- | --- |
-| O conjunto de medidas do período descrito evidencia… | `ch-brasil-republica` | — |
-
-- **PROBLEMA:** Agrupa assuntos: a linha do tempo é de MOVIMENTOS LITERÁRIOS brasileiros, mas era vinculada a 4 tópicos de História (colônia, império, república, história geral). Questão da Era Vargas exibia eras literárias.
+- **CORRIGIDO:** Agrupava assuntos: a linha do tempo é de MOVIMENTOS LITERÁRIOS brasileiros, mas era vinculada a 4 tópicos de História (colônia, império, república, história geral). Questão da Era Vargas exibia eras literárias.
   - **Correção:** Vinculada só a lc-literatura-movimentos.movimentos; tópicos de História ficam sem demo.
 
 <details><summary>Textos e fórmulas exibidos (23 trechos extraídos do código)</summary>
@@ -489,15 +588,13 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · modo de vínculo: **tópico
 
 - **Arquivo:** `src/components/demos/mapas-demo.tsx`
 - **Área:** ch
-- **Vinculada a (tópico):** `ch-geo-fisica`, `ch-geo-humana`, `ch-cartografia`, `ch-meio-ambiente`
-- **Questões seed que exibem:** 1
+- **Vinculada a (subtópicos):** `ch-geo-humana.populacao`
+- **Questões seed que exibem:** 0
 
-| Questão (início do enunciado) | Tópico | Subtópico |
-| --- | --- | --- |
-| A ação humana que mais diretamente reduziria as emissões de CO₂ ligada… | `ch-meio-ambiente` | — |
-
-- **PROBLEMA:** Agrupa assuntos: gráfico de população por região era vinculado a geo-física, cartografia e meio-ambiente (a questão de emissões de CO₂ exibia população do Censo). Dados do Censo 2022 imprecisos (Sul 30,4 mi e shares somando 100,4%).
-  - **Correção:** Vinculada só a ch-geo-humana.populacao; dados corrigidos pelo Censo 2022 (Sul 29,2 mi; shares somam 100,0%).
+- **CORRIGIDO:** Agrupava assuntos: gráfico de população por região era vinculado a geo-física, cartografia e meio-ambiente (a questão de emissões de CO₂ exibia população do Censo).
+  - **Correção:** Vinculada só a ch-geo-humana.populacao.
+- **PROBLEMA:** Dados do Censo 2022 imprecisos (Sul 30,4 mi; shares somando 100,4%).
+  - **Correção:** Dados corrigidos pelo Censo 2022 (SE 84,8 mi/41,8%, NE 54,6, S 29,2, N 17,0, CO 16,2 — shares calculados pelo código somam 99,5%).
 
 <details><summary>Textos e fórmulas exibidos (35 trechos extraídos do código)</summary>
 
@@ -543,15 +640,15 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · modo de vínculo: **tópico
 
 - **Arquivo:** `src/components/demos/phet-demo.tsx`
 - **Área:** cn
-- **Vinculada a (tópico):** `cn-mecanica`, `cn-energia-trabalho`, `cn-ondas-optica`, `cn-eletricidade`
+- **Vinculada a (subtópicos):** `cn-eletricidade.circuitos`, `cn-eletricidade.potencia-eletrica`, `cn-energia-trabalho.fontes-transformacoes`, `cn-mecanica.energia-mecanica`, `cn-ondas-optica.ondas`
 - **Questões seed que exibem:** 1
 
 | Questão (início do enunciado) | Tópico | Subtópico |
 | --- | --- | --- |
-| O custo mensal (30 dias) aproximado para operar esse chuveiro é de… | `cn-eletricidade` | — |
+| O custo mensal (30 dias) aproximado para operar esse chuveiro é de… | `cn-eletricidade` | `potencia-eletrica` |
 
-- **PROBLEMA:** Agrupa assuntos: uma única demo com 3 simulações em abas abria SEMPRE na aba 'Movimento' — a questão do chuveiro elétrico (circuitos) exibia a de movimento. Título com erro de digitação ('Movimento ( Energia de um Skate)').
-  - **Correção:** Aceita parâmetro da questão (subtópico → aba inicial: circuits/waves/motion); título corrigido.
+- **PROBLEMA:** Uma única demo com 3 simulações em abas abria SEMPRE na aba 'Movimento' — a questão do chuveiro elétrico (circuitos) exibia a de movimento. Título com erro de digitação ('Movimento ( Energia de um Skate)').
+  - **Correção:** Aceitar o parâmetro da questão (subtópico → aba inicial: circuits/waves/motion); título corrigido (PASSO 3).
 
 <details><summary>Textos e fórmulas exibidos (20 trechos extraídos do código)</summary>
 
@@ -582,17 +679,16 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · modo de vínculo: **tópico
 
 - **Arquivo:** `src/components/demos/porcentagem-demo.tsx`
 - **Área:** mt
-- **Vinculada a (tópico):** `mt-porcentagem-juros`
-- **Questões seed que exibem:** 6
+- **Vinculada a (subtópicos):** `mt-porcentagem-juros.juros-compostos`, `mt-porcentagem-juros.porcentagem`, `mt-porcentagem-juros.variacoes-sucessivas`
+- **Questões seed que exibem:** 5
 
 | Questão (início do enunciado) | Tópico | Subtópico |
 | --- | --- | --- |
-| Comparando os preços finais à vista nas duas lojas, conclui-se que… | `mt-porcentagem-juros` | — |
-| O preço de um produto passou de R$ 80,00 para R$ 92,00. A variação per… | `mt-porcentagem-juros` | — |
-| Após 5 meses de aplicação, o total de juros recebidos, em reais, será … | `mt-porcentagem-juros` | — |
-| A diferença entre os montantes finais dos dois investimentos, em reais… | `mt-porcentagem-juros` | — |
-| O número de alunos que NÃO participam da oficina de robótica é… | `mt-porcentagem-juros` | — |
-| Após uma alta de 25%, o preço de um produto passou a ser maior que o o… | `mt-porcentagem-juros` | — |
+| Comparando os preços finais à vista nas duas lojas, conclui-se que… | `mt-porcentagem-juros` | `variacoes-sucessivas` |
+| O preço de um produto passou de R$ 80,00 para R$ 92,00. A variação per… | `mt-porcentagem-juros` | `porcentagem` |
+| A diferença entre os montantes finais dos dois investimentos, em reais… | `mt-porcentagem-juros` | `juros-compostos` |
+| O número de alunos que NÃO participam da oficina de robótica é… | `mt-porcentagem-juros` | `porcentagem` |
+| Após uma alta de 25%, o preço de um produto passou a ser maior que o o… | `mt-porcentagem-juros` | `variacoes-sucessivas` |
 
 <details><summary>Textos e fórmulas exibidos (36 trechos extraídos do código)</summary>
 
@@ -639,20 +735,18 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · modo de vínculo: **tópico
 
 - **Arquivo:** `src/components/demos/probabilidade-demo.tsx`
 - **Área:** mt
-- **Vinculada a (tópico):** `mt-probabilidade`, `mt-combinatoria`
-- **Questões seed que exibem:** 4
+- **Vinculada a (subtópicos):** `mt-probabilidade.eventos-compostos`
+- **Questões seed que exibem:** 2
 
 | Questão (início do enunciado) | Tópico | Subtópico |
 | --- | --- | --- |
-| A probabilidade de a bola retirada ser vermelha é… | `mt-probabilidade` | — |
-| A probabilidade de a soma dos pontos ser igual a 7 é… | `mt-probabilidade` | — |
-| Uma moeda honesta é lançada 3 vezes seguidas. A probabilidade de apare… | `mt-probabilidade` | — |
-| O total de senhas diferentes possíveis é… | `mt-combinatoria` | — |
+| A probabilidade de a soma dos pontos ser igual a 7 é… | `mt-probabilidade` | `eventos-compostos` |
+| Uma moeda honesta é lançada 3 vezes seguidas. A probabilidade de apare… | `mt-probabilidade` | `eventos-compostos` |
 
-- **PROBLEMA:** Agrupa assuntos: vinculada a mt-probabilidade E mt-combinatoria. A questão de senhas (princípio multiplicativo — contagem) exibia a árvore de probabilidades, que não ensina contagem.
-  - **Correção:** Vinculação passou a ser por subtópico: apenas eventos compostos (mt-probabilidade.eventos-compostos); combinatoria fica sem demo.
+- **CORRIGIDO:** Agrupava assuntos: vinculada a mt-probabilidade E mt-combinatoria. A questão de senhas (princípio multiplicativo — contagem) exibia a árvore de probabilidades, que não ensina contagem.
+  - **Correção:** Vinculação por subtópico: apenas eventos compostos (mt-probabilidade.eventos-compostos); combinatoria fica sem demo.
 - **PROBLEMA:** SVG com min-w-[480px] — rolagem lateral em telas de 360 px.
-  - **Correção:** SVG responsivo sem min-width.
+  - **Correção:** SVG responsivo sem min-width (correção do PASSO 3).
 
 <details><summary>Textos e fórmulas exibidos (30 trechos extraídos do código)</summary>
 
@@ -689,55 +783,104 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · modo de vínculo: **tópico
 
 </details>
 
-### `razao-proporcao`
+### `razao`
 
-- **Arquivo:** `src/components/demos/razao-proporcao-demo.tsx`
+- **Arquivo:** `src/components/demos/razao-demo.tsx`
 - **Área:** mt
-- **Vinculada a (tópico):** `mt-razao-proporcao`
-- **Questões seed que exibem:** 3
+- **Vinculada a (subtópicos):** `mt-razao-proporcao.proporcao`, `mt-razao-proporcao.razao`
+- **Questões seed que exibem:** 0
 
-| Questão (início do enunciado) | Tópico | Subtópico |
-| --- | --- | --- |
-| A distância real entre as duas cidades é de… | `mt-razao-proporcao` | — |
-| Com 8 operários trabalhando no mesmo ritmo, a obra ficará pronta em… | `mt-razao-proporcao` | — |
-| O gasto estimado apenas com gasolina para a viagem será de… | `mt-razao-proporcao` | — |
+<details><summary>Textos e fórmulas exibidos (36 trechos extraídos do código)</summary>
 
-- **PROBLEMA:** Mistura áreas e assuntos: contém uma ALAVANCA (conceito de FÍSICA — torque) dentro de uma demo de MATEMÁTICA, além de uma tabela de regra de três fixa com arroz (texto estático, não calculado pelos controles). Nada disso ensina ESCALA DE MAPA — mas a questão de escala (4,5 cm, 1:200.000) exibia exatamente esta demo.
-  - **Correção:** Separar em demos independentes: razao, regra-de-tres (calculada), escala-mapa (nova) e alavanca (física, vinculada só a Física). Demo razao-proporcao removida.
-- **PROBLEMA:** Matemática quebrada: `rightDistance` é SEMPRE recalculado para igualar o torque esquerdo (o equilíbrio é automático e trivial), e `balanced` compara DISTÂNCIAS em vez de TORQUES. Com 3 kg × 4 m = 6 kg × 2 m (torques iguais = 12), a barra aparece INCLINADA — a animação contradiz o texto.
-  - **Correção:** Demo descontinuada; a nova alavanca calcula torque dos dois lados e só fica horizontal quando os torques são iguais (testado: 3×4 = 6×2 ⇒ inclinação 0°).
-
-<details><summary>Textos e fórmulas exibidos (29 trechos extraídos do código)</summary>
-
-- , balanced ?
-- , stiffness: 120, damping: 12 }} > {leftWeight} kg </motion.span> <span className=
-- , stiffness: 120, damping: 12 }} > {rightWeight} kg </motion.span> <span className=
-- , stiffness: 120, damping: 12 }} > <span className=
+- , i < parts ? tone :
+- , proportional ?
+- ; /** * Simulador de RAZÃO E PROPORÇÃO (PASSO 2 — demo
+- ; import { areProportional, ratioValue, simplifyRatio } from
 - ; import { cn } from
 - ; import { motion, useReducedMotion } from
 - ; import { Slider } from
-- )} </td> </tr> </tbody> </table> </div> <p className=
-- } {rightWeight} kg × {format(rightDistance)} m = {format(leftWeight * rightDistance)} </p> <div className=
-- /> </motion.div> <div className=
-- > {/* Balance */} <section aria-label=
-- > {leftWeight} kg × {format(leftDistance)} m = {format(leftTorque)} · {
-- > <div className=
+- } {flour} × {scaledSugar} = {flour * scaledSugar} </p> </div> <p className=
+- } {ratio !== null ?
+- } </p> <div className=
+- } > <IngredientColumn label=
+- } de açúcar para {flour} de farinha </h3> <p className=
+- /> </div> </div> </section> <section aria-label=
+- /> </div> <div> <label htmlFor=
+- > : </span> <IngredientColumn label=
+- > {Array.from({ length: max }, (_, i) => ( <motion.span key={i} className={cn(
+- > {sugar} : {flour} &nbsp;=&nbsp; {scaledSugar} : {scaledFlour} </p> <p className=
+- > {sugar} × {flour === 0 ?
+- > <div> <label htmlFor=
 - > <h3 className=
-- > <motion.span className=
-- > A balança equilibra quando peso × distância é igual dos dois lados </h3> <p className=
-- > A proporção se mantém: o preço por quilo é sempre 21 ÷ 3 = R$ 7. </p> </section> </div> ); } function format(n: number): string { return (Math.round(n * 10) / 10).toString().replace(
-- >{format(leftDistance)} m</span> </div> <motion.div className=
-- >{format(rightDistance)} m</span> </div> </div> <p className={cn(
-- animate={{ rotate: -tilt }} transition={reduced ? { duration: 0 } : { type:
-- animate={{ y: -tilt }} transition={reduced ? { duration: 0 } : { type:
-- animate={{ y: tilt }} transition={reduced ? { duration: 0 } : { type:
-- Distância do lado esquerdo
-- Equilibrada! A distância do lado direito se ajusta sozinha pela proporção.
-- Para equilibrar com ${rightWeight} kg, a distância certa é ${format(rightDistance)} m.
-- Peso do lado direito
-- Peso do lado esquerdo
-- Regra de três
-- w-full text-sm
+- > <p className=
+- > <section aria-label=
+- > A razão da receita: {sugar} parte{sugar === 1 ?
+- > Açúcar (partes): <strong className=
+- > Farinha (partes): <strong className=
+- > Proporção: duas razões iguais </h3> <div className=
+- > Razão {sugar} : {flour} {simple.b > 0 && (simple.a !== sugar || simple.b !== flour) ?
+- > Receitas: <strong className=
+- >{batches}×</strong> </label> <Slider id=
+- >{flour}</strong> </label> <Slider id=
+- >{sugar}</strong> </label> <Slider id=
+- ${batches}× a receita usa ${scaledSugar} : ${scaledFlour} — a mesma proporção de ${sugar} : ${flour}.
+- Ajuste os ingredientes.
+- className=
+- className={cn(
+- O açúcar é sempre ${fmt(sugarShare)}% da mistura.
+
+</details>
+
+### `regra-de-tres`
+
+- **Arquivo:** `src/components/demos/regra-de-tres-demo.tsx`
+- **Área:** mt
+- **Vinculada a (subtópicos):** `mt-razao-proporcao.regra-de-tres-direta`, `mt-razao-proporcao.regra-de-tres-inversa`
+- **Questões seed que exibem:** 2
+
+| Questão (início do enunciado) | Tópico | Subtópico |
+| --- | --- | --- |
+| Com 8 operários trabalhando no mesmo ritmo, a obra ficará pronta em… | `mt-razao-proporcao` | `regra-de-tres-inversa` |
+| O gasto estimado apenas com gasolina para a viagem será de… | `mt-razao-proporcao` | `regra-de-tres-direta` |
+
+<details><summary>Textos e fórmulas exibidos (36 trechos extraídos do código)</summary>
+
+- , { maximumFractionDigits: 2 }); } export function RegraDeTresDemo() { const [kind, setKind] = useState<Kind>(
+- , x === null ?
+- ; /** * Simulador de REGRA DE TRÊS (PASSO 2 — dividido da antiga
+- ; import { cn } from
+- ; import { motion, useReducedMotion } from
+- ; import { ruleOfThree } from
+- ; import { Slider } from
+- ; interface Grandeza { name: string; unit: string; } const DIRECT: [Grandeza, Grandeza] = [ { name:
+- ? ( <p className=
+- ? 10 : 20} step={1} aria-label={
+- ? 20 : 20} step={1} aria-label={
+- ? DIRECT : INVERSE; const x = ruleOfThree(a, b, c, kind); return ( <div className=
+- ); const [a, setA] = useState(3); const [b, setB] = useState(21); const [c, setC] = useState(5); const reduced = useReducedMotion(); const labels = kind ===
+- ). * Tabela clássica com grandezas e valores calculados pelo código a partir * dos controles (nunca texto fixo). Modos directo e inverso. */ type Kind =
+- } /> </div> </div> </section> <section aria-label=
+- } /> </div> <div> <label htmlFor=
+- } </p> </div> <div className=
+- }, ]; const INVERSE: [Grandeza, Grandeza] = [ { name:
+- }, ]; function fmt(n: number): string { return n.toLocaleString(
+- }, { name:
+- > {kind ===
+- > {labels[0].name} (1ª): <strong className=
+- > {labels[0].name} (2ª): <strong className=
+- > {labels[0].name} </th> <td className=
+- > {labels[1].name} (1ª): <strong className=
+- > {labels[1].name} </th> <td className=
+- > {x === null ?
+- > {x === null ? ( <p> Valor de {labels[0].name.toLowerCase()} na 1ª situação não pode ser zero — não há proporção possível. </p> ) : kind ===
+- > &nbsp; </th> <th className=
+- > <div role=
+- > <div> <label htmlFor=
+- > <motion.div initial={reduced ? undefined : { opacity: 0, y: 6 }} animate={reduced ? undefined : { opacity: 1, y: 0 }} className=
+- > <section aria-label=
+- > <strong>{fmt(a)}</strong> {labels[0].unit} </td> <td className=
+- > <strong>{fmt(b)}</strong> {labels[1].unit} </td> <td className=
+- > <strong>{fmt(c)}</strong> {labels[0].unit} </td> </tr> <tr className=
 
 </details>
 
@@ -745,16 +888,17 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · modo de vínculo: **tópico
 
 - **Arquivo:** `src/components/demos/textos-demo.tsx`
 - **Área:** lc
-- **Vinculada a (tópico):** `lc-interpretacao`, `lc-generos-tipos`, `lc-variacao-linguistica`, `lc-figuras-linguagem`
-- **Questões seed que exibem:** 2
+- **Vinculada a (subtópicos):** `lc-figuras-linguagem.figuras`, `lc-interpretacao.interpretacao`
+- **Questões seed que exibem:** 1
 
 | Questão (início do enunciado) | Tópico | Subtópico |
 | --- | --- | --- |
-| Pela construção do texto, conclui-se que o narrador critica… | `lc-interpretacao` | — |
-| Comparando as duas falas, a mudança de registro linguístico da neta oc… | `lc-variacao-linguistica` | — |
+| Pela construção do texto, conclui-se que o narrador critica… | `lc-interpretacao` | `interpretacao` |
 
-- **PROBLEMA:** Agrupa assuntos: vinculada a 4 tópicos de Linguagens, incluindo gêneros textuais e variação linguística, que a anotação de figuras/funções não ensina. Além disso a explicação da ironia contém frase truncada ('na pasta com a realidade').
-  - **Correção:** Vinculada só a lc-interpretacao.interpretacao e lc-figuras-linguagem.figuras; texto da ironia reescrito.
+- **CORRIGIDO:** Agrupava assuntos: vinculada a 4 tópicos de Linguagens, incluindo gêneros textuais e variação linguística, que a anotação de figuras/funções não ensina.
+  - **Correção:** Vinculada só a lc-interpretacao.interpretacao e lc-figuras-linguagem.figuras.
+- **PROBLEMA:** A explicação da ironia contém frase truncada ('na pasta com a realidade') — texto sem sentido em português.
+  - **Correção:** Reescrever a explicação da ironia (correção de conteúdo do PASSO 3).
 
 <details><summary>Textos e fórmulas exibidos (28 trechos extraídos do código)</summary>
 
@@ -791,18 +935,33 @@ Gerado por `scripts/audit-demos.ts` em 2026-10-09 · modo de vínculo: **tópico
 
 ## Problemas estruturais detectados
 
-- ⚠️ `funcoes` vinculada a 2 assuntos (mt-funcoes, mt-geometria-analitica) — agrupamento; o vínculo deve ser por subtópico.
-- ⚠️ `divisao` vinculada a 2 assuntos (mt-operacoes-basicas, mt-divisibilidade) — agrupamento; o vínculo deve ser por subtópico.
-- ⚠️ `probabilidade` vinculada a 2 assuntos (mt-probabilidade, mt-combinatoria) — agrupamento; o vínculo deve ser por subtópico.
-- ⚠️ `estatistica` vinculada a 2 assuntos (mt-estatistica, mt-graficos-tabelas) — agrupamento; o vínculo deve ser por subtópico.
-- ⚠️ `balanceamento` vinculada a 2 assuntos (cn-estequiometria, cn-equilibrio-eletroquimica) — agrupamento; o vínculo deve ser por subtópico.
-- ⚠️ `phet` vinculada a 4 assuntos (cn-mecanica, cn-energia-trabalho, cn-ondas-optica, cn-eletricidade) — agrupamento; o vínculo deve ser por subtópico.
-- ⚠️ `textos` vinculada a 4 assuntos (lc-interpretacao, lc-generos-tipos, lc-variacao-linguistica, lc-figuras-linguagem) — agrupamento; o vínculo deve ser por subtópico.
-- ⚠️ `linha-tempo` vinculada a 5 assuntos (lc-literatura-movimentos, ch-brasil-colonia, ch-brasil-imperio, ch-brasil-republica, ch-historia-geral) — agrupamento; o vínculo deve ser por subtópico.
-- ⚠️ `linha-tempo` mistura áreas: lc, ch (via lc-literatura-movimentos, ch-brasil-colonia, ch-brasil-imperio, ch-brasil-republica, ch-historia-geral).
-- ⚠️ `geometria` vinculada a 2 assuntos (mt-geometria-plana, mt-geometria-espacial) — agrupamento; o vínculo deve ser por subtópico.
-- ⚠️ `mapas` vinculada a 4 assuntos (ch-geo-fisica, ch-geo-humana, ch-cartografia, ch-meio-ambiente) — agrupamento; o vínculo deve ser por subtópico.
+Nenhum: nenhuma demo atende tópicos distintos sem justificativa, nenhuma mistura áreas e nenhuma questão carrega demo de outro subtópico. Demos que atendem vários subtópicos do MESMO tópico são facetas da mesma habilidade (ex.: regra de três direta/inversa).
 
-## Vínculo atual (fonte da verdade: `src/components/demos/registry.ts` + `src/lib/demos/subtopics.ts`)
+### Vínculos entre tópicos (justificados)
+- ℹ️ `divisao` atende 2 tópicos da mesma área — justificativa: divisão com resto é a base dos critérios de divisibilidade (resto 0 ⇒ divisível) — mesma habilidade de dividir.
+- ℹ️ `funcoes` atende 2 tópicos da mesma área — justificativa: afim/quadrática são abas do mesmo plotter; a reta da geometria analítica É a função afim (coeficiente angular/linear).
+- ℹ️ `phet` atende 4 tópicos da mesma área — justificativa: seletor PhET: cada subtópico define a aba inicial via params.sim — o vínculo por subtópico garante a simulação certa.
+- ℹ️ `textos` atende 2 tópicos da mesma área — justificativa: anotação interpretativa de um texto real: as marcações são figuras/funções de linguagem EM contexto de interpretação.
 
-Vínculo por TÓPICO (demoTopicBindings) — causa raiz do bug da demo desligada. O PASSO 2 substitui por vínculo por SUBTÓPICO (granularidade fina).
+## Vínculo atual (fonte da verdade: `src/lib/demos/subtopics.ts` + `src/components/demos/registry.ts`)
+
+```ts
+alavanca: [cn-mecanica.alavanca]
+balanceamento: [cn-estequiometria.balanceamento, cn-estequiometria.calculos-estequiometricos]
+divisao: [mt-divisibilidade.criterios, mt-operacoes-basicas.multiplicacao-divisao]
+escala-mapa: [mt-razao-proporcao.escala]
+estatistica: [mt-estatistica.media-mediana-moda]
+eutrofizacao: [cn-ecologia.eutrofizacao]
+fracoes: [mt-fracoes-decimais.fracoes]
+funcoes: [mt-funcoes.afim, mt-funcoes.quadratica, mt-geometria-analitica.reta]
+genetica: [cn-genetica.cruzamentos]
+geometria: [mt-geometria-plana.areas-perimetros]
+linha-tempo: [lc-literatura-movimentos.movimentos]
+mapas: [ch-geo-humana.populacao]
+phet: [cn-eletricidade.circuitos, cn-eletricidade.potencia-eletrica, cn-energia-trabalho.fontes-transformacoes, cn-mecanica.energia-mecanica, cn-ondas-optica.ondas]
+porcentagem: [mt-porcentagem-juros.juros-compostos, mt-porcentagem-juros.porcentagem, mt-porcentagem-juros.variacoes-sucessivas]
+probabilidade: [mt-probabilidade.eventos-compostos]
+razao: [mt-razao-proporcao.proporcao, mt-razao-proporcao.razao]
+regra-de-tres: [mt-razao-proporcao.regra-de-tres-direta, mt-razao-proporcao.regra-de-tres-inversa]
+textos: [lc-figuras-linguagem.figuras, lc-interpretacao.interpretacao]
+```

@@ -110,19 +110,25 @@ export interface Alternative {
 
 /**
  * Question as the CLIENT may see it (answer columns are server-only).
- * `demo_id` is the simulator of the question's TOPIC (topics.demo_id, joined
- * at query time) — a question never carries an area-level or foreign-topic
- * demo. null = topic has no simulator → no demo section is rendered.
+ * `demo_id`/`demo_params` are DERIVED from the question's own SUBTOPIC
+ * (catalog in src/lib/demos/subtopics.ts, resolved at query time): a
+ * question never carries an area-level, topic-level or foreign-subtopic
+ * demo. null = subtopic without simulator → no demo section is rendered.
  */
 export interface QuestionPublic {
   id: string;
   topic_id: string;
+  /** local subtopic slug — the demo is resolved from it (see lib/demos/subtopics.ts) */
+  subtopic: string | null;
   difficulty: number;
   context_md: string | null;
   statement_md: string;
   alternatives: Alternative[];
   hints: string[];
+  /** DERIVED: demo of the question's own subtopic (null = no demo) */
   demo_id: string | null;
+  /** DERIVED: params for the demo (subtopic defaults + question overrides) */
+  demo_params: Record<string, string | number | boolean> | null;
   status: QuestionStatus;
   source: string | null;
   license: string | null;

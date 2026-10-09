@@ -23,6 +23,8 @@ export interface GenerateQuestionsInput {
   areaName: string;
   level: "básico" | "intermediário" | "avançado";
   count: number;
+  /** Subtópicos do tópico (slug local → nome) para a IA etiquetar cada questão. */
+  subtopics?: Array<{ slug: string; name: string }>;
 }
 
 export function generateQuestionsPrompt(
@@ -44,11 +46,19 @@ export function generateQuestionsPrompt(
       content:
         `Tópico: ${input.topicName} (área: ${input.areaName})\n` +
         `Descrição do tópico: ${input.topicDescription}\n` +
-        `Nível de dificuldade alvo: ${input.level}\n\n` +
+        `Nível de dificuldade alvo: ${input.level}\n` +
+        (input.subtopics && input.subtopics.length > 0
+          ? `Subtópicos deste tópico (escolha O subtópico exato de cada questão):\n${input.subtopics
+              .map((s) => `- ${s.slug}: ${s.name}`)
+              .join("\n")}\n\n`
+          : "") +
         `Gere ${input.count} questões neste formato JSON exato:\n` +
         `{"questions": [{"topic_slug": "", "difficulty": 800-2000, "context_md": "texto-base ou null", ` +
         `"statement_md": "enunciado", "alternatives": [{"key": "A", "text": "..."}, ...5 itens A-E], ` +
         `"answer_key": "A", "explanation_md": "resolução passo a passo em markdown", "hints": ["dica 1", "dica 2"], ` +
+        (input.subtopics && input.subtopics.length > 0
+          ? `"subtopic": "um dos slugs da lista acima que melhor descreve o assunto da questão", `
+          : `"subtopic": null, `) +
         `"demo_id": null, "source": "Conceito: ${input.topicName}", "origin": "ai", ` +
         `"numeric_check": {"expression": "expressão mathjs que valida o resultado numérico", "result": "valor esperado"} ou null}]}\n\n` +
         `Regras: dificuldade ${input.level === "básico" ? "900-1200" : input.level === "intermediário" ? "1100-1500" : "1400-2000"}; ` +

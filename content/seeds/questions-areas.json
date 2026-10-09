@@ -19,6 +19,7 @@
         "Monte o quadro de Punnett para Vv × Vv.",
         "Qual genótipo produz flores brancas, sendo V dominante?"
       ],
+      "subtopic": "cruzamentos",
       "demo_id": "genetica",
       "source": "Leis de Mendel e quadro de Punnett (Matriz ENEM H28)",
       "origin": "seed",
@@ -42,7 +43,8 @@
         "Monte o Punnett com os gametas: Iᴬ/i do pai e Iᴮ/i da mãe.",
         "Grupo O é homozigoto recessivo (ii)."
       ],
-      "demo_id": "genetica",
+      "subtopic": "sistema-abo",
+      "demo_id": null,
       "source": "Sistema ABO e alelos múltiplos (Matriz ENEM H28)",
       "origin": "seed",
       "numeric_check": null
@@ -65,6 +67,7 @@
         "Comece convertendo gramas em mol (n = m/M).",
         "A proporção entre H₂ e H₂O é 2:2, ou seja, 1:1."
       ],
+      "subtopic": "calculos-estequiometricos",
       "demo_id": "balanceamento",
       "source": "Cálculos estequiométricos (Matriz ENEM H15)",
       "origin": "seed",
@@ -88,6 +91,8 @@
         "Converta a potência para kW (5.500 W = 5,5 kW) e o tempo para horas.",
         "Custo = kWh do mês × tarifa."
       ],
+      "subtopic": "potencia-eletrica",
+      "demo_params": {"sim": "circuits"},
       "demo_id": "phet",
       "source": "Potência e consumo elétrico (Matriz ENEM H10)",
       "origin": "seed",
@@ -111,6 +116,7 @@
         "O que acontece com as algas quando morrem? Quem as decompõe e o que isso consome?",
         "Fosfato em excesso → floração de algas → nome do processo?"
       ],
+      "subtopic": "eutrofizacao",
       "demo_id": "eutrofizacao",
       "source": "Eutrofização e ciclos de matéria (Matriz ENEM H29)",
       "origin": "seed",
@@ -134,7 +140,8 @@
         "Quais são os DOIS fatores citados no texto? A resposta deve atacar os dois.",
         "Combustíveis fósseis respondem por qual troca? E desmatamento, por qual política?"
       ],
-      "demo_id": "mapas",
+      "subtopic": "mudancas-climaticas",
+      "demo_id": null,
       "source": "Mudanças climáticas e matriz energética (Matriz ENEM CH H19-H21, interárea CN)",
       "origin": "seed",
       "numeric_check": null
@@ -157,7 +164,8 @@
         "Repare que o texto traz duas ações aparentemente contraditórias: censura E direitos. Que conceito explica essa combinação?",
         "Estado Novo: autoritarismo + trabalhismo."
       ],
-      "demo_id": "linha-tempo",
+      "subtopic": "era-vargas",
+      "demo_id": null,
       "source": "Era Vargas: Estado Novo, DIP e CLT (Matriz ENEM CH H5-H6)",
       "origin": "seed",
       "numeric_check": null
@@ -180,6 +188,7 @@
         "O que a metáfora 'mapa do próprio dia' sugere sobre o papel do celular na vida das pessoas?",
         "O contraste final (quem olha e quem não é visto) reforça qual crítica?"
       ],
+      "subtopic": "interpretacao",
       "demo_id": "textos",
       "source": "Interpretação e metáfora em crônica (Matriz ENEM LC H1-H3)",
       "origin": "seed",
@@ -203,7 +212,8 @@
         "O que mudou além das palavras: o LUGAR onde a fala circula e para QUEM.",
         "A fala do avô é 'errada' ou apenas adequada a outro contexto?"
       ],
-      "demo_id": "textos",
+      "subtopic": "registro",
+      "demo_id": null,
       "source": "Variação linguística e registro (Matriz ENEM LC H6-H8)",
       "origin": "seed",
       "numeric_check": null
@@ -226,6 +236,7 @@
         "O que os dois hormônios fazem com a variação da glicose: ampliam ou corrigem?",
         "Homeostase se mantém por qual tipo de feedback?"
       ],
+      "subtopic": "homeostase",
       "demo_id": null,
       "source": "Homeostase e regulação hormonal (Matriz ENEM CN H30)",
       "origin": "seed",

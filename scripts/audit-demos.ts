@@ -16,7 +16,8 @@
  */
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { demoLoaders, demoTopicBindings } from "@/components/demos/registry";
+import { demoLoaders } from "@/components/demos/registry";
+import { demoSubtopicBindings, resolveDemoForQuestion } from "@/lib/demos/subtopics";
 
 // ---------------------------------------------------------------------------
 // Content loading
@@ -30,6 +31,7 @@ interface CurriculoTopic {
 interface SeedQuestion {
   topic_slug: string;
   statement_md: string;
+  context_md?: string | null;
   demo_id: string | null;
   subtopic?: string | null;
 }
@@ -124,93 +126,119 @@ interface Finding {
 const FINDINGS: Finding[] = [
   {
     demo: "razao-proporcao",
-    severity: "PROBLEMA",
+    severity: "CORRIGIDO",
     issue:
       "Mistura áreas e assuntos: contém uma ALAVANCA (conceito de FÍSICA — torque) dentro de uma demo de MATEMÁTICA, além de uma tabela de regra de três fixa com arroz (texto estático, não calculado pelos controles). Nada disso ensina ESCALA DE MAPA — mas a questão de escala (4,5 cm, 1:200.000) exibia exatamente esta demo.",
-    fix: "Separar em demos independentes: razao, regra-de-tres (calculada), escala-mapa (nova) e alavanca (física, vinculada só a Física). Demo razao-proporcao removida.",
+    fix: "Separada em demos independentes: razao, regra-de-tres (calculada), escala-mapa (nova) e alavanca (física, vinculada só a cn-mecanica.alavanca). Demo razao-proporcao removida.",
   },
   {
     demo: "razao-proporcao",
-    severity: "PROBLEMA",
+    severity: "CORRIGIDO",
     issue:
-      "Matemática quebrada: `rightDistance` é SEMPRE recalculado para igualar o torque esquerdo (o equilíbrio é automático e trivial), e `balanced` compara DISTÂNCIAS em vez de TORQUES. Com 3 kg × 4 m = 6 kg × 2 m (torques iguais = 12), a barra aparece INCLINADA — a animação contradiz o texto.",
+      "Matemática quebrada: `rightDistance` é SEMPRE recalculado para igualar o torque esquerdo (o equilíbrio é automático e trivial), e `balanced` compara DISTÂNCIAS em vez de TORQUES. Com 3 kg × 4 m = 6 kg × 2 m (torques iguais = 12), a barra aparecia INCLINADA — a animação contradizia o texto.",
     fix: "Demo descontinuada; a nova alavanca calcula torque dos dois lados e só fica horizontal quando os torques são iguais (testado: 3×4 = 6×2 ⇒ inclinação 0°).",
   },
   {
     demo: "probabilidade",
-    severity: "PROBLEMA",
+    severity: "CORRIGIDO",
     issue:
-      "Agrupa assuntos: vinculada a mt-probabilidade E mt-combinatoria. A questão de senhas (princípio multiplicativo — contagem) exibia a árvore de probabilidades, que não ensina contagem.",
-    fix: "Vinculação passou a ser por subtópico: apenas eventos compostos (mt-probabilidade.eventos-compostos); combinatoria fica sem demo.",
+      "Agrupava assuntos: vinculada a mt-probabilidade E mt-combinatoria. A questão de senhas (princípio multiplicativo — contagem) exibia a árvore de probabilidades, que não ensina contagem.",
+    fix: "Vinculação por subtópico: apenas eventos compostos (mt-probabilidade.eventos-compostos); combinatoria fica sem demo.",
+  },
+  {
+    demo: "textos",
+    severity: "CORRIGIDO",
+    issue:
+      "Agrupava assuntos: vinculada a 4 tópicos de Linguagens, incluindo gêneros textuais e variação linguística, que a anotação de figuras/funções não ensina.",
+    fix: "Vinculada só a lc-interpretacao.interpretacao e lc-figuras-linguagem.figuras.",
   },
   {
     demo: "textos",
     severity: "PROBLEMA",
     issue:
-      "Agrupa assuntos: vinculada a 4 tópicos de Linguagens, incluindo gêneros textuais e variação linguística, que a anotação de figuras/funções não ensina. Além disso a explicação da ironia contém frase truncada ('na pasta com a realidade').",
-    fix: "Vinculada só a lc-interpretacao.interpretacao e lc-figuras-linguagem.figuras; texto da ironia reescrito.",
+      "A explicação da ironia contém frase truncada ('na pasta com a realidade') — texto sem sentido em português.",
+    fix: "Reescrever a explicação da ironia (correção de conteúdo do PASSO 3).",
   },
   {
     demo: "linha-tempo",
-    severity: "PROBLEMA",
+    severity: "CORRIGIDO",
     issue:
-      "Agrupa assuntos: a linha do tempo é de MOVIMENTOS LITERÁRIOS brasileiros, mas era vinculada a 4 tópicos de História (colônia, império, república, história geral). Questão da Era Vargas exibia eras literárias.",
+      "Agrupava assuntos: a linha do tempo é de MOVIMENTOS LITERÁRIOS brasileiros, mas era vinculada a 4 tópicos de História (colônia, império, república, história geral). Questão da Era Vargas exibia eras literárias.",
     fix: "Vinculada só a lc-literatura-movimentos.movimentos; tópicos de História ficam sem demo.",
+  },
+  {
+    demo: "mapas",
+    severity: "CORRIGIDO",
+    issue:
+      "Agrupava assuntos: gráfico de população por região era vinculado a geo-física, cartografia e meio-ambiente (a questão de emissões de CO₂ exibia população do Censo).",
+    fix: "Vinculada só a ch-geo-humana.populacao.",
   },
   {
     demo: "mapas",
     severity: "PROBLEMA",
     issue:
-      "Agrupa assuntos: gráfico de população por região era vinculado a geo-física, cartografia e meio-ambiente (a questão de emissões de CO₂ exibia população do Censo). Dados do Censo 2022 imprecisos (Sul 30,4 mi e shares somando 100,4%).",
-    fix: "Vinculada só a ch-geo-humana.populacao; dados corrigidos pelo Censo 2022 (Sul 29,2 mi; shares somam 100,0%).",
+      "Dados do Censo 2022 imprecisos (Sul 30,4 mi; shares somando 100,4%).",
+    fix: "Dados corrigidos pelo Censo 2022 (SE 84,8 mi/41,8%, NE 54,6, S 29,2, N 17,0, CO 16,2 — shares calculados pelo código somam 99,5%).",
   },
   {
     demo: "genetica",
-    severity: "PROBLEMA",
+    severity: "CORRIGIDO",
     issue:
       "Granularidade: o quadro de Punnett (1 alelo, dominância V/v) era exibido na questão do sistema ABO (alelos múltiplos e co-dominância) — conceito diferente.",
     fix: "Vinculada só ao subtópico de cruzamentos monohíbridos (cn-genetica.cruzamentos); ABO fica sem demo.",
   },
   {
     demo: "estatistica",
-    severity: "PROBLEMA",
+    severity: "CORRIGIDO",
     issue:
-      "'Adicionar aluno' sorteia nota com Math.random() (não determinístico) e a demo era vinculada a mt-graficos-tabelas, cujo foco é leitura de gráficos, não média/mediana/moda.",
-    fix: "Nota inicial determinística; vinculação só a mt-estatistica.media-mediana-moda.",
+      "Era vinculada a mt-graficos-tabelas, cujo foco é leitura de gráficos, não média/mediana/moda.",
+    fix: "Vinculada só a mt-estatistica.media-mediana-moda.",
+  },
+  {
+    demo: "estatistica",
+    severity: "PROBLEMA",
+    issue: "'Adicionar aluno' sorteia nota com Math.random() (não determinístico).",
+    fix: "Nota inicial determinística (correção de conteúdo do PASSO 3).",
   },
   {
     demo: "funcoes",
     severity: "PROBLEMA",
     issue:
-      "SVG com min-w-[320px] e a demo era exibida também para geometria analítica sem recorte; em 360 px causa rolagem lateral; comparação `delta === 0` com ponto flutuante.",
-    fix: "SVG responsivo (escala pelo viewBox, sem min-width); delta com tolerância; vínculo por subtópicos afim/quadrática + reta.",
+      "SVG com min-w-[320px] causa rolagem lateral em telas de 360 px; comparação `delta === 0` com ponto flutuante.",
+    fix: "SVG responsivo (escala pelo viewBox, sem min-width); delta com tolerância (correção do PASSO 3).",
   },
   {
     demo: "probabilidade",
     severity: "PROBLEMA",
     issue: "SVG com min-w-[480px] — rolagem lateral em telas de 360 px.",
-    fix: "SVG responsivo sem min-width.",
+    fix: "SVG responsivo sem min-width (correção do PASSO 3).",
   },
   {
     demo: "geometria",
-    severity: "PROBLEMA",
+    severity: "CORRIGIDO",
     issue:
       "Vinculada a geometria espacial (volumes), mas a demo é de áreas/perímetros planos.",
     fix: "Vinculada só a mt-geometria-plana.areas-perimetros; espacial fica sem demo.",
   },
   {
     demo: "balanceamento",
-    severity: "PROBLEMA",
+    severity: "CORRIGIDO",
     issue:
-      "Vinculada a cn-equilibrio-eletroquimica, mas a demo é o balanceamento molecular H₂+O₂→H₂O, sem relação com equilíbrio químico/eletroquímica. O botão do coeficiente também DECREMENTA ao ser clicado (confuso).",
-    fix: "Vinculada a cn-estequiometria.balanceamento e cn-estequiometria.calculos-estequiometricos; botão vira exibição.",
+      "Vinculada a cn-equilibrio-eletroquimica, mas a demo é o balanceamento molecular H₂+O₂→H₂O, sem relação com equilíbrio químico/eletroquímica.",
+    fix: "Vinculada a cn-estequiometria.balanceamento e cn-estequiometria.calculos-estequiometricos (a equação balanceada é o passo 0 do cálculo).",
+  },
+  {
+    demo: "balanceamento",
+    severity: "PROBLEMA",
+    issue: "O botão do coeficiente DECREMENTA ao ser clicado (confuso: parece seletor, é ação).",
+    fix: "Botão vira exibição passiva (correção do PASSO 3).",
   },
   {
     demo: "phet",
     severity: "PROBLEMA",
     issue:
-      "Agrupa assuntos: uma única demo com 3 simulações em abas abria SEMPRE na aba 'Movimento' — a questão do chuveiro elétrico (circuitos) exibia a de movimento. Título com erro de digitação ('Movimento ( Energia de um Skate)').",
-    fix: "Aceita parâmetro da questão (subtópico → aba inicial: circuits/waves/motion); título corrigido.",
+      "Uma única demo com 3 simulações em abas abria SEMPRE na aba 'Movimento' — a questão do chuveiro elétrico (circuitos) exibia a de movimento. Título com erro de digitação ('Movimento ( Energia de um Skate)').",
+    fix: "Aceitar o parâmetro da questão (subtópico → aba inicial: circuits/waves/motion); título corrigido (PASSO 3).",
   },
 ];
 
@@ -219,59 +247,66 @@ const FINDINGS: Finding[] = [
 // ---------------------------------------------------------------------------
 
 async function main() {
-  const { topics, topicToArea } = await loadCurriculum();
+  const { topicToArea } = await loadCurriculum();
   const seeds = await loadSeeds();
   const files = await demoFiles();
 
-  // Optional subtopic catalog (exists after PASSO 2).
-  let subtopicBindings: Record<string, string[]> | null = null;
-  try {
-    const mod = (await import(
-      "@/lib/demos/subtopics"
-    )) as typeof import("./../src/lib/demos/subtopics");
-    subtopicBindings = mod.demoSubtopicFullSlugs
-      ? Object.fromEntries(
-          Object.keys(demoLoaders).map((id) => [id, mod.demoSubtopicFullSlugs(id)]),
-        )
-      : null;
-  } catch {
-    subtopicBindings = null;
-  }
+  // Vínculos por subtópico (fonte da verdade: src/lib/demos/subtopics.ts).
+  const bindings = demoSubtopicBindings;
 
-  const topicBySlug = new Map(topics.map((t) => [t.slug, t]));
-  const mode = subtopicBindings ? "subtópico" : "tópico";
-
-  // Questions displaying each demo.
+  // Questions displaying each demo (resolved from each question's subtopic).
   const demoQuestions = new Map<string, SeedQuestion[]>();
   for (const demoId of Object.keys(demoLoaders)) demoQuestions.set(demoId, []);
   for (const q of seeds) {
-    let displayed: string | null = q.demo_id;
-    if (subtopicBindings) {
-      const topic = topicBySlug.get(q.topic_slug);
-      displayed = topic && topic.demo_id ? topic.demo_id : null;
-      // After PASSO 2 the seed itself carries the resolved demo_id.
-      displayed = q.demo_id ?? displayed;
-    } else {
-      displayed = topicBySlug.get(q.topic_slug)?.demo_id ?? null;
-    }
+    const displayed = resolveDemoForQuestion(q.topic_slug, q.subtopic ?? null)?.demoId ?? null;
     if (displayed && demoQuestions.has(displayed)) {
       demoQuestions.get(displayed)!.push(q);
     }
   }
 
   // ---- structural problem detection ----------------------------------------
+  // Regras (PASSO 1):
+  //  PROBLEMA: demo ligada a mais de um ASSUNTO DISTINTO = subtópicos de
+  //  TÓPICOS diferentes sem justificativa documentada, ou de áreas diferentes.
+  //  Vários subtópicos do MESMO tópico são facetas da mesma habilidade
+  //  (ex.: regra de três direta/inversa são abas do mesmo simulador) — OK.
+  const JUSTIFIED_CROSS_TOPIC: Record<string, string> = {
+    divisao:
+      "divisão com resto é a base dos critérios de divisibilidade (resto 0 ⇒ divisível) — mesma habilidade de dividir",
+    funcoes:
+      "afim/quadrática são abas do mesmo plotter; a reta da geometria analítica É a função afim (coeficiente angular/linear)",
+    textos:
+      "anotação interpretativa de um texto real: as marcações são figuras/funções de linguagem EM contexto de interpretação",
+    phet: "seletor PhET: cada subtópico define a aba inicial via params.sim — o vínculo por subtópico garante a simulação certa",
+  };
   const problems: string[] = [];
-  const bindings = subtopicBindings ?? demoTopicBindings;
+  const notes: string[] = [];
   for (const [demoId, bound] of Object.entries(bindings) as [string, readonly string[]][]) {
-    if (bound.length > 1) {
-      problems.push(
-        `\`${demoId}\` vinculada a ${bound.length} assuntos (${bound.join(", ")}) — agrupamento; o vínculo deve ser por subtópico.`,
-      );
-    }
     const areas = new Set(bound.map((slug) => topicToArea.get(slug.split(".")[0]) ?? "?"));
     if (areas.size > 1) {
       problems.push(
         `\`${demoId}\` mistura áreas: ${[...areas].join(", ")} (via ${bound.join(", ")}).`,
+      );
+      continue;
+    }
+    const topicsOf = new Set(bound.map((slug) => slug.split(".")[0]));
+    if (topicsOf.size > 1) {
+      const why = JUSTIFIED_CROSS_TOPIC[demoId];
+      if (why) {
+        notes.push(`\`${demoId}\` atende ${topicsOf.size} tópicos da mesma área — justificativa: ${why}.`);
+      } else {
+        problems.push(
+          `\`${demoId}\` vinculada a subtópicos de ${topicsOf.size} TÓPICOS distintos (${bound.join(", ")}) sem justificativa — separe a demo ou registre a justificativa em JUSTIFIED_CROSS_TOPIC.`,
+        );
+      }
+    }
+  }
+  // questões com subtópico que não existe no tópico dela
+  for (const q of seeds) {
+    if (!q.subtopic) continue;
+    if (!resolveDemoForQuestion(q.topic_slug, q.subtopic) && q.demo_id) {
+      problems.push(
+        `questão "${q.statement_md.slice(0, 48)}…" (${q.topic_slug}.${q.subtopic}) carrega demo "${q.demo_id}" que não é a do subtópico.`,
       );
     }
   }
@@ -282,9 +317,9 @@ async function main() {
   lines.push(`# DEMO_AUDIT.md — Auditoria dos simuladores interativos`);
   lines.push("");
   lines.push(
-    `Gerado por \`scripts/audit-demos.ts\` em ${today} · modo de vínculo: **${mode}** · ` +
+    `Gerado por \`scripts/audit-demos.ts\` em ${today} · vínculo por **subtópico** · ` +
       `${Object.keys(demoLoaders).length} simuladores · ${seeds.length} questões seed · ` +
-      `${seeds.filter((q) => (q.demo_id ?? topicBySlug.get(q.topic_slug)?.demo_id) !== null).length} questões com demo no estado atual.`,
+      `${seeds.filter((q) => resolveDemoForQuestion(q.topic_slug, q.subtopic ?? null) !== null).length} questões com demo no estado atual.`,
   );
   lines.push("");
   lines.push(
@@ -324,7 +359,7 @@ async function main() {
     const areas = [...new Set(bound.map((s) => topicToArea.get(s.split(".")[0]) ?? "?"))];
     lines.push(`- **Área:** ${areas.join(", ") || "—"}`);
     lines.push(
-      `- **Vinculada a (${mode}):** ${bound.length ? bound.map((b) => `\`${b}\``).join(", ") : "—"}`,
+      `- **Vinculada a (subtópicos):** ${bound.length ? bound.map((b) => `\`${b}\``).join(", ") : "—"}`,
     );
     const qs = demoQuestions.get(demoId) ?? [];
     lines.push(`- **Questões seed que exibem:** ${qs.length}`);
@@ -370,32 +405,34 @@ async function main() {
   lines.push(`## Problemas estruturais detectados`);
   lines.push("");
   if (problems.length === 0) {
-    lines.push("Nenhum problema estrutural: nenhuma demo agrupa assuntos e nenhuma mistura áreas.");
+    lines.push(
+      "Nenhum: nenhuma demo atende tópicos distintos sem justificativa, nenhuma mistura áreas " +
+        "e nenhuma questão carrega demo de outro subtópico. Demos que atendem vários subtópicos " +
+        "do MESMO tópico são facetas da mesma habilidade (ex.: regra de três direta/inversa).",
+    );
   } else {
     for (const p of problems) lines.push(`- ⚠️ ${p}`);
   }
+  if (notes.length > 0) {
+    lines.push("");
+    lines.push("### Vínculos entre tópicos (justificados)");
+    for (const n of notes) lines.push(`- ℹ️ ${n}`);
+  }
   lines.push("");
   lines.push(
-    `## Vínculo atual (fonte da verdade: \`src/components/demos/registry.ts\` + ` +
-      `\`src/lib/demos/subtopics.ts\`)`,
+    `## Vínculo atual (fonte da verdade: \`src/lib/demos/subtopics.ts\` + ` +
+      `\`src/components/demos/registry.ts\`)`,
   );
   lines.push("");
-  if (subtopicBindings) {
-    lines.push("```ts");
-    for (const [demoId, subs] of Object.entries(subtopicBindings).sort()) {
-      lines.push(`${demoId}: [${subs.join(", ")}]`);
-    }
-    lines.push("```");
-  } else {
-    lines.push(
-      "Vínculo por TÓPICO (demoTopicBindings) — causa raiz do bug da demo desligada. " +
-        "O PASSO 2 substitui por vínculo por SUBTÓPICO (granularidade fina).",
-    );
+  lines.push("```ts");
+  for (const [demoId, subs] of Object.entries(demoSubtopicBindings).sort()) {
+    lines.push(`${demoId}: [${subs.join(", ")}]`);
   }
+  lines.push("```");
   lines.push("");
 
   await writeFile(DOCS, lines.join("\n"), "utf8");
-  console.log(`OK: docs/DEMO_AUDIT.md gerado (modo ${mode}, ${Object.keys(demoLoaders).length} demos).`);
+  console.log(`OK: docs/DEMO_AUDIT.md gerado (vínculo por subtópico, ${Object.keys(demoLoaders).length} demos).`);
   console.log(`Problemas estruturais: ${problems.length}`);
   for (const p of problems) console.log(`  - ${p}`);
 }

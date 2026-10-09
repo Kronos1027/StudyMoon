@@ -1,34 +1,47 @@
 /**
- * Demo ↔ topic binding (bugfix: "Veja o conceito em movimento" aparecia
- * desligado do assunto da questão — ex.: quadro de Punnett em questão de
- * eutrofização).
+ * Demo ↔ question resolution (PASSO 2 da auditoria de simuladores).
  *
- * RULE: a simulator is bound to a specific topic, never to an area. The
- * demo displayed with a question is ALWAYS the demo of the question's OWN
- * topic, resolved from `topics.demo_id` via a PostgREST embed — never from
- * the `questions.demo_id` column. Topics without a simulator (demo_id null)
- * show no demo at all: an honest nothing beats a wrong simulator.
+ * Histórico: a demo já foi vinculada à ÁREA (quadro de Punnett em questão de
+ * eutrofização) e depois ao TÓPICO (demo "razao-proporcao" — uma alavanca
+ * de FÍSICA e uma tabela de arroz — aparecia na questão de ESCALA DE MAPA).
  *
- * The embed `topics(demo_id)` rides the questions.topic_id → topics.id FK
- * and returns `{ topics: { demo_id } | null }`, which the queries flatten
- * back into `QuestionPublic.demo_id`.
+ * REGRA ATUAL (subtópico): o simulador exibido com uma questão vem do
+ * SUBTÓPICO declarado pela questão (`questions.subtopic`), resolvido no
+ * CÓDIGO pelo catálogo de src/lib/demos/subtopics.ts — nunca do tópico,
+ * nunca da área, nunca da coluna questions.demo_id (que hoje é apenas um
+ * espelho de higiene mantido por scripts/sync-demo-bindings.ts).
+ * Subtópico sem simulador ⇒ NENHUMA demo: nada é melhor que demo errada.
  */
 
-/** Shape of the PostgREST `topics(demo_id)` embed on a question row. */
-export interface TopicDemoEmbed {
-  demo_id: string | null;
+import { resolveDemoForQuestion, type DemoParam } from "@/lib/demos/subtopics";
+
+/** Shape of the PostgREST `topics(slug)` embed on a question row. */
+export interface TopicSlugEmbed {
+  slug: string;
+}
+
+export interface ResolvedDemo {
+  demoId: string;
+  params: Record<string, DemoParam>;
 }
 
 /**
- * Flattens the `topics(demo_id)` embed into the public `demo_id` field.
- * Accepts the single-object shape (PostgREST many-to-one) and the array
- * shape (supabase-js default types). `null`/missing/empty embed (topic
- * without simulator) resolves to null → no demo.
+ * Resolves the demo a question may display, from the question's own
+ * subtopic. Accepts the `topics(slug)` embed (single object or array —
+ * supabase-js may return either) plus the question's subtopic/demo_params.
+ * Returns null whenever there is no exact subtopic match → no demo.
  */
-export function demoIdFromTopicEmbed(
-  embed: TopicDemoEmbed | TopicDemoEmbed[] | null | undefined,
-): string | null {
-  if (!embed) return null;
-  const row = Array.isArray(embed) ? embed[0] : embed;
-  return row?.demo_id ?? null;
+export function demoForQuestionRow(args: {
+  topicEmbed: TopicSlugEmbed | TopicSlugEmbed[] | null | undefined;
+  subtopic: string | null | undefined;
+  demoParams?: Record<string, unknown> | null;
+}): ResolvedDemo | null {
+  if (!args.topicEmbed) return null;
+  const row = Array.isArray(args.topicEmbed) ? args.topicEmbed[0] : args.topicEmbed;
+  if (!row?.slug) return null;
+  return resolveDemoForQuestion(
+    row.slug,
+    args.subtopic ?? null,
+    (args.demoParams ?? null) as Record<string, DemoParam | null | undefined> | null,
+  );
 }

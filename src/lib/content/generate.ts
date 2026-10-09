@@ -14,6 +14,7 @@ import {
   validateQuestionFormat,
   type AiQuestion,
 } from "@/lib/content/schemas";
+import { TOPIC_SUBTOPICS, getSubtopic, resolveDemoForQuestion } from "@/lib/demos/subtopics";
 
 const math = create(all, {});
 const evaluate = math.evaluate as (expr: string) => unknown;
@@ -63,6 +64,7 @@ export async function generateBatchForTopic(
 
   const level =
     topic.level === 1 ? "básico" : topic.level === 2 ? "intermediário" : "avançado";
+  const subtopicsOfTopic = TOPIC_SUBTOPICS[topic.slug] ?? [];
 
   // ---- 2. Generate ----------------------------------------------------------
   const messages = generateQuestionsPrompt({
@@ -71,6 +73,7 @@ export async function generateBatchForTopic(
     areaName: area?.name ?? "",
     level,
     count,
+    subtopics: subtopicsOfTopic.map((s) => ({ slug: s.slug, name: s.name })),
   });
 
   let questions: AiQuestion[] = [];
@@ -94,6 +97,18 @@ export async function generateBatchForTopic(
   // ---- 3. Validate each question --------------------------------------------
   for (const question of questions) {
     const topicSlugFixed = { ...question, topic_slug: topic.slug };
+
+    // (0) Subtópico: deve existir no TÓPICO da questão; senão vira null
+    // (sem demo — nunca uma demo de assunto errado).
+    let subtopic = topicSlugFixed.subtopic ?? null;
+    if (subtopic !== null && !getSubtopic(topic.slug, subtopic)) {
+      stats.rejected.push({
+        reason: "subtópico inválido",
+        detail: `"${subtopic}" não existe em ${topic.slug} — demo suprimida`,
+      });
+      subtopic = null;
+    }
+    const demoId = resolveDemoForQuestion(topic.slug, subtopic)?.demoId ?? null;
 
     // (a) Format layer.
     const format = validateQuestionFormat(topicSlugFixed);
@@ -182,13 +197,15 @@ export async function generateBatchForTopic(
       answer_key: topicSlugFixed.answer_key,
       explanation_md: topicSlugFixed.explanation_md,
       hints: topicSlugFixed.hints,
-      demo_id: topicSlugFixed.demo_id ?? null,
+      subtopic,
+      demo_id: demoId,
       status: "validated",
       source: topicSlugFixed.source,
       license: "Conteúdo original StudyMoon (CC BY-SA)",
       origin: "ai",
       verified_by_model: "blind-solve-4layers",
       numeric_check: Boolean(topicSlugFixed.numeric_check),
+      numeric_expr: topicSlugFixed.numeric_check ?? null,
     });
     stats.validated += 1;
   }

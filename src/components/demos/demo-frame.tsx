@@ -2,21 +2,26 @@
 
 import { useEffect, useState, type ComponentType } from "react";
 import { Construction } from "lucide-react";
-import { demoLoaders } from "./registry";
+import { demoLoaders, type DemoProps } from "./registry";
 
 interface DemoFrameProps {
   demoId: string;
+  /** Parameters from the question/subtopic (e.g. escala-mapa: distanceCm/scale). */
+  params?: Record<string, unknown> | null;
   /** compact: tighter presentation for inline use (after a wrong answer) */
   compact?: boolean;
 }
 
 /**
- * Loads the interactive simulator by id (client-only, code-split).
- * Unknown ids show an honest "em construção" state — never fake interactivity.
+ * Loads the interactive simulator by id (client-only, code-split) and passes
+ * the question parameters through. Unknown ids show an honest "em
+ * construção" state — never fake interactivity.
  */
-export function DemoFrame({ demoId, compact }: DemoFrameProps) {
+export function DemoFrame({ demoId, params, compact }: DemoFrameProps) {
   const known = demoId in demoLoaders;
-  const [loaded, setLoaded] = useState<{ id: string; Component: ComponentType } | null>(null);
+  const [loaded, setLoaded] = useState<{ id: string; Component: ComponentType<DemoProps> } | null>(
+    null,
+  );
 
   // Adjust state when the prop changes (React render-phase pattern).
   const [prevDemoId, setPrevDemoId] = useState(demoId);
@@ -45,7 +50,7 @@ export function DemoFrame({ demoId, compact }: DemoFrameProps) {
       <div className="flex items-center gap-3 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
         <Construction className="h-5 w-5 shrink-0" aria-hidden="true" />
         <p>
-          O simulador interativo deste tópico está sendo construído e chega em
+          O simulador interativo deste assunto está sendo construído e chega em
           breve. Por enquanto, siga a resolução passo a passo.
         </p>
       </div>
@@ -64,9 +69,11 @@ export function DemoFrame({ demoId, compact }: DemoFrameProps) {
   }
 
   const DemoComponent = loaded.Component;
+  const safeParams =
+    params && typeof params === "object" && !Array.isArray(params) ? params : undefined;
   return (
     <div className={compact ? "" : "rounded-xl border border-border p-4"}>
-      <DemoComponent />
+      <DemoComponent params={safeParams} />
     </div>
   );
 }

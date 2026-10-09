@@ -15,7 +15,7 @@ import {
   FIXED_XP,
 } from "@/lib/gamification/xp";
 import { countsAsStudyDay, updateStreak, type StreakState } from "@/lib/gamification/streak";
-import { demoIdFromTopicEmbed } from "@/lib/demos/topic-binding";
+import { demoForQuestionRow } from "@/lib/demos/topic-binding";
 import type { QuestionPublic } from "@/lib/db/types";
 
 // ---------------------------------------------------------------------------
@@ -120,20 +120,27 @@ export async function getNextQuestion(
   const { data: full } = await supabase
     .from("questions")
     .select(
-      "id, topic_id, difficulty, context_md, statement_md, alternatives, hints, status, source, license, origin, created_at, topics(demo_id)",
+      "id, topic_id, subtopic, demo_params, difficulty, context_md, statement_md, alternatives, hints, status, source, license, origin, created_at, topics(slug)",
     )
     .eq("id", selection.question.id)
     .single();
 
   if (!full) return { question: null, reason: null };
 
-  // Demo comes from the question's TOPIC (never from the question row):
-  // guarantees demo.topic == question.topic; null topic demo → no demo.
-  const { topics: topicDemo, ...questionFields } = full;
+  // Demo comes from the question's OWN SUBTOPIC (catalog in code), never
+  // from the topic/area: question without a demo-bound subtopic → no demo.
+  const { topics: topicEmbed, ...questionFields } = full;
+  const resolution = demoForQuestionRow({
+    topicEmbed,
+    subtopic: full.subtopic,
+    demoParams: full.demo_params,
+  });
   return {
     question: {
       ...questionFields,
-      demo_id: demoIdFromTopicEmbed(topicDemo),
+      subtopic: full.subtopic ?? null,
+      demo_id: resolution?.demoId ?? null,
+      demo_params: resolution?.params ?? null,
       alternatives: full.alternatives ?? [],
     } as QuestionPublic,
     reason: selection.reason,

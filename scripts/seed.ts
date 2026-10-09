@@ -258,6 +258,8 @@ async function main() {
       answer_key: string;
       explanation_md: string;
       hints: string[];
+      subtopic?: string | null;
+      demo_params?: Record<string, string | number | boolean> | null;
       demo_id: string | null;
       source: string;
       license?: string;
@@ -270,13 +272,16 @@ async function main() {
       continue;
     }
     await sql`
-      insert into questions (topic_id, difficulty, context_md, statement_md, alternatives, answer_key, explanation_md, hints, demo_id, status, source, license, origin, numeric_check)
+      insert into questions (topic_id, difficulty, context_md, statement_md, alternatives, answer_key, explanation_md, hints, subtopic, demo_params, demo_id, status, source, license, origin, numeric_check, numeric_expr)
       values (
         ${topicId}, ${q.difficulty}, ${q.context_md ?? null}, ${q.statement_md},
         ${sql.json(q.alternatives)}, ${q.answer_key}, ${q.explanation_md},
-        ${sql.json(q.hints)}, ${q.demo_id ?? null}, 'validated',
+        ${sql.json(q.hints)}, ${q.subtopic ?? null},
+        ${q.demo_params ? sql.json(q.demo_params) : null},
+        ${q.demo_id ?? null}, 'validated',
         ${q.source}, ${q.license ?? "Conteúdo original StudyMoon (CC BY-SA)"}, ${q.origin},
-        ${q.numeric_check ? true : false}
+        ${q.numeric_check ? true : false},
+        ${q.numeric_check ? sql.json(q.numeric_check) : null}
       )
     `;
     qOk += 1;

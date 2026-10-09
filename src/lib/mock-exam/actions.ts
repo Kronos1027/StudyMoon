@@ -4,7 +4,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { getSupabaseServerClient } from "@/lib/db/server";
 import { getSupabaseAdmin } from "@/lib/db/admin";
-import { demoIdFromTopicEmbed } from "@/lib/demos/topic-binding";
+import { demoForQuestionRow } from "@/lib/demos/topic-binding";
 import type { QuestionPublic } from "@/lib/db/types";
 
 import { EXAM_CONFIG } from "./config";
@@ -129,17 +129,24 @@ export async function startMockExam(
     const { data: q } = await admin
       .from("questions")
       .select(
-        "id, topic_id, difficulty, context_md, statement_md, alternatives, hints, status, source, license, origin, created_at, topics(demo_id)",
+        "id, topic_id, subtopic, demo_params, difficulty, context_md, statement_md, alternatives, hints, status, source, license, origin, created_at, topics(slug)",
       )
       .eq("id", selected[i].questionId)
       .single();
     if (!q) continue;
-    // Demo comes from the question's TOPIC (never from the question row):
-    // guarantees demo.topic == question.topic; null topic demo → no demo.
-    const { topics: topicDemo, ...questionFields } = q;
+    // Demo comes from the question's OWN SUBTOPIC (catalog in code),
+    // never from the topic/area: no demo-bound subtopic → no demo.
+    const { topics: topicEmbed, ...questionFields } = q;
+    const resolution = demoForQuestionRow({
+      topicEmbed,
+      subtopic: q.subtopic,
+      demoParams: q.demo_params,
+    });
     examQuestions.push({
       ...questionFields,
-      demo_id: demoIdFromTopicEmbed(topicDemo),
+      subtopic: q.subtopic ?? null,
+      demo_id: resolution?.demoId ?? null,
+      demo_params: resolution?.params ?? null,
       alternatives: q.alternatives ?? [],
       areaName: areaNames.get(selected[i].areaId) ?? "",
       position: i,

@@ -19,6 +19,7 @@
         "Descontos sucessivos se calculam multiplicando fatores: cada desconto incide sobre o valor JÁ atualizado.",
         "Calcule separadamente cada loja. Na Loja A: 20% sobre 2.000 e depois 10% sobre o resultado."
       ],
+      "subtopic": "variacoes-sucessivas",
       "demo_id": "porcentagem",
       "source": "Conceito de variações percentuais sucessivas (Matriz ENEM H3)",
       "origin": "seed",
@@ -42,6 +43,7 @@
         "Variação percentual = (valor novo − valor antigo) ÷ valor antigo × 100.",
         "Sobre qual valor o aumento aconteceu? Sobre o preço INICIAL."
       ],
+      "subtopic": "porcentagem",
       "demo_id": "porcentagem",
       "source": "Variação percentual (Matriz ENEM H3)",
       "origin": "seed",
@@ -65,7 +67,8 @@
         "Juros simples: J = C · i · t, com i em decimal e t na mesma unidade da taxa.",
         "Não confunda juros (o rendimento) com montante (capital + juros)."
       ],
-      "demo_id": "porcentagem",
+      "subtopic": "juros-simples",
+      "demo_id": null,
       "source": "Juros simples (Matriz ENEM H6)",
       "origin": "seed",
       "numeric_check": { "expression": "1200*0.03*5", "result": "180" }
@@ -88,6 +91,7 @@
         "No 1º ano, juros simples e compostos coincidem. A diferença nasce no 2º.",
         "Simples: M = C(1 + i·n). Compostos: M = C(1 + i)ⁿ."
       ],
+      "subtopic": "juros-compostos",
       "demo_id": "porcentagem",
       "source": "Juros simples e compostos (Matriz ENEM H6)",
       "origin": "seed",
@@ -111,6 +115,7 @@
         "Se 35% participam, que porcentagem fica de fora?",
         "Calcular o complementar (65%) evita responder o contrário do que a questão pede."
       ],
+      "subtopic": "porcentagem",
       "demo_id": "porcentagem",
       "source": "Percentual e complementar (Matriz ENEM H3)",
       "origin": "seed",
@@ -134,6 +139,7 @@
         "Use um valor de referência: 100. A alta leva a 125.",
         "O desconto incide sobre 125, não sobre 100. Que percentual de 125 vale 25?"
       ],
+      "subtopic": "variacoes-sucessivas",
       "demo_id": "porcentagem",
       "source": "Variações sucessivas simétricas (Matriz ENEM H3)",
       "origin": "seed",
@@ -157,6 +163,7 @@
         "Trabalhe sempre sobre 'o que resta': primeiro calcule o resto após o dia 1.",
         "O 'de' em '1/3 do resto' vira multiplicação de frações."
       ],
+      "subtopic": "fracoes",
       "demo_id": "fracoes",
       "source": "Frações e parte do todo (Matriz ENEM H2)",
       "origin": "seed",
@@ -180,6 +187,7 @@
         "'desses' quer dizer: da quantidade de livros de literatura (não do total).",
         "Fração de fração é multiplicação: 2/5 × 3/4 de 200."
       ],
+      "subtopic": "fracoes",
       "demo_id": "fracoes",
       "source": "Fração de uma quantidade (Matriz ENEM H2)",
       "origin": "seed",
@@ -203,7 +211,9 @@
         "Escala 1:200.000: cada centímetro do mapa vale 200.000 cm reais.",
         "Quantos centímetros tem 1 km? 100.000. Use isso para converter."
       ],
-      "demo_id": "razao-proporcao",
+      "subtopic": "escala",
+      "demo_params": {"distanceCm": 4.5, "scale": 200000},
+      "demo_id": "escala-mapa",
       "source": "Escalas e proporção (Matriz ENEM H3)",
       "origin": "seed",
       "numeric_check": { "expression": "4.5*200000/100000", "result": "9" }
@@ -226,7 +236,8 @@
         "Mais gente para a MESMA tarefa: proporcionalidade direta ou inversa?",
         "Em proporção inversa, o produto (operários × dias) é constante."
       ],
-      "demo_id": "razao-proporcao",
+      "subtopic": "regra-de-tres-inversa",
+      "demo_id": "regra-de-tres",
       "source": "Regra de três inversa (Matriz ENEM H3)",
       "origin": "seed",
       "numeric_check": { "expression": "6*20/8", "result": "15" }
@@ -249,7 +260,8 @@
         "Primeiro ache os litros: distância ÷ consumo.",
         "km ÷ (km/L) = L; depois L × R$/L = R$."
       ],
-      "demo_id": "razao-proporcao",
+      "subtopic": "regra-de-tres-direta",
+      "demo_id": "regra-de-tres",
       "source": "Proporcionalidade em consumo (Matriz ENEM H3)",
       "origin": "seed",
       "numeric_check": { "expression": "360/12*6", "result": "180" }
@@ -272,6 +284,7 @@
         "Substitua o valor pago na fórmula e isole o x.",
         "Primeiro tire a taxa fixa (R$ 8) do total."
       ],
+      "subtopic": "afim",
       "demo_id": "funcoes",
       "source": "Função afim e modelagem (Matriz ENEM H7)",
       "origin": "seed",
@@ -295,6 +308,7 @@
         "Lucro máximo em quadrática com a < 0 = valor da função no vértice.",
         "x_v = −b/2a; depois calcule L(x_v)."
       ],
+      "subtopic": "quadratica",
       "demo_id": "funcoes",
       "source": "Função quadrática e otimização (Matriz ENEM H7)",
       "origin": "seed",
@@ -318,7 +332,8 @@
         "Em 6 horas, quantas vezes a população dobrou?",
         "2^(t/2) com t = 6: o expoente é 3, não 6."
       ],
-      "demo_id": "funcoes",
+      "subtopic": "exponencial",
+      "demo_id": null,
       "source": "Crescimento exponencial (Matriz ENEM H7)",
       "origin": "seed",
       "numeric_check": { "expression": "500*2^(6/2)", "result": "4000" }
@@ -341,6 +356,7 @@
         "Calcule a média e a mediana e compare-as com os salários reais.",
         "Um único valor muito alto 'puxa' qual medida para cima?"
       ],
+      "subtopic": "media-mediana-moda",
       "demo_id": "estatistica",
       "source": "Média, mediana e representatividade (Matriz ENEM H16)",
       "origin": "seed",
@@ -364,7 +380,8 @@
         "Percentual de crescimento = aumento ÷ valor inicial.",
         "Sobre qual mês o aumento aconteceu?"
       ],
-      "demo_id": "estatistica",
+      "subtopic": "leitura-dados",
+      "demo_id": null,
       "source": "Variação percentual em dados (Matriz ENEM H16)",
       "origin": "seed",
       "numeric_check": { "expression": "(120-80)/80*100", "result": "50" }
@@ -387,6 +404,7 @@
         "Média = soma dos valores ÷ quantidade de valores.",
         "Some os quatro meses e divida por 4."
       ],
+      "subtopic": "media-mediana-moda",
       "demo_id": "estatistica",
       "source": "Média aritmética simples (Matriz ENEM H16)",
       "origin": "seed",
@@ -410,7 +428,8 @@
         "P = favoráveis ÷ possíveis. Conte o total de bolas primeiro.",
         "Simplifique a fração antes de comparar com as alternativas."
       ],
-      "demo_id": "probabilidade",
+      "subtopic": "probabilidade-simples",
+      "demo_id": null,
       "source": "Probabilidade clássica (Matriz ENEM H14)",
       "origin": "seed",
       "numeric_check": null
@@ -433,6 +452,7 @@
         "Liste os pares que somam 7: comece por (1,6).",
         "São 36 resultados possíveis no total (6 × 6)."
       ],
+      "subtopic": "eventos-compostos",
       "demo_id": "probabilidade",
       "source": "Probabilidade com dois dados (Matriz ENEM H14)",
       "origin": "seed",
@@ -456,6 +476,7 @@
         "'Pelo menos um' quase sempre se resolve pelo complementar: 1 − P(nenhum).",
         "Qual a chance de dar coroa nas TRÊS lançamentos?"
       ],
+      "subtopic": "eventos-compostos",
       "demo_id": "probabilidade",
       "source": "Probabilidade do complementar (Matriz ENEM H15)",
       "origin": "seed",
@@ -479,6 +500,7 @@
         "Preço por m² multiplica a ÁREA, não o perímetro.",
         "Área do retângulo = base × altura."
       ],
+      "subtopic": "areas-perimetros",
       "demo_id": "geometria",
       "source": "Área de retângulo (Matriz ENEM H10)",
       "origin": "seed",
@@ -502,7 +524,8 @@
         "A escada é sempre a hipotenusa do triângulo.",
         "5² = 3² + h². Que número ao quadrado dá 16?"
       ],
-      "demo_id": "geometria",
+      "subtopic": "pitagoras",
+      "demo_id": null,
       "source": "Teorema de Pitágoras (Matriz ENEM H10)",
       "origin": "seed",
       "numeric_check": { "expression": "sqrt(5^2 - 3^2)", "result": "4" }
@@ -525,7 +548,8 @@
         "Sem repetição e com ordem: multiplique as opções decrescentes (26×25 e 10×9).",
         "Depois combine as duas partes multiplicando."
       ],
-      "demo_id": "probabilidade",
+      "subtopic": "principio-multiplicativo",
+      "demo_id": null,
       "source": "Princípio multiplicativo e arranjos (Matriz ENEM H9)",
       "origin": "seed",
       "numeric_check": { "expression": "26*25*10*9", "result": "58500" }
@@ -548,6 +572,7 @@
         "45° é o ângulo do triângulo isósceles: os catetos são iguais.",
         "tan(45°) = 1; altura = sombra × tan(45°)."
       ],
+      "subtopic": "triangulos-retangulos",
       "demo_id": null,
       "source": "Trigonometria no triângulo retângulo (Matriz ENEM H13)",
       "origin": "seed",
@@ -571,6 +596,7 @@
         "Ache a última fileira: a_n = a_1 + (n−1)·r.",
         "Some tudo: (primeira + última) × quantidade ÷ 2."
       ],
+      "subtopic": "progressoes",
       "demo_id": null,
       "source": "PA: termo geral e soma (Matriz ENEM H7)",
       "origin": "seed",

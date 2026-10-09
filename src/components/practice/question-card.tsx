@@ -352,7 +352,7 @@ export function QuestionCard({
                   <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     Veja o conceito em movimento
                   </p>
-                  <DemoFrame demoId={question.demo_id} compact />
+                  <DemoFrame demoId={question.demo_id} params={question.demo_params} compact />
                 </div>
               ) : null}
 

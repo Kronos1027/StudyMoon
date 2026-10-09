@@ -21,6 +21,15 @@ export const questionSeedSchema = z.object({
   answer_key: z.enum(ALTERNATIVE_KEYS),
   explanation_md: z.string().min(40),
   hints: z.array(z.string().min(5)).min(1).max(3),
+  /**
+   * Subtópico LOCAL da questão (granularidade fina). A demo exibida é
+   * resolvida dele (src/lib/demos/subtopics.ts); subtópico sem simulador
+   * ⇒ nenhuma demo. null/ausente ⇒ nenhuma demo.
+   */
+  subtopic: z.string().min(2).max(60).nullable().optional(),
+  /** Parâmetros da demo vindos da questão (ex.: escala-mapa: distanceCm/scale). */
+  demo_params: z.record(z.string(), z.union([z.number(), z.string(), z.boolean()])).nullable().optional(),
+  /** Espelho derivado do subtópico (validação e sync); nunca é a fonte. */
   demo_id: z.string().nullable().optional(),
   source: z.string().min(3).max(300),
   license: z.string().max(300).optional(),

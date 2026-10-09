@@ -16,7 +16,7 @@
             { "slug": "mt-operacoes-basicas", "name": "Operações básicas e problemas", "level": 1, "enem_weight": 7, "matrix_codes": ["H1", "H2"], "demo_id": "divisao", "description": "As quatro operações com números naturais na resolução de problemas do dia a dia: compras, trocos, divisões em grupos e estimativas." },
             { "slug": "mt-divisibilidade", "name": "Divisibilidade, múltiplos, MMC e MDC", "level": 1, "enem_weight": 6, "matrix_codes": ["H1", "H2"], "demo_id": "divisao", "description": "Critérios de divisibilidade, números primos, mínimo múltiplo comum e máximo divisor comum aplicados a situações como ciclos de ônibus e ladrilhos." },
             { "slug": "mt-fracoes-decimais", "name": "Frações e números decimais", "level": 1, "enem_weight": 8, "matrix_codes": ["H2", "H3"], "demo_id": "fracoes", "description": "Partes de um todo, comparação, soma e subtração de frações, conversão com decimais e porcentagem simples." },
-            { "slug": "mt-razao-proporcao", "name": "Razão, proporção e regra de três", "level": 1, "enem_weight": 9, "matrix_codes": ["H3", "H6"], "demo_id": "razao-proporcao", "description": "Relações entre grandezas proporcionalidade direta e inversa, regra de três simples e composta em contextos de consumo, escala e velocidade." },
+            { "slug": "mt-razao-proporcao", "name": "Razão, proporção e regra de três", "level": 1, "enem_weight": 9, "matrix_codes": ["H3", "H6"], "demo_id": "razao", "description": "Relações entre grandezas proporcionalidade direta e inversa, regra de três simples e composta em contextos de consumo, escala e velocidade." },
             { "slug": "mt-porcentagem-juros", "name": "Porcentagem e juros", "level": 1, "enem_weight": 10, "matrix_codes": ["H3", "H6"], "demo_id": "porcentagem", "description": "Aumentos e descontos sucessivos, juros simples e compostos, comparação de ofertas — o tema campeão do ENEM." },
             { "slug": "mt-grandezas-unidades", "name": "Grandezas e unidades de medida", "level": 2, "enem_weight": 6, "matrix_codes": ["H1", "H4"], "demo_id": null, "description": "Comprimento, área, volume, massa, tempo e temperatura; conversões de unidades e notação científica aplicada." }
           ]
@@ -29,7 +29,7 @@
             { "slug": "mt-expressoes-equacoes", "name": "Expressões, equações e inequações", "level": 2, "enem_weight": 9, "matrix_codes": ["H5", "H6"], "demo_id": null, "description": "Equações do 1º e 2º grau, sistemas, fatoração e inequações para modelar problemas." },
             { "slug": "mt-funcoes", "name": "Funções (afim, quadrática, exponencial, logarítmica)", "level": 2, "enem_weight": 9, "matrix_codes": ["H7", "H8"], "demo_id": "funcoes", "description": "Interpretar e construir gráficos, taxa de variação, vértice da parábola, crescimento exponencial e logaritmos em aplicações." },
             { "slug": "mt-sequencias", "name": "Sequências: PA e PG", "level": 2, "enem_weight": 6, "matrix_codes": ["H7"], "demo_id": null, "description": "Progressões aritméticas e geométricas: termo geral, soma e aplicações em juros e padrões." },
-            { "slug": "mt-combinatoria", "name": "Análise combinatória", "level": 3, "enem_weight": 6, "matrix_codes": ["H9"], "demo_id": "probabilidade", "description": "Princípio multiplicativo, permutações, arranjos e combinações para contar possibilidades." }
+            { "slug": "mt-combinatoria", "name": "Análise combinatória", "level": 3, "enem_weight": 6, "matrix_codes": ["H9"], "demo_id": null, "description": "Princípio multiplicativo, permutações, arranjos e combinações para contar possibilidades." }
           ]
         },
         {
@@ -37,7 +37,7 @@
           "name": "Geometria",
           "topics": [
             { "slug": "mt-geometria-plana", "name": "Geometria plana", "level": 2, "enem_weight": 8, "matrix_codes": ["H10", "H11"], "demo_id": "geometria", "description": "Ângulos, triângulos, quadriláteros, círculos; semelhança, Pitágoras e cálculo de áreas por decomposição." },
-            { "slug": "mt-geometria-espacial", "name": "Geometria espacial", "level": 2, "enem_weight": 7, "matrix_codes": ["H11", "H12"], "demo_id": "geometria", "description": "Prismas, pirâmides, cilindros, cones e esferas: planificações, áreas e volumes." },
+            { "slug": "mt-geometria-espacial", "name": "Geometria espacial", "level": 2, "enem_weight": 7, "matrix_codes": ["H11", "H12"], "demo_id": null, "description": "Prismas, pirâmides, cilindros, cones e esferas: planificações, áreas e volumes." },
             { "slug": "mt-trigonometria", "name": "Trigonometria", "level": 3, "enem_weight": 7, "matrix_codes": ["H10", "H13"], "demo_id": null, "description": "Seno, cosseno e tangente no triângulo retângulo, círculo trigonométrico e leis do seno/cosseno." },
             { "slug": "mt-geometria-analitica", "name": "Geometria analítica", "level": 3, "enem_weight": 5, "matrix_codes": ["H12", "H13"], "demo_id": "funcoes", "description": "Plano cartesiano, distância entre pontos, reta e circunferência como lugares geométricos." }
           ]
@@ -48,7 +48,7 @@
           "topics": [
             { "slug": "mt-probabilidade", "name": "Probabilidade", "level": 2, "enem_weight": 8, "matrix_codes": ["H14", "H15"], "demo_id": "probabilidade", "description": "Espaço amostral, eventos, probabilidade condicional e independência em jogos, sorteios e previsões." },
             { "slug": "mt-estatistica", "name": "Estatística descritiva", "level": 2, "enem_weight": 9, "matrix_codes": ["H16", "H17"], "demo_id": "estatistica", "description": "Média, moda, mediana, desvio, amplitude e interpretação crítica de pesquisas amostrais." },
-            { "slug": "mt-graficos-tabelas", "name": "Leitura de gráficos e tabelas", "level": 1, "enem_weight": 10, "matrix_codes": ["H16", "H17", "H18"], "demo_id": "estatistica", "description": "Interpretar gráficos de barras, setores, linhas e histogramas; pegadinhas de escala e variação relativa." }
+            { "slug": "mt-graficos-tabelas", "name": "Leitura de gráficos e tabelas", "level": 1, "enem_weight": 10, "matrix_codes": ["H16", "H17", "H18"], "demo_id": null, "description": "Interpretar gráficos de barras, setores, linhas e histogramas; pegadinhas de escala e variação relativa." }
           ]
         }
       ]
@@ -64,8 +64,8 @@
           "name": "Língua Portuguesa",
           "topics": [
             { "slug": "lc-interpretacao", "name": "Interpretação de texto", "level": 1, "enem_weight": 10, "matrix_codes": ["H1", "H2", "H3"], "demo_id": "textos", "description": "Compreensão, inferência, tema e intenção do autor em gêneros variados — a habilidade mais cobrada de todo o exame." },
-            { "slug": "lc-generos-tipos", "name": "Gêneros e tipos textuais", "level": 1, "enem_weight": 8, "matrix_codes": ["H4", "H5"], "demo_id": "textos", "description": "Reconhecer gêneros (crônica, artigo, memes, publicidade) e tipos (narração, descrição, dissertação, injunção)." },
-            { "slug": "lc-variacao-linguistica", "name": "Variação linguística", "level": 2, "enem_weight": 7, "matrix_codes": ["H6", "H7", "H8"], "demo_id": "textos", "description": "Variação histórica, regional e social; preconceito linguístico e adequação de registro." },
+            { "slug": "lc-generos-tipos", "name": "Gêneros e tipos textuais", "level": 1, "enem_weight": 8, "matrix_codes": ["H4", "H5"], "demo_id": null, "description": "Reconhecer gêneros (crônica, artigo, memes, publicidade) e tipos (narração, descrição, dissertação, injunção)." },
+            { "slug": "lc-variacao-linguistica", "name": "Variação linguística", "level": 2, "enem_weight": 7, "matrix_codes": ["H6", "H7", "H8"], "demo_id": null, "description": "Variação histórica, regional e social; preconceito linguístico e adequação de registro." },
             { "slug": "lc-funcoes-linguagem", "name": "Funções da linguagem", "level": 2, "enem_weight": 6, "matrix_codes": ["H6", "H9"], "demo_id": null, "description": "Referencial, emotiva, conativa, fática, metalinguística e poética na publicidade e na comunicação." },
             { "slug": "lc-figuras-linguagem", "name": "Figuras de linguagem", "level": 2, "enem_weight": 6, "matrix_codes": ["H10", "H11"], "demo_id": "textos", "description": "Metáfora, metonímia, hipérbole, ironia e outras figuras em contextos literários e publicitários." },
             { "slug": "lc-gramatica-aplicada", "name": "Gramática aplicada ao texto", "level": 2, "enem_weight": 8, "matrix_codes": ["H12", "H13", "H14"], "demo_id": null, "description": "Coesão e coerência, regência, concordância, pontuação e acentuação SEMPRE em contexto textual." },
@@ -101,10 +101,10 @@
           "slug": "historia",
           "name": "História",
           "topics": [
-            { "slug": "ch-brasil-colonia", "name": "Brasil colônia", "level": 1, "enem_weight": 8, "matrix_codes": ["H1", "H2"], "demo_id": "linha-tempo", "description": "Colonização portuguesa, escravidão africana e indígena, economia açucareira e aurífera, expansão territorial e revoltas coloniais." },
-            { "slug": "ch-brasil-imperio", "name": "Brasil império", "level": 2, "enem_weight": 7, "matrix_codes": ["H3", "H4"], "demo_id": "linha-tempo", "description": "Independência, Primeiro e Segundo Reinados, crise monárquica e abolição." },
-            { "slug": "ch-brasil-republica", "name": "Brasil república", "level": 2, "enem_weight": 9, "matrix_codes": ["H5", "H6"], "demo_id": "linha-tempo", "description": "República Velha, Vargas, JK, ditadura militar, redemocratização e Brasil contemporâneo." },
-            { "slug": "ch-historia-geral", "name": "História geral", "level": 2, "enem_weight": 7, "matrix_codes": ["H7", "H8", "H9"], "demo_id": "linha-tempo", "description": "Revoluções liberais, industrialização, imperialismo, guerras mundiais e Guerra Fria." },
+            { "slug": "ch-brasil-colonia", "name": "Brasil colônia", "level": 1, "enem_weight": 8, "matrix_codes": ["H1", "H2"], "demo_id": null, "description": "Colonização portuguesa, escravidão africana e indígena, economia açucareira e aurífera, expansão territorial e revoltas coloniais." },
+            { "slug": "ch-brasil-imperio", "name": "Brasil império", "level": 2, "enem_weight": 7, "matrix_codes": ["H3", "H4"], "demo_id": null, "description": "Independência, Primeiro e Segundo Reinados, crise monárquica e abolição." },
+            { "slug": "ch-brasil-republica", "name": "Brasil república", "level": 2, "enem_weight": 9, "matrix_codes": ["H5", "H6"], "demo_id": null, "description": "República Velha, Vargas, JK, ditadura militar, redemocratização e Brasil contemporâneo." },
+            { "slug": "ch-historia-geral", "name": "História geral", "level": 2, "enem_weight": 7, "matrix_codes": ["H7", "H8", "H9"], "demo_id": null, "description": "Revoluções liberais, industrialização, imperialismo, guerras mundiais e Guerra Fria." },
             { "slug": "ch-historia-cultural", "name": "Cultura, pensamento e lutas sociais", "level": 3, "enem_weight": 6, "matrix_codes": ["H10", "H11"], "demo_id": null, "description": "Movimentos culturais, direitos civis, feminismos e questões indígenas e quilombolas." }
           ]
         },
@@ -112,11 +112,11 @@
           "slug": "geografia",
           "name": "Geografia",
           "topics": [
-            { "slug": "ch-geo-fisica", "name": "Geografia física", "level": 1, "enem_weight": 7, "matrix_codes": ["H12", "H13"], "demo_id": "mapas", "description": "Clima, relevo, solos, hidrografia, vegetação e biomas brasileiros e mundiais." },
+            { "slug": "ch-geo-fisica", "name": "Geografia física", "level": 1, "enem_weight": 7, "matrix_codes": ["H12", "H13"], "demo_id": null, "description": "Clima, relevo, solos, hidrografia, vegetação e biomas brasileiros e mundiais." },
             { "slug": "ch-geo-humana", "name": "Geografia da população", "level": 2, "enem_weight": 8, "matrix_codes": ["H14", "H15"], "demo_id": "mapas", "description": "Crescimento populacional, transição demográfica, urbanização, migrações e cidades." },
             { "slug": "ch-geo-economica", "name": "Geografia econômica e agrária", "level": 2, "enem_weight": 7, "matrix_codes": ["H16", "H17"], "demo_id": null, "description": "Agronegócio, industrialização, comércio mundial, blocos econômicos e nova economia." },
-            { "slug": "ch-cartografia", "name": "Cartografia", "level": 1, "enem_weight": 6, "matrix_codes": ["H12", "H18"], "demo_id": "mapas", "description": "Escalas, projeções, fusos horários, coordenadas e leitura crítica de mapas." },
-            { "slug": "ch-meio-ambiente", "name": "Meio ambiente e sustentabilidade", "level": 2, "enem_weight": 8, "matrix_codes": ["H19", "H20", "H21"], "demo_id": "mapas", "description": "Problemas ambientais, mudanças climáticas, energia e políticas de sustentabilidade." }
+            { "slug": "ch-cartografia", "name": "Cartografia", "level": 1, "enem_weight": 6, "matrix_codes": ["H12", "H18"], "demo_id": null, "description": "Escalas, projeções, fusos horários, coordenadas e leitura crítica de mapas." },
+            { "slug": "ch-meio-ambiente", "name": "Meio ambiente e sustentabilidade", "level": 2, "enem_weight": 8, "matrix_codes": ["H19", "H20", "H21"], "demo_id": null, "description": "Problemas ambientais, mudanças climáticas, energia e políticas de sustentabilidade." }
           ]
         },
         {
@@ -155,7 +155,7 @@
             { "slug": "cn-estequiometria", "name": "Estequiometria", "level": 2, "enem_weight": 8, "matrix_codes": ["H15", "H16"], "demo_id": "balanceamento", "description": "Mol, massa molar, cálculos estequiométricos e rendimento de reações." },
             { "slug": "cn-solucoes", "name": "Soluções e concentração", "level": 2, "enem_weight": 7, "matrix_codes": ["H16", "H17"], "demo_id": null, "description": "Soluto e solvente, concentração comum e molar, diluição e misturas." },
             { "slug": "cn-termo-cinetica", "name": "Termoquímica e cinética", "level": 3, "enem_weight": 6, "matrix_codes": ["H17", "H18"], "demo_id": null, "description": "Calor de reação, energia de ativação, catalisadores e velocidade das reações." },
-            { "slug": "cn-equilibrio-eletroquimica", "name": "Equilíbrio e eletroquímica", "level": 3, "enem_weight": 6, "matrix_codes": ["H18", "H19"], "demo_id": "balanceamento", "description": "Equilíbrio químico, pH, pilhas e eletrólise em contextos reais." },
+            { "slug": "cn-equilibrio-eletroquimica", "name": "Equilíbrio e eletroquímica", "level": 3, "enem_weight": 6, "matrix_codes": ["H18", "H19"], "demo_id": null, "description": "Equilíbrio químico, pH, pilhas e eletrólise em contextos reais." },
             { "slug": "cn-quimica-organica", "name": "Química orgânica", "level": 3, "enem_weight": 6, "matrix_codes": ["H20", "H21"], "demo_id": null, "description": "Hidrocarbonetos, funções orgânicas, polímeros e compostos do cotidiano." },
             { "slug": "cn-quimica-ambiental", "name": "Química ambiental e da água", "level": 1, "enem_weight": 8, "matrix_codes": ["H22", "H23", "H24"], "demo_id": null, "description": "Ciclo da água, tratamento, poluição, chuva ácida e efeito estufa." }
           ]

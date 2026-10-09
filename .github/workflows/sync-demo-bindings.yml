@@ -1,7 +1,11 @@
 name: Sync demo bindings (manual)
 
-# Atualiza topics.demo_id a partir do curriculo.json e espelha
-# questions.demo_id do próprio tópico (bugfix da demo desligada do assunto).
+# PASSO 2 da auditoria de simuladores: aplica migrações pendentes (ex.:
+# 0006 — colunas questions.subtopic/demo_params/numeric_expr) e sincroniza
+# o banco com a vinculação de demos por SUBTÓPICO:
+#   1. topics.demo_id ← curriculo.json (demo da lição)
+#   2. questions.subtopic/demo_params/numeric_expr ← seeds (match por enunciado)
+#   3. questions.demo_id ← resolvido do subtópico pelo catálogo em código
 # Uso: aba Actions → "Sync demo bindings (manual)" → Run workflow.
 
 on:
@@ -19,6 +23,11 @@ jobs:
 
       - name: Instalar bun
         uses: oven-sh/setup-bun@v2
+
+      - name: Aplicar migrações pendentes
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: bun scripts/migrate.ts
 
       - name: Rodar sync-demo-bindings
         env:
