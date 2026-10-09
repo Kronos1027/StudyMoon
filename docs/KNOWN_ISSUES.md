@@ -42,3 +42,11 @@ O CI roda o smoke (renderização + manifest). O fluxo completo (cadastro → �
 ## KI-011 — SMTP da Supabase tem limite de 2 e-mails/hora
 O cadastro com confirmação por e-mail está ATIVO no projeto (padrão Supabase). O SMTP embutido (gratuito) limita ~2 e-mails/hora e os links de confirmação apontam para a Site URL configurada no dashboard. **Após o deploy:** (1) definir Site URL em Authentication → URL Configuration com a URL de produção; (2) para uso real, configurar SMTP próprio (ex.: Resend) ou desligar "Confirm email" em Authentication → Providers → Email.
 **Status:** espera configuração pós-deploy; cadastro/login por senha testados ao vivo e funcionando.
+
+## KI-012 — Aviso do React 19.2+ sobre script do next-themes (só dev)
+O React 19.2 introduziu o aviso `Encountered a script tag while rendering React component` disparado pelo script anti-flash de tema que o next-themes (0.4.6) renderiza dentro do provider. É **benigno**: o script executa no HTML gerado pelo SSR (que é o único momento em que ele importa — evita o flash de tema errado); no cliente ele nunca precisou executar. Não aparece no build de produção. Monitorar atualização do next-themes que adote o padrão `<template>` recomendado pelo React.
+**Status:** aceito (dev-only); tema claro/escuro verificado funcionando em desktop e 375px.
+
+## KI-013 — postgres.js re-serializa parâmetros com cast `::jsonb`
+O driver postgres.js aplica `JSON.stringify` próprio em valores de parâmetros seguidos de cast `::jsonb` — passar `JSON.stringify(x)` nesses pontos produz **dupla codificação** (jsonb escalar string contendo o JSON, quebrando `Array.isArray` no cliente). Corrigido no `seed.ts` migrando para `sql.json(x)` (forma canônica, codificação única). Regra para o futuro: **nunca** combinar `JSON.stringify` com `::jsonb` em queries com postgres.js; usar `sql.json()`.
+**Status:** corrigido (commit "fix(db): repair lessons JSON + seed jsonb double-encoding"); dados do banco re-semeados e verificados (35/35 alternativas como array).

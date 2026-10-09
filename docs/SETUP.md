@@ -27,6 +27,9 @@ cp .env.example .env.local
    - Aba **API Keys** → **Publishable key** (`sb_publishable_...`) → cole em `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - **Secret key** (`sb_secret_...`) → cole em `SUPABASE_SECRET_KEY`
 3. Em **Project Settings → Database → Connection string → URI**: substitua `[YOUR-PASSWORD]` pela senha real → cole em `DATABASE_URL` (use a *Session pooler*, porta 5432).
+   - **Atenção ao tipo de conexão:** o host direto `db.<ref>.supabase.co` resolve apenas IPv6. Se o seu ambiente só tem saída IPv4 (a maioria das redes corporativas e VMs), use o **Session pooler**: host `aws-1-<região>.pooler.supabase.com:5432`, usuário `postgres.<ref>`. A região deste projeto é `us-west-2` (hostname: `aws-1-us-west-2.pooler.supabase.com`).
+   - **Senha com caracteres especiais** precisa de percent-encoding na URI: `:` → `%3A`, `@` → `%40`, `/` → `%2F` etc.
+   - Para descobrir o pooler certo por DNS/região: `scripts/find-region.py` + `scripts/probe-pooler.mjs`.
 4. **Login com Google (opcional, recomendado):**
    - No [Google Cloud Console](https://console.cloud.google.com), crie um projeto → **APIs & Services → OAuth consent screen** (External) → **Credentials → Create OAuth client ID → Web application**.
    - Authorized redirect URI: `https://SEU-PROJETO.supabase.co/auth/v1/callback`
