@@ -23,7 +23,7 @@
       "demo_id": "genetica",
       "source": "Leis de Mendel e quadro de Punnett (Matriz ENEM H28)",
       "origin": "seed",
-      "numeric_check": null
+      "numeric_check": {"expression": "1/4", "result": "0.25"}
     },
     {
       "topic_slug": "cn-genetica",

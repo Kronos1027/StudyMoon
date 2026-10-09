@@ -167,7 +167,7 @@
       "demo_id": "fracoes",
       "source": "Frações e parte do todo (Matriz ENEM H2)",
       "origin": "seed",
-      "numeric_check": null
+      "numeric_check": {"expression": "1 - 1/4 - (1/3)*(1 - 1/4)", "result": "0.5"}
     },
     {
       "topic_slug": "mt-fracoes-decimais",
@@ -456,7 +456,7 @@
       "demo_id": "probabilidade",
       "source": "Probabilidade com dois dados (Matriz ENEM H14)",
       "origin": "seed",
-      "numeric_check": null
+      "numeric_check": {"expression": "6/36", "result": "1/6"}
     },
     {
       "topic_slug": "mt-probabilidade",

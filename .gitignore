@@ -49,3 +49,4 @@ prompt
 
 # multi-agent worklog (sandbox artifact)
 /worklog.md
+scripts/.audit-blind-cache.json

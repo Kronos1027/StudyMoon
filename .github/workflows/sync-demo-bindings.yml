@@ -33,3 +33,11 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: bun scripts/sync-demo-bindings.ts
+
+      - name: Auditar todas as questões do banco (cega + mathjs)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          # SDK do segundo modelo (efêmero — não altera o repositório)
+          bun add z-ai-web-dev-sdk@0.0.18
+          bun scripts/audit-questions.ts --db
