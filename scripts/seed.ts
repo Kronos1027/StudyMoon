@@ -85,7 +85,7 @@ async function main() {
       for (const topic of discipline.topics) {
         const row = await sql`
           insert into topics (area_id, parent_id, slug, name, description, level, enem_weight, matrix_codes, demo_id, sort_order)
-          values (${areaId}, ${disciplineId}, ${topic.slug}, ${topic.name}, ${topic.description}, ${topic.level}, ${topic.enem_weight}, ${JSON.stringify(topic.matrix_codes)}::jsonb, ${topic.demo_id ?? null}, ${order})
+          values (${areaId}, ${disciplineId}, ${topic.slug}, ${topic.name}, ${topic.description}, ${topic.level}, ${topic.enem_weight}, ${sql.json(topic.matrix_codes)}, ${topic.demo_id ?? null}, ${order})
           on conflict (slug) do update
             set name = excluded.name, description = excluded.description, level = excluded.level,
                 enem_weight = excluded.enem_weight, matrix_codes = excluded.matrix_codes,
@@ -239,7 +239,7 @@ async function main() {
   for (const theme of themes) {
     await sql`
       insert into essay_themes (title, texts_motivadores, kind, status)
-      values (${theme.title}, ${JSON.stringify(theme.texts)}::jsonb, ${theme.kind}, 'validated')
+      values (${theme.title}, ${sql.json(theme.texts)}, ${theme.kind}, 'validated')
       on conflict do nothing
     `;
   }
@@ -273,8 +273,8 @@ async function main() {
       insert into questions (topic_id, difficulty, context_md, statement_md, alternatives, answer_key, explanation_md, hints, demo_id, status, source, license, origin, numeric_check)
       values (
         ${topicId}, ${q.difficulty}, ${q.context_md ?? null}, ${q.statement_md},
-        ${JSON.stringify(q.alternatives)}::jsonb, ${q.answer_key}, ${q.explanation_md},
-        ${JSON.stringify(q.hints)}::jsonb, ${q.demo_id ?? null}, 'validated',
+        ${sql.json(q.alternatives)}, ${q.answer_key}, ${q.explanation_md},
+        ${sql.json(q.hints)}, ${q.demo_id ?? null}, 'validated',
         ${q.source}, ${q.license ?? "Conteúdo original StudyMoon (CC BY-SA)"}, ${q.origin},
         ${q.numeric_check ? true : false}
       )
