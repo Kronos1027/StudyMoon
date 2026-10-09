@@ -1,0 +1,26 @@
+name: Sync demo bindings (manual)
+
+# Atualiza topics.demo_id a partir do curriculo.json e espelha
+# questions.demo_id do próprio tópico (bugfix da demo desligada do assunto).
+# Uso: aba Actions → "Sync demo bindings (manual)" → Run workflow.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Rodar sync-demo-bindings
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: bun scripts/sync-demo-bindings.ts
