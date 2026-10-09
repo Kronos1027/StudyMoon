@@ -164,11 +164,11 @@
           "slug": "biologia",
           "name": "Biologia",
           "topics": [
-            { "slug": "cn-citologia", "name": "Citologia", "level": 1, "enem_weight": 7, "matrix_codes": ["H25", "H26"], "demo_id": "biologia", "description": "Estrutura celular, membranas, organelas e metabolismo energético." },
-            { "slug": "cn-fotossintese", "name": "Fotossíntese e respiração", "level": 2, "enem_weight": 7, "matrix_codes": ["H26", "H27"], "demo_id": "biologia", "description": "Etapas da fotossíntese, respiração celular e balanço dos gases na atmosfera." },
-            { "slug": "cn-genetica", "name": "Genética", "level": 2, "enem_weight": 9, "matrix_codes": ["H28"], "demo_id": "biologia", "description": "Leis de Mendel, heredogramas, quadro de Punnett, mutações e biotecnologia." },
+            { "slug": "cn-citologia", "name": "Citologia", "level": 1, "enem_weight": 7, "matrix_codes": ["H25", "H26"], "demo_id": null, "description": "Estrutura celular, membranas, organelas e metabolismo energético." },
+            { "slug": "cn-fotossintese", "name": "Fotossíntese e respiração", "level": 2, "enem_weight": 7, "matrix_codes": ["H26", "H27"], "demo_id": null, "description": "Etapas da fotossíntese, respiração celular e balanço dos gases na atmosfera." },
+            { "slug": "cn-genetica", "name": "Genética", "level": 2, "enem_weight": 9, "matrix_codes": ["H28"], "demo_id": "genetica", "description": "Leis de Mendel, heredogramas, quadro de Punnett, mutações e biotecnologia." },
             { "slug": "cn-evolucao", "name": "Evolução", "level": 2, "enem_weight": 6, "matrix_codes": ["H29"], "demo_id": null, "description": "Darwin, Wallace, evidências evolutivas e especiação." },
-            { "slug": "cn-ecologia", "name": "Ecologia", "level": 1, "enem_weight": 8, "matrix_codes": ["H29", "H30"], "demo_id": "biologia", "description": "Cadeias alimentares, ciclos biogeoquímicos, relações ecológicas e desequilíbrios." },
+            { "slug": "cn-ecologia", "name": "Ecologia", "level": 1, "enem_weight": 8, "matrix_codes": ["H29", "H30"], "demo_id": "eutrofizacao", "description": "Cadeias alimentares, ciclos biogeoquímicos, relações ecológicas e desequilíbrios." },
             { "slug": "cn-fisiologia", "name": "Fisiologia humana e saúde", "level": 1, "enem_weight": 8, "matrix_codes": ["H30"], "demo_id": null, "description": "Sistemas do corpo, hormônios, saúde pública, epidemias e qualidade de vida." }
           ]
         }

@@ -19,7 +19,7 @@
         "Monte o quadro de Punnett para Vv × Vv.",
         "Qual genótipo produz flores brancas, sendo V dominante?"
       ],
-      "demo_id": "biologia",
+      "demo_id": "genetica",
       "source": "Leis de Mendel e quadro de Punnett (Matriz ENEM H28)",
       "origin": "seed",
       "numeric_check": null
@@ -42,7 +42,7 @@
         "Monte o Punnett com os gametas: Iᴬ/i do pai e Iᴮ/i da mãe.",
         "Grupo O é homozigoto recessivo (ii)."
       ],
-      "demo_id": "biologia",
+      "demo_id": "genetica",
       "source": "Sistema ABO e alelos múltiplos (Matriz ENEM H28)",
       "origin": "seed",
       "numeric_check": null
@@ -88,7 +88,7 @@
         "Converta a potência para kW (5.500 W = 5,5 kW) e o tempo para horas.",
         "Custo = kWh do mês × tarifa."
       ],
-      "demo_id": null,
+      "demo_id": "phet",
       "source": "Potência e consumo elétrico (Matriz ENEM H10)",
       "origin": "seed",
       "numeric_check": { "expression": "5.5*0.5*30*0.8", "result": "66" }
@@ -111,7 +111,7 @@
         "O que acontece com as algas quando morrem? Quem as decompõe e o que isso consome?",
         "Fosfato em excesso → floração de algas → nome do processo?"
       ],
-      "demo_id": "biologia",
+      "demo_id": "eutrofizacao",
       "source": "Eutrofização e ciclos de matéria (Matriz ENEM H29)",
       "origin": "seed",
       "numeric_check": null
@@ -226,7 +226,7 @@
         "O que os dois hormônios fazem com a variação da glicose: ampliam ou corrigem?",
         "Homeostase se mantém por qual tipo de feedback?"
       ],
-      "demo_id": "biologia",
+      "demo_id": null,
       "source": "Homeostase e regulação hormonal (Matriz ENEM CN H30)",
       "origin": "seed",
       "numeric_check": null

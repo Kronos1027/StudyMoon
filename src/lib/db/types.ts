@@ -108,7 +108,12 @@ export interface Alternative {
   text: string;
 }
 
-/** Question as the CLIENT may see it (answer columns are server-only). */
+/**
+ * Question as the CLIENT may see it (answer columns are server-only).
+ * `demo_id` is the simulator of the question's TOPIC (topics.demo_id, joined
+ * at query time) — a question never carries an area-level or foreign-topic
+ * demo. null = topic has no simulator → no demo section is rendered.
+ */
 export interface QuestionPublic {
   id: string;
   topic_id: string;

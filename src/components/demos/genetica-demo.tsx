@@ -27,8 +27,9 @@ function phenotype(g: Genotype): "vermelha" | "branca" {
 /**
  * Genetics simulator: interactive Punnett square with selectable parents
  * (doc section 12: genética com quadro de Punnett).
+ * Bound ONLY to the topic cn-genetica (registry.ts) — never to the area.
  */
-export function BiologiaDemo() {
+export function GeneticaDemo() {
   const [parentA, setParentA] = useState<Cross>("Vv");
   const [parentB, setParentB] = useState<Cross>("Vv");
   const reduced = useReducedMotion();

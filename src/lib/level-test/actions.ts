@@ -4,6 +4,7 @@ import { z } from "zod";
 import { getSupabaseServerClient } from "@/lib/db/server";
 import { getSupabaseAdmin } from "@/lib/db/admin";
 import { updateMastery, expectedScore } from "@/lib/elo";
+import { demoIdFromTopicEmbed } from "@/lib/demos/topic-binding";
 import type { Area, QuestionPublic } from "@/lib/db/types";
 
 const ROUNDS = 4; // 4 questions per area
@@ -214,14 +215,18 @@ async function pickNextQuestion(
   const { data: full } = await admin
     .from("questions")
     .select(
-      "id, topic_id, difficulty, context_md, statement_md, alternatives, hints, demo_id, status, source, license, origin, created_at",
+      "id, topic_id, difficulty, context_md, statement_md, alternatives, hints, status, source, license, origin, created_at, topics(demo_id)",
     )
     .eq("id", best.id)
     .single();
   if (!full) return null;
 
+  // Demo comes from the question's TOPIC (never from the question row):
+  // guarantees demo.topic == question.topic; null topic demo → no demo.
+  const { topics: topicDemo, ...questionFields } = full;
   return {
-    ...full,
+    ...questionFields,
+    demo_id: demoIdFromTopicEmbed(topicDemo),
     alternatives: full.alternatives ?? [],
     areaName: area.name,
     round: Math.floor(previous.length / areas.length) + 1,

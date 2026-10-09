@@ -15,6 +15,7 @@ import {
   FIXED_XP,
 } from "@/lib/gamification/xp";
 import { countsAsStudyDay, updateStreak, type StreakState } from "@/lib/gamification/streak";
+import { demoIdFromTopicEmbed } from "@/lib/demos/topic-binding";
 import type { QuestionPublic } from "@/lib/db/types";
 
 // ---------------------------------------------------------------------------
@@ -119,15 +120,22 @@ export async function getNextQuestion(
   const { data: full } = await supabase
     .from("questions")
     .select(
-      "id, topic_id, difficulty, context_md, statement_md, alternatives, hints, demo_id, status, source, license, origin, created_at",
+      "id, topic_id, difficulty, context_md, statement_md, alternatives, hints, status, source, license, origin, created_at, topics(demo_id)",
     )
     .eq("id", selection.question.id)
     .single();
 
   if (!full) return { question: null, reason: null };
 
+  // Demo comes from the question's TOPIC (never from the question row):
+  // guarantees demo.topic == question.topic; null topic demo → no demo.
+  const { topics: topicDemo, ...questionFields } = full;
   return {
-    question: { ...full, alternatives: full.alternatives ?? [] } as QuestionPublic,
+    question: {
+      ...questionFields,
+      demo_id: demoIdFromTopicEmbed(topicDemo),
+      alternatives: full.alternatives ?? [],
+    } as QuestionPublic,
     reason: selection.reason,
   };
 }

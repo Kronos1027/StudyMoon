@@ -4,6 +4,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { getSupabaseServerClient } from "@/lib/db/server";
 import { getSupabaseAdmin } from "@/lib/db/admin";
+import { demoIdFromTopicEmbed } from "@/lib/demos/topic-binding";
 import type { QuestionPublic } from "@/lib/db/types";
 
 import { EXAM_CONFIG } from "./config";
@@ -128,13 +129,17 @@ export async function startMockExam(
     const { data: q } = await admin
       .from("questions")
       .select(
-        "id, topic_id, difficulty, context_md, statement_md, alternatives, hints, demo_id, status, source, license, origin, created_at",
+        "id, topic_id, difficulty, context_md, statement_md, alternatives, hints, status, source, license, origin, created_at, topics(demo_id)",
       )
       .eq("id", selected[i].questionId)
       .single();
     if (!q) continue;
+    // Demo comes from the question's TOPIC (never from the question row):
+    // guarantees demo.topic == question.topic; null topic demo → no demo.
+    const { topics: topicDemo, ...questionFields } = q;
     examQuestions.push({
-      ...q,
+      ...questionFields,
+      demo_id: demoIdFromTopicEmbed(topicDemo),
       alternatives: q.alternatives ?? [],
       areaName: areaNames.get(selected[i].areaId) ?? "",
       position: i,
