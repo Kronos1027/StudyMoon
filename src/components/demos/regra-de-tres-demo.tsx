@@ -83,7 +83,7 @@ export function RegraDeTresDemo() {
           ))}
         </div>
 
-        <div className="mx-auto max-w-md overflow-hidden rounded-xl border border-border">
+        <div className="mx-auto w-full max-w-md overflow-hidden rounded-xl border border-border">
           <table className="w-full text-sm" aria-label="Tabela da regra de três">
             <thead>
               <tr className="bg-muted/40">

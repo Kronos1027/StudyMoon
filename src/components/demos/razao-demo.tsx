@@ -133,7 +133,7 @@ export function RazaoDemo() {
         <h3 className="mb-3 text-sm font-medium text-muted-foreground">
           Proporção: duas razões iguais
         </h3>
-        <div className="mx-auto max-w-md rounded-xl border border-border p-4 font-mono text-sm">
+        <div className="mx-auto w-full max-w-md rounded-xl border border-border p-4 font-mono text-sm">
           <p className="text-center tabular-nums">
             {sugar} : {flour} &nbsp;=&nbsp; {scaledSugar} : {scaledFlour}
           </p>

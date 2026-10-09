@@ -25,7 +25,11 @@ import {
 import { Markdown } from "@/components/content/markdown";
 import { DemoFrame } from "@/components/demos/demo-frame";
 import { TutorDialog } from "@/components/practice/tutor-dialog";
-import { submitAttempt, reportQuestion, type AttemptResult } from "@/lib/practice/actions";
+import {
+  submitAttempt,
+  reportQuestion,
+  type AttemptResult,
+} from "@/lib/practice/actions";
 import type { QuestionPublic } from "@/lib/db/types";
 import { cn } from "@/lib/utils";
 
@@ -41,6 +45,10 @@ interface QuestionCardProps {
   /** Stats for the session header. */
   sessionCount: number;
   sessionCorrect: number;
+  /** Injeção de dependência para fixtures/E2E: substitui a action real. */
+  submitter?: typeof submitAttempt;
+  /** Injeção de dependência para fixtures/E2E (reportar problema). */
+  reporter?: typeof reportQuestion;
 }
 
 type Phase = "answering" | "submitting" | "feedback";
@@ -61,6 +69,8 @@ export function QuestionCard({
   onFinish,
   sessionCount,
   sessionCorrect,
+  submitter = submitAttempt,
+  reporter = reportQuestion,
 }: QuestionCardProps) {
   const [selected, setSelected] = useState<null | "A" | "B" | "C" | "D" | "E">(null);
   const [phase, setPhase] = useState<Phase>("answering");
@@ -96,7 +106,7 @@ export function QuestionCard({
     setPhase("submitting");
     setActionError(null);
     const timeMs = Date.now() - startRef.current;
-    const response = await submitAttempt({
+    const response = await submitter({
       questionId: question.id,
       selected,
       timeMs,
@@ -117,7 +127,7 @@ export function QuestionCard({
       submittedRef.current = true;
       onAnswered?.(response.correct === true, response.xpEarned ?? 0);
     }
-  }, [selected, phase, question.id, mode, onAnswered]);
+  }, [selected, phase, question.id, mode, onAnswered, submitter]);
 
   // Keyboard: 1-5/A-E select, Enter submit/advance.
   useEffect(() => {
@@ -141,7 +151,7 @@ export function QuestionCard({
 
   async function sendReport() {
     setReportDone(false);
-    const response = await reportQuestion({
+    const response = await reporter({
       questionId: question.id,
       reason: reportReason as (typeof REASONS)[number]["value"],
     });
@@ -180,7 +190,7 @@ export function QuestionCard({
           {sessionCount} respondidas
           {accuracy !== null ? ` · ${accuracy}% de acerto` : ""}
         </span>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {phase === "answering" ? (
             <>
               <Button

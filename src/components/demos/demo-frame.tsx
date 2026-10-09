@@ -47,7 +47,7 @@ export function DemoFrame({ demoId, params, compact }: DemoFrameProps) {
 
   if (!known) {
     return (
-      <div className="flex items-center gap-3 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
+      <div data-demo-id={demoId} data-loaded="unknown" className="flex items-center gap-3 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
         <Construction className="h-5 w-5 shrink-0" aria-hidden="true" />
         <p>
           O simulador interativo deste assunto está sendo construído e chega em
@@ -60,6 +60,8 @@ export function DemoFrame({ demoId, params, compact }: DemoFrameProps) {
   if (!loaded || loaded.id !== demoId) {
     return (
       <div
+        data-demo-id={demoId}
+        data-loaded="loading"
         className="flex h-40 animate-pulse items-center justify-center rounded-xl bg-muted/30 text-sm text-muted-foreground"
         role="status"
       >
@@ -72,7 +74,7 @@ export function DemoFrame({ demoId, params, compact }: DemoFrameProps) {
   const safeParams =
     params && typeof params === "object" && !Array.isArray(params) ? params : undefined;
   return (
-    <div className={compact ? "" : "rounded-xl border border-border p-4"}>
+    <div data-demo-id={demoId} data-loaded="1" className={compact ? "" : "rounded-xl border border-border p-4"}>
       <DemoComponent params={safeParams} />
     </div>
   );
