@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { AppShell } from "@/components/app/app-shell";
 import { PracticeSession } from "@/components/practice/practice-session";
 import { getSupabaseServerClient } from "@/lib/db/server";
+import { resolvePracticeMode } from "@/lib/practice/review";
 
 export const metadata: Metadata = { title: "Prática" };
 export const dynamic = "force-dynamic";
@@ -27,8 +28,8 @@ export default async function PraticaPage({
     .single();
   if (!profile?.onboarding_completed) redirect("/onboarding");
 
-  const isTest = modo === "teste";
-  const practiceMode = isTest ? "lesson_test" : modo === "revisao" ? "review" : "practice";
+  const practiceMode = resolvePracticeMode(modo);
+  const isTest = practiceMode === "lesson_test";
 
   return (
     <AppShell apelido={profile.apelido}>
