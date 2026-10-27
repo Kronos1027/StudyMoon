@@ -7,7 +7,7 @@ Esta auditoria foi realizada **somente com leituras** no projeto Supabase `study
 - Tabelas do schema public: **25/25 com RLS ligado** (confirmado por SQL).
 - Conteúdo atualmente registrado: 5 áreas, 80 tópicos, 66 aulas, 40 questões.
 - Histórico: 27 tentativas, 25 registros de domínio, 9 cartões de repetição espaçada.
-- `supabase` API `list_migrations` retornou lista vazia — **não significa que os arquivos SQL do repositório não foram aplicados**, apenas que não há migrações listadas nessa API. Conferir esquema real versus `supabase/migrations/` antes de qualquer mudança.
+- O histórico proprietário **`_studymoon.migrations` confirmou que `0001` a `0006` já foram aplicadas** (em 9 de outubro de 2026). A API nativa de migrações do Supabase fica vazia porque este projeto usa o migrador `scripts/migrate.ts`. **Não rodar 0001–0006 novamente.**
 
 ## Alertas de segurança dos Advisors
 1. **Funções trigger expostas a EXECUTE** (`public.handle_new_user` e `public.handle_new_profile`): ambas são SECURITY DEFINER, têm `search_path=public` e o privilégio de EXECUTE para `anon` e `authenticated`. Por serem funções com retorno `trigger`, uma execução direta via RPC normalmente falhará fora do contexto de trigger; mesmo assim o privilégio é desnecessário e deve ser revisado/revogado após teste em ambiente seguro. Não substituir por SECURITY INVOKER sem verificar a criação automática de perfis e streaks. Referência: https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable .
@@ -28,3 +28,22 @@ Esta auditoria foi realizada **somente com leituras** no projeto Supabase `study
 6. Somente então considerar mudanças na produção.
 
 > Não aplicar instruções de migração de maneira cega: a produção contém dados de alunos.
+
+## Etapa 2 — mudanças preparadas no PR (AINDA NÃO APLICADAS AO BANCO)
+
+- `0007_security_and_indexes.sql`: `GRANT SELECT (subtopic, demo_params)` para consertar o carregamento autenticado de exercícios (confirmou-se no banco que essas colunas não estão no grant atual), sem expor `answer_key`, `explanation_md` ou `numeric_expr`; revogação de EXECUTE público dos dois SECURITY DEFINER de trigger; `search_path` fixado para três funções; oito índices para FKs.
+- `0008_optimize_rls.sql`: 24 `ALTER POLICY` gerados das políticas REAIS via `pg_policies`, conservando nomes, funções e predicados de propriedade. Somente `auth.uid()` muda para `(select auth.uid())`.
+- `scripts/test-rls.ts`: removido falso positivo que aceitava uma leitura indevida de `answer_key`; verificação adicional de `numeric_expr` e permissões dos simuladores; limpeza garantida das contas de teste mesmo quando falha.
+- `tests/unit/migration-security.test.ts`: testes estáticos que protegem os grants, as funções de trigger e as 24 policies.
+- `src/lib/essay/actions.ts` e `src/components/essay/essay-editor.tsx`: trava atômica contra múltiplas correções de uma mesma redação, evita salvamentos após envio, informa falhas ao usuário e corrige gráfico de nota zero.
+
+**Não aplicar automaticamente em produção.** Fluxo recomendado:
+
+1. Criar um ambiente de teste isolado, sem despesas adicionais sem consentimento.
+2. Aplicar as migrações com `pnpm db:migrate` **somente** contra a URL de teste, depois de confirmar que o histórico de migrações tem `0001`–`0006`.
+3. Rodar `pnpm verify:full` e `pnpm db:test-rls` usando exclusivamente URL, publishable/anon e secret key **do ambiente de teste**. Esse teste cria e apaga dois usuários temporários.
+4. Exercitar os fluxos reais de cadastro → perfil → streak, questões → revisão, redação → autosave → correção, isolamento entre contas.
+5. Executar os Advisors novamente e comparar com o baseline.
+6. Só considerar produção com backup testado, janela de rollback e autorização específica. **Nenhuma dessas migrações foi aplicada via esta auditoria.**
+
+**Limites dos testes atuais**: O CI público executa lint, TypeScript, unitários, compilação, Playwright smoke e gitleaks. Não possui credenciais para testes autenticados de Supabase; passar no CI **não** demonstra que `0007`/`0008` funcionam no banco. O script `db:test-rls` deve ser rodado em ambiente isolado antes da liberação.
