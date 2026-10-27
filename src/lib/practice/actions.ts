@@ -75,54 +75,90 @@ export async function getNextQuestion(
   if (!topics || topics.length === 0) return { question: null, reason: null };
 
   const topicIds = new Set(topics.map((t) => t.id));
-  const { data: questions } = await supabase
+
+  // Review sessions MUST use the student's due FSRS cards, ordered by due
+  // date. Adaptive practice deliberately uses a different selection policy.
+  let dueQuestionIds: string[] | null = null;
+  if (parsed.data.mode === "review") {
+    const { data: dueCards, error: dueError } = await supabase
+      .from("srs_cards")
+      .select("question_id")
+      .eq("user_id", user.id)
+      .not("question_id", "is", null)
+      .lte("due", new Date().toISOString())
+      .order("due", { ascending: true })
+      .limit(100);
+    if (dueError) throw new Error("Não foi possível consultar suas revisões.");
+    dueQuestionIds = [...new Set((dueCards ?? [])
+      .map((card) => card.question_id)
+      .filter((id): id is string => typeof id === "string"))];
+    if (!dueQuestionIds.length) {
+      return { question: null, reason: "no_due_reviews" };
+    }
+  }
+
+  let questionsQuery = supabase
     .from("questions")
     .select("id, topic_id, difficulty")
-    .eq("status", "validated")
-    .limit(600);
-  if (!questions || questions.length === 0) return { question: null, reason: null };
+    .eq("status", "validated");
 
-  const candidates = questions
+  if (dueQuestionIds) {
+    questionsQuery = questionsQuery.in("id", dueQuestionIds);
+  }
+  const { data: questions, error: questionsError } = await questionsQuery.limit(600);
+  if (questionsError) throw new Error("Não foi possível carregar as questões.");
+
+  const candidates = (questions ?? [])
     .filter((q) => topicIds.has(q.topic_id))
     .map((q) => ({ id: q.id, topicId: q.topic_id, difficulty: q.difficulty }));
 
-  // Mastery + recent attempts for the user.
-  const [{ data: mastery }, { data: recent }] = await Promise.all([
-    supabase
-      .from("topic_mastery")
-      .select("topic_id, elo, confidence, attempts_count")
-      .eq("user_id", user.id),
-    supabase
-      .from("attempts")
-      .select("question_id, created_at")
-      .eq("user_id", user.id)
-      .gte("created_at", isoWeekAgo()),
-  ]);
+  let selectedId: string | null = null;
+  let selectedReason: string | null = null;
 
-  // Dynamic import keeps the pure selection module out of the action bundle.
-  const { selectNextQuestion } = await import("@/lib/practice/selection");
-  const selection = selectNextQuestion({
-    candidates,
-    mastery: (mastery ?? []).map((m) => ({
-      topicId: m.topic_id,
-      elo: m.elo,
-      confidence: m.confidence,
-    })),
-    recentAttempts: (recent ?? []).map((a) => ({
-      questionId: a.question_id,
-      attemptedAt: a.created_at,
-    })),
-    now: new Date(),
-  });
+  if (dueQuestionIds) {
+    const candidateIds = new Set(candidates.map((candidate) => candidate.id));
+    selectedId = dueQuestionIds.find((id) => candidateIds.has(id)) ?? null;
+    selectedReason = selectedId ? "review_due" : "no_due_reviews";
+  } else {
+    // Normal practice: use the existing adaptive 70/20/10 selector.
+    const [{ data: mastery }, { data: recent }] = await Promise.all([
+      supabase
+        .from("topic_mastery")
+        .select("topic_id, elo, confidence, attempts_count")
+        .eq("user_id", user.id),
+      supabase
+        .from("attempts")
+        .select("question_id, created_at")
+        .eq("user_id", user.id)
+        .gte("created_at", isoWeekAgo()),
+    ]);
 
-  if (!selection) return { question: null, reason: null };
+    const { selectNextQuestion } = await import("@/lib/practice/selection");
+    const selection = selectNextQuestion({
+      candidates,
+      mastery: (mastery ?? []).map((m) => ({
+        topicId: m.topic_id,
+        elo: m.elo,
+        confidence: m.confidence,
+      })),
+      recentAttempts: (recent ?? []).map((a) => ({
+        questionId: a.question_id,
+        attemptedAt: a.created_at,
+      })),
+      now: new Date(),
+    });
+    selectedId = selection?.question.id ?? null;
+    selectedReason = selection?.reason ?? null;
+  }
+
+  if (!selectedId) return { question: null, reason: selectedReason };
 
   const { data: full } = await supabase
     .from("questions")
     .select(
       "id, topic_id, subtopic, demo_params, difficulty, context_md, statement_md, alternatives, hints, status, source, license, origin, created_at, topics(slug)",
     )
-    .eq("id", selection.question.id)
+    .eq("id", selectedId)
     .single();
 
   if (!full) return { question: null, reason: null };
@@ -143,7 +179,7 @@ export async function getNextQuestion(
       demo_params: resolution?.params ?? null,
       alternatives: full.alternatives ?? [],
     } as QuestionPublic,
-    reason: selection.reason,
+    reason: selectedReason,
   };
 }
 
