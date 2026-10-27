@@ -44,7 +44,7 @@ export function EssayEditor({
   const [content, setContent] = useState("");
   const [timerRunning, setTimerRunning] = useState(mode === "training");
   const [secondsLeft, setSecondsLeft] = useState(TRAINING_SECONDS);
-  const [saved, setSaved] = useState<"idle" | "saving" | "saved">("idle");
+  const [saved, setSaved] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<EssayCorrectionResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -72,17 +72,24 @@ export function EssayEditor({
   }, [timerRunning, secondsLeft]);
 
   // Autosave.
-  const save = useCallback(async () => {
-    if (!contentRef.current) return;
+  const save = useCallback(async (): Promise<boolean> => {
     setSaved("saving");
-    await saveEssayDraft({ essayId, content: contentRef.current });
-    setSaved("saved");
+    try {
+      // A cleared editor is a valid draft and must also be saved.
+      const response = await saveEssayDraft({ essayId, content: contentRef.current });
+      setSaved(response.ok ? "saved" : "error");
+      return response.ok;
+    } catch {
+      setSaved("error");
+      return false;
+    }
   }, [essayId]);
 
   useEffect(() => {
+    if (submitting || result?.ok) return;
     const interval = setInterval(() => void save(), AUTOSAVE_MS);
     return () => clearInterval(interval);
-  }, [save]);
+  }, [save, submitting, result?.ok]);
 
   // Save on unload.
   useEffect(() => {
@@ -106,11 +113,20 @@ export function EssayEditor({
     }
     setError(null);
     setSubmitting(true);
-    await save();
-    const response = await correctEssay({ essayId });
-    setSubmitting(false);
-    setResult(response);
-    if (response.ok) router.refresh();
+    try {
+      if (!await save()) {
+        setError("Não foi possível salvar sua redação. Confira sua conexão antes de enviar.");
+        return;
+      }
+      const response = await correctEssay({ essayId });
+      setResult(response);
+      if (response.ok) router.refresh();
+      else setError(response.error ?? "A correção não foi concluída. Tente novamente.");
+    } catch {
+      setError("Erro de conexão durante a correção. Sua redação não foi perdida se o último salvamento foi confirmado.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   // ---------- Correction result ----------
@@ -258,6 +274,8 @@ export function EssayEditor({
                   <Save className="h-3 w-3" aria-hidden="true" />
                   salvo automaticamente
                 </>
+              ) : saved === "error" ? (
+                <span role="alert" className="text-destructive">Falha ao salvar. Tente novamente.</span>
               ) : null}
             </span>
           </div>
