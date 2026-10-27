@@ -174,9 +174,11 @@ export async function correctEssay(
       zeroReason: correction.zero_reason,
     };
   } catch (err) {
+    // Let the student edit and retry after an AI provider failure.
+    // The status lock only applies while correction is in progress.
     await admin
       .from("essays")
-      .update({ status: "submitted" })
+      .update({ status: "draft" })
       .eq("id", essay.id);
     console.error("[essay] correction failed:", (err as Error).message);
     return {
