@@ -106,12 +106,19 @@ export function QuestionCard({
     setPhase("submitting");
     setActionError(null);
     const timeMs = Date.now() - startRef.current;
-    const response = await submitter({
-      questionId: question.id,
-      selected,
-      timeMs,
-      mode,
-    });
+    let response: AttemptResult;
+    try {
+      response = await submitter({
+        questionId: question.id,
+        selected,
+        timeMs,
+        mode,
+      });
+    } catch {
+      setActionError("Não foi possível registrar sua resposta. Verifique a conexão e tente novamente.");
+      setPhase("answering");
+      return;
+    }
     if (!response.ok) {
       setActionError(response.error ?? "Erro inesperado.");
       setPhase("answering");
@@ -132,7 +139,13 @@ export function QuestionCard({
   // Keyboard: 1-5/A-E select, Enter submit/advance.
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
-      if (reportOpen) return;
+      if (reportOpen || event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
+      // Never hijack typing in the tutor, report dialogs, inputs or editors.
+      const target = event.target;
+      if (target instanceof HTMLElement &&
+          (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT", "BUTTON"].includes(target.tagName))) {
+        return;
+      }
       if (phase === "answering") {
         const key = event.key.toUpperCase();
         const map: Record<string, "A" | "B" | "C" | "D" | "E"> = {
