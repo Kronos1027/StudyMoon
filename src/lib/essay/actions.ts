@@ -61,6 +61,9 @@ export async function correctEssay(
   if (essay.status === "corrected") {
     return { ok: false, error: "Esta redação já foi corrigida." };
   }
+  if (essay.status === "correcting") {
+    return { ok: false, error: "Esta redação já está sendo corrigida." };
+  }
   if (countWords(essay.content_md) < 30) {
     return {
       ok: false,
@@ -92,10 +95,18 @@ export async function correctEssay(
     .update(`essay-v1:${essay.prompt_title}:${essay.content_md}`)
     .digest("hex");
 
-  await admin
+  // Claim the correction atomically. Two simultaneous submissions must
+  // never start two AI requests for the same essay.
+  const { data: claimed, error: claimError } = await admin
     .from("essays")
     .update({ status: "correcting" })
-    .eq("id", essay.id);
+    .eq("id", essay.id)
+    .in("status", ["draft", "submitted", "failed"])
+    .select("id")
+    .maybeSingle();
+  if (claimError || !claimed) {
+    return { ok: false, error: "Não foi possível iniciar a correção. Verifique se ela já está em andamento." };
+  }
 
   try {
     const response = await routeLlmCached(cacheKey, {
@@ -193,15 +204,19 @@ export async function saveEssayDraft(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false };
 
-  await supabase
+  // Autosave must not overwrite an essay after submission or grading.
+  const { data: saved, error } = await supabase
     .from("essays")
     .update({
       content_md: parsed.data.content,
       word_count: countWords(parsed.data.content),
     })
     .eq("id", parsed.data.essayId)
-    .eq("user_id", user.id);
-  return { ok: true };
+    .eq("user_id", user.id)
+    .eq("status", "draft")
+    .select("id")
+    .maybeSingle();
+  return { ok: !error && Boolean(saved) };
 }
 
 const createSchema = z.object({
