@@ -34,7 +34,7 @@ describe("StudyMoon migration security contracts", () => {
 
   it("keeps 24 ownership policies scoped to a statement-initialized auth id", () => {
     const sql = migration("0008_optimize_rls.sql");
-    const statements = sql.split("\n").filter((line) => line.startsWith("alter policy "));
+    const statements = sql.match(/alter policy [\s\S]*?;/g) ?? [];
     expect(statements).toHaveLength(24);
     for (const statement of statements) {
       expect(statement).toContain("(select auth.uid())");
