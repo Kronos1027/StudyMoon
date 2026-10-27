@@ -114,7 +114,7 @@ export function EssayEditor({
     setError(null);
     setSubmitting(true);
     try {
-      if (!await save()) {
+      if (!(await save())) {
         setError("Não foi possível salvar sua redação. Confira sua conexão antes de enviar.");
         return;
       }
@@ -131,7 +131,7 @@ export function EssayEditor({
 
   // ---------- Correction result ----------
   if (result?.ok) {
-    const maxScore = Math.max(...(result.competencies?.map((c) => c.score) ?? [0]));
+    // Each ENEM competency is scored out of 200; zeroes are valid.
     return (
       <div className="mx-auto w-full max-w-2xl px-4 py-6">
         <motion.div
@@ -175,7 +175,7 @@ export function EssayEditor({
                     <motion.div
                       className="h-full rounded-full bg-brand-gradient"
                       initial={reduced ? { width: `${(c.score / 200) * 100}%` } : { width: 0 }}
-                      animate={{ width: `${(c.score / maxScore) * 100}%` }}
+                      animate={{ width: `${(c.score / 200) * 100}%` }}
                       transition={{ duration: reduced ? 0 : 0.8 }}
                     />
                   </div>
