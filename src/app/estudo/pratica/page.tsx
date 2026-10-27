@@ -28,6 +28,7 @@ export default async function PraticaPage({
   if (!profile?.onboarding_completed) redirect("/onboarding");
 
   const isTest = modo === "teste";
+  const practiceMode = isTest ? "lesson_test" : modo === "revisao" ? "review" : "practice";
 
   return (
     <AppShell apelido={profile.apelido}>
@@ -41,7 +42,7 @@ export default async function PraticaPage({
         >
           <PracticeSession
             topicSlug={topico ?? null}
-            mode={isTest ? "lesson_test" : "practice"}
+            mode={practiceMode}
             testLength={isTest ? 5 : null}
           />
         </Suspense>
