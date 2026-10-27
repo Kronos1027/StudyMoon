@@ -17,6 +17,7 @@ import {
 import { countsAsStudyDay, updateStreak, type StreakState } from "@/lib/gamification/streak";
 import { demoForQuestionRow } from "@/lib/demos/topic-binding";
 import type { QuestionPublic } from "@/lib/db/types";
+import { firstAvailableDueQuestion } from "@/lib/practice/review";
 
 // ---------------------------------------------------------------------------
 // Next question (adaptive selection)
@@ -116,8 +117,10 @@ export async function getNextQuestion(
   let selectedReason: string | null = null;
 
   if (dueQuestionIds) {
-    const candidateIds = new Set(candidates.map((candidate) => candidate.id));
-    selectedId = dueQuestionIds.find((id) => candidateIds.has(id)) ?? null;
+    selectedId = firstAvailableDueQuestion(
+      dueQuestionIds,
+      candidates.map((candidate) => candidate.id),
+    );
     selectedReason = selectedId ? "review_due" : "no_due_reviews";
   } else {
     // Normal practice: use the existing adaptive 70/20/10 selector.
