@@ -183,4 +183,6 @@ rollback;
 SQL
 echo "==> Verifying atomic, idempotent XP awards on the test database"
 psql_test -f "tests/database/xp-awards.sql"
-echo "PostgreSQL migration, RLS and atomic XP integration tests passed."
+echo "==> Racing two concurrent XP awards on a single student"
+bash tests/database/xp-concurrency.sh
+echo "PostgreSQL migration, RLS, and atomic XP concurrency tests passed."
