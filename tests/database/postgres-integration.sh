@@ -38,7 +38,8 @@ grant select, insert, update, delete on all tables in schema public
   to anon, authenticated, service_role;
 SQL
 for file in 0004_grants.sql 0005_indexes.sql 0006_question_subtopic.sql \
-            0007_security_and_indexes.sql 0008_optimize_rls.sql; do
+            0007_security_and_indexes.sql 0008_optimize_rls.sql \
+            0009_atomic_xp_awards.sql; do
   echo "==> $file"
   psql_test -f "supabase/migrations/$file" >/dev/null
 done
@@ -180,4 +181,6 @@ begin
 end $$;
 rollback;
 SQL
-echo "PostgreSQL migration and RLS integration tests passed."
+echo "==> Verifying atomic, idempotent XP awards on the test database"
+psql_test -f "tests/database/xp-awards.sql"
+echo "PostgreSQL migration, RLS and atomic XP integration tests passed."
