@@ -9,7 +9,7 @@ import { essayCorrectionPrompt } from "@/lib/ai/prompts";
 import { essayCorrectionSchema } from "@/lib/ai/schemas";
 import { extractJson } from "@/lib/ai/providers/types";
 import { createHash } from "node:crypto";
-import { FIXED_XP } from "@/lib/gamification/xp";
+import { FIXED_XP, levelFromXp, rankTitleFromLevel } from "@/lib/gamification/xp";
 
 const submitSchema = z.object({
   essayId: z.string().uuid(),
@@ -119,7 +119,9 @@ export async function correctEssay(
 
     const correction = essayCorrectionSchema.parse(extractJson(response.text));
 
-    await admin.from("essay_feedback").insert({
+    // Never mark a submission corrected unless its actual feedback exists.
+    // Supabase write errors are returned as values rather than thrown.
+    const { error: feedbackError } = await admin.from("essay_feedback").insert({
       essay_id: essay.id,
       total_score: correction.total_score,
       competencies: correction.competencies,
@@ -129,10 +131,22 @@ export async function correctEssay(
       is_ai_estimate: true,
       model_used: response.provider,
     });
-    await admin
+    if (feedbackError) {
+      throw new Error(`Falha ao persistir a correção: ${feedbackError.message}`);
+    }
+
+    const { data: marked, error: statusError } = await admin
       .from("essays")
       .update({ status: "corrected" })
-      .eq("id", essay.id);
+      .eq("id", essay.id)
+      .eq("status", "correcting")
+      .select("id")
+      .maybeSingle();
+    if (statusError || !marked) {
+      // Feedback has already been saved; keep it for recovery/auditing.
+      // Do not claim successful grading if its status was not persisted.
+      throw new Error(`Falha ao concluir o status da redação: ${statusError?.message ?? "status alterado"}`);
+    }
 
     const { count: alreadyPaid } = await admin
       .from("xp_events")
@@ -154,10 +168,19 @@ export async function correctEssay(
           .eq("id", user.id)
           .single();
         if (profile) {
-          await admin
+          const totalXp = profile.xp + FIXED_XP.essaySubmitted;
+          const level = levelFromXp(totalXp);
+          const { error: profileError } = await admin
             .from("profiles")
-            .update({ xp: profile.xp + FIXED_XP.essaySubmitted })
+            .update({
+              xp: totalXp,
+              level,
+              rank_title: rankTitleFromLevel(level),
+            })
             .eq("id", user.id);
+          if (profileError) {
+            console.error("[essay] failed to update profile XP:", profileError.message);
+          }
         }
       }
     }
@@ -176,10 +199,16 @@ export async function correctEssay(
   } catch (err) {
     // Let the student edit and retry after an AI provider failure.
     // The status lock only applies while correction is in progress.
-    await admin
+    // Only release a still-in-progress claim. Never undo a completed grade
+    // because a later non-critical step (XP/cache revalidation) failed.
+    const { error: recoveryError } = await admin
       .from("essays")
       .update({ status: "draft" })
-      .eq("id", essay.id);
+      .eq("id", essay.id)
+      .eq("status", "correcting");
+    if (recoveryError) {
+      console.error("[essay] failed to release correction claim:", recoveryError.message);
+    }
     console.error("[essay] correction failed:", (err as Error).message);
     return {
       ok: false,
