@@ -212,6 +212,7 @@ const submitSchema = z.object({
 export interface AttemptResult {
   ok: boolean;
   error?: string;
+  errorCode?: "ticket_unavailable";
   correct?: boolean;
   answerKey?: "A" | "B" | "C" | "D" | "E";
   explanationMd?: string;
@@ -286,6 +287,7 @@ export async function submitAttempt(input: z.infer<typeof submitSchema>): Promis
     return {
       ok: false,
       error: "Esta questão já foi respondida ou expirou. Carregue uma nova questão.",
+      errorCode: "ticket_unavailable",
     };
   }
 
