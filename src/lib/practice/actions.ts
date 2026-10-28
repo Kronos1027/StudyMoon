@@ -15,7 +15,7 @@ import {
 import { countsAsStudyDay, updateStreak, type StreakState } from "@/lib/gamification/streak";
 import { demoForQuestionRow } from "@/lib/demos/topic-binding";
 import type { QuestionPublic } from "@/lib/db/types";
-import { firstAvailableDueQuestion } from "@/lib/practice/review";
+import { firstAvailableDueQuestion, isReviewDue } from "@/lib/practice/review";
 
 // ---------------------------------------------------------------------------
 // Next question (adaptive selection)
@@ -236,6 +236,20 @@ export async function submitAttempt(input: z.infer<typeof submitSchema>): Promis
     .single();
   if (!question || question.status !== "validated") {
     return { ok: false, error: "Questão não encontrada ou indisponível." };
+  }
+
+  // Do not trust the client-provided "review" mode. A crafted server-action
+  // call must not grant review XP for an unlearned/already-rescheduled card.
+  if (mode === "review") {
+    const { data: card, error: cardError } = await admin
+      .from("srs_cards")
+      .select("due")
+      .eq("user_id", user.id)
+      .eq("question_id", questionId)
+      .maybeSingle();
+    if (cardError || !isReviewDue(card?.due, new Date())) {
+      return { ok: false, error: "Esta revisão não está disponível agora. Atualize sua lista." };
+    }
   }
 
   const correct = selected === question.answer_key;
