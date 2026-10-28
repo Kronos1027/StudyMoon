@@ -105,3 +105,28 @@ A action de questões e a de redações chamam a função com o cliente **servid
 2. Fazer backup do banco de produção, verificar não existirem duplicatas históricas de XP de redação e ensaiar rollback. O índice único `uq_xp_essay_once` falhará com segurança se houver duplicatas antigas.
 3. Não disponibilizar a função a `anon`/`authenticated`; manter a chave `service_role` estritamente no servidor.
 4. Continuam pendentes uma homologação integrada com Supabase Auth real, validação completa do navegador autenticado e aprovação explícita antes de modificar produção.
+
+## Etapa 6 — limite diário transacional do tutor e revisão elegível (28/10)
+
+### Tutor
+
+A implementação anterior do endpoint `/api/tutor` contava as linhas em `ai_cache` e só registrava o uso **depois** do retorno da IA. Duas requisições simultâneas podiam ultrapassar as 20 perguntas/dia porque ambas enxergavam a mesma contagem anterior.
+
+- A migração `0010_tutor_daily_quota.sql` cria `public.tutor_daily_usage`, uma tabela com **RLS ativado e sem grants aos papéis anon/authenticated**, e duas funções **SECURITY INVOKER** exclusivas do service role: `claim_tutor_daily_turn` e `release_tutor_daily_turn`.
+- A reserva do contador usa `INSERT ... ON CONFLICT ... DO UPDATE WHERE used < limit`, cuja disputa pela mesma linha é serializada pelo PostgreSQL. O dia é calculado em **UTC**, explicitamente.
+- O endpoint verifica a existência da questão validada, reserva **antes** de chamar o provedor e responde com `429` quando o limite é atingido. Se o provedor falha ou devolve JSON inválido, tenta devolver a reserva. Em caso de erro no banco, retorna 503 sem consumir IA (fail closed).
+- O log em `ai_cache` passa a ser apenas histórico auxiliar; não é mais a fonte de verdade da cota.
+- **Limitação operacional:** se a função for interrompida abruptamente, a reserva pode permanecer contada até o próximo dia; isso evita ultrapassar a cota, mas pode negar temporariamente uma pergunta. Avaliar um mecanismo de reserva com TTL se a plataforma crescer.
+
+### Segurança das revisões
+
+- `submitAttempt(mode="review")` agora consulta o cartão `srs_cards` do usuário e rejeita a solicitação quando não existe, tem data inválida ou ainda **não venceu**. Isso impede ganhar XP de revisão apenas manipulando o argumento da ação do servidor.
+- Testes unitários cobrem cartões vencidos, futuros, ausentes e inválidos.
+- **Limitação ainda aberta:** duas respostas simultâneas a um mesmo cartão podem observar o cartão como vencido antes da primeira atualização. Há deduplicação do XP por cartão, mas uma futura transação conjunta de tentativas/Elo/FSRS é recomendada para consistência perfeita de toda a sessão.
+
+### Testes do banco isolado
+
+- `tests/database/tutor-quota.sql`: limite, liberação por falha, isolamento de usuários, RLS/grants, função não exposta e argumentos inválidos.
+- `tests/database/tutor-concurrency.sh`: duas conexões disputam uma vaga; **exatamente uma** deve conseguir reservá-la.
+- `tests/database/postgres-integration.sh`: executa as migrações **0001 a 0010**, segurança RLS, premiação transacional de XP e testes de cota.
+- As novas funções não foram instaladas no Supabase de produção. **A publicação do código depende de aplicar as migrações 0007–0010 no ambiente de homologação e validá-las antes de qualquer implantação.**
