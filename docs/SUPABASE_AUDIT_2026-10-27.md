@@ -74,3 +74,34 @@ A workflow `.github/workflows/postgres-integration.yml` sobe um PostgreSQL 17 **
 - A correção com IA continua sendo estimativa, nunca nota oficial do ENEM.
 
 Os testes CI de lint, tipos, unidade, build e Playwright smoke devem passar no commit final do PR antes da revisão para merge.
+
+## Etapa 5 — consistência transacional de XP (28/10)
+
+### Problema corrigido no código em revisão
+
+Antes, `submitAttempt` e `correctEssay` gravavam `xp_events` e atualizavam `profiles.xp` em chamadas **distintas**, calculando o novo saldo a partir do valor lido antes. Duas solicitações simultâneas podiam sobrescrever recompensas, e falhas de rede entre as chamadas podiam deixar o histórico e o perfil divergentes.
+
+A migração `0009_atomic_xp_awards.sql` cria a função `public.award_study_xp`, com:
+
+- `SECURITY INVOKER`, `search_path` fixo e **EXECUTE reservado ao papel `service_role`**; não se concede acesso ao visitante nem ao estudante autenticado.
+- Bloqueio `SELECT ... FOR UPDATE` sobre o perfil do aluno, serializando todas as recompensas desse usuário.
+- Verificação de duplicidade por `user_id`, `kind` e `ref_id` (incluindo redações); índice único parcial para redações.
+- Cálculo de limite diário por tipo, usando corte de data em UTC, como no comportamento existente.
+- Inserção do evento, atualização de XP, nível e título numa **mesma transação**.
+- Proteção contra argumentos inválidos e quantidade excessiva de XP solicitada.
+
+A action de questões e a de redações chamam a função com o cliente **servidor-only**, nunca pelo navegador. A falha de recompensa é registrada no servidor e não apaga uma resposta ou correção já persistida.
+
+### Testes
+
+- `tests/database/xp-awards.sql` verifica prêmio inicial, deduplicação, teto diário, teto independente por categoria, nível, perfil, ledger, argumentos inválidos e privilégio de execução.
+- `tests/database/xp-concurrency.sh` inicia duas transações separadas no mesmo aluno. Uma bloqueia a linha com `FOR UPDATE`; a segunda aguarda e lê o saldo já atualizado, para detectar perda de atualizações e violação de teto.
+- `tests/database/postgres-integration.sh` aplica **0001 a 0009** em um contêiner PostgreSQL 17 descartável e executa os testes existentes de RLS e os novos de XP.
+- Os scripts têm proteção contra uso em host que não seja `localhost`/`127.0.0.1`. **Não executá-los contra banco de produção.**
+
+### Cuidados antes de publicar
+
+1. A aplicação nova **depende da migração 0009** para creditar XP. Garantir a aplicação validada de `0007`, `0008` e `0009` no banco de homologação antes de testar/implantar o novo código.
+2. Fazer backup do banco de produção, verificar não existirem duplicatas históricas de XP de redação e ensaiar rollback. O índice único `uq_xp_essay_once` falhará com segurança se houver duplicatas antigas.
+3. Não disponibilizar a função a `anon`/`authenticated`; manter a chave `service_role` estritamente no servidor.
+4. Continuam pendentes uma homologação integrada com Supabase Auth real, validação completa do navegador autenticado e aprovação explícita antes de modificar produção.
