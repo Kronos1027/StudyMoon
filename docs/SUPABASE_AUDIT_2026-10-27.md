@@ -47,3 +47,30 @@ Esta auditoria foi realizada **somente com leituras** no projeto Supabase `study
 6. Só considerar produção com backup testado, janela de rollback e autorização específica. **Nenhuma dessas migrações foi aplicada via esta auditoria.**
 
 **Limites dos testes atuais**: O CI público executa lint, TypeScript, unitários, compilação, Playwright smoke e gitleaks. Não possui credenciais para testes autenticados de Supabase; passar no CI **não** demonstra que `0007`/`0008` funcionam no banco. O script `db:test-rls` deve ser rodado em ambiente isolado antes da liberação.
+
+
+## Etapa 3 — integração isolada automatizada (PostgreSQL 17)
+
+A workflow `.github/workflows/postgres-integration.yml` sobe um PostgreSQL 17 **descartável** em GitHub Actions. O script `tests/database/postgres-integration.sh` recria os papéis essenciais (`anon`, `authenticated`, `service_role`), a função `auth.uid()` e a tabela mínima `auth.users` para testes. Executa as oito migrações SQL da aplicação, depois confirma com assertions PostgreSQL reais:
+
+- Cadastro de dois estudantes acionando ambos os triggers (perfis e streaks).
+- Leitura isolada de perfil, tentativas e redações sob o papel de cada estudante.
+- Separação entre questão publicada e rascunho não publicado.
+- Consulta autenticada a `questions.subtopic` e `questions.demo_params`, sem conceder gabarito, explicação nem `numeric_expr`.
+- Bloqueio de escrita direta de XP/tentativas e chamada de funções de trigger privilegiadas.
+- Visitante anônimo sem acesso a registros pessoais.
+- Edição legítima do perfil do próprio estudante permanece funcional.
+
+**Resultado inicial confirmado:** https://github.com/Kronos1027/StudyMoon/actions/runs/40605874962 — PostgreSQL migration + RLS integration: `success`.
+
+**Limite metodológico:** o teste usa emulação mínima de Auth e não substitui o serviço Supabase hospedado, os claims reais JWT nem os testes completos do navegador autenticado. Nenhuma tabela de produção foi criada ou alterada. 
+
+## Etapa 4 — integridade de redações
+
+- Criação de redação deixou de acontecer durante a renderização de `GET /redacao/nova`: somente a ação explícita no seletor de modo cria um novo registro.
+- Nova rota protegida `/redacao/[id]/editar` carrega o texto persistido e exige ser o proprietário de um rascunho.
+- O histórico e o detalhe da redação permitem continuar a escrita.
+- Salvamentos de uma mesma edição são serializados e usam debounce de 1,5 s, evitando que pedidos antigos sobrescrevam texto novo.
+- A correção com IA continua sendo estimativa, nunca nota oficial do ENEM.
+
+Os testes CI de lint, tipos, unidade, build e Playwright smoke devem passar no commit final do PR antes da revisão para merge.
