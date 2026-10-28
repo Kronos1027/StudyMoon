@@ -39,7 +39,7 @@ grant select, insert, update, delete on all tables in schema public
 SQL
 for file in 0004_grants.sql 0005_indexes.sql 0006_question_subtopic.sql \
             0007_security_and_indexes.sql 0008_optimize_rls.sql \
-            0009_atomic_xp_awards.sql; do
+            0009_atomic_xp_awards.sql 0010_tutor_daily_quota.sql; do
   echo "==> $file"
   psql_test -f "supabase/migrations/$file" >/dev/null
 done
@@ -185,4 +185,8 @@ echo "==> Verifying atomic, idempotent XP awards on the test database"
 psql_test -f "tests/database/xp-awards.sql"
 echo "==> Racing two concurrent XP awards on a single student"
 bash tests/database/xp-concurrency.sh
-echo "PostgreSQL migration, RLS, and atomic XP concurrency tests passed."
+echo "==> Checking tutor daily quota, security and retry refunds"
+psql_test -f "tests/database/tutor-quota.sql"
+echo "==> Racing competing tutor requests"
+bash tests/database/tutor-concurrency.sh
+echo "PostgreSQL migration, RLS, XP concurrency and tutor quota tests passed."
