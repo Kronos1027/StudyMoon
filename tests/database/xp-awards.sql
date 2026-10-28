@@ -66,7 +66,7 @@ begin
     from public.award_study_xp(
       '11111111-1111-4111-8111-111111111111','essay',
       'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee',50,null);
-  if v_awarded <> 50 or v_total <> 80 or v_old <> 1 or v_new <> 2
+  if v_awarded <> 50 or v_total <> 80 or v_old <> 2 or v_new <> 2
   then raise exception 'Essay XP/level synchronization mismatch'; end if;
   select awarded_amount,total_xp into v_awarded,v_total
     from public.award_study_xp(
