@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { createEssay } from "@/lib/essay/actions";
@@ -16,23 +16,27 @@ export function EssayModePicker({ themeId, title, kind }: Props) {
   const router = useRouter();
   const [starting, setStarting] = useState<"training" | "exam" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const creatingRef = useRef(false);
 
   async function start(mode: "training" | "exam") {
-    if (starting) return;
+    // A synchronous ref lock also guards rapid double clicks before render.
+    if (creatingRef.current) return;
+    creatingRef.current = true;
     setError(null);
     setStarting(mode);
     try {
       const created = await createEssay({ themeId, mode });
-      if (!created.ok) {
-        setError(created.error);
+      if (created.ok) {
+        // Keep both buttons disabled until navigation unmounts this picker.
+        router.push(`/redacao/${created.essayId}/editar`);
         return;
       }
-      router.push(`/redacao/${created.essayId}/editar`);
+      setError(created.error);
     } catch {
       setError("Não foi possível iniciar a redação. Confira sua conexão.");
-    } finally {
-      setStarting(null);
     }
+    creatingRef.current = false;
+    setStarting(null);
   }
 
   return (
