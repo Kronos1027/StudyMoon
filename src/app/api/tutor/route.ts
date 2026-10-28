@@ -21,8 +21,8 @@ const bodySchema = z.object({
 
 /**
  * Socratic tutor endpoint (doc section 9). The student's text is passed as
- * DATA, never as instructions (prompt-injection protection). Rate limited to
- * TUTOR_DAILY_LIMIT per user per day; identical questions hit the cache.
+ * DATA, never as instructions (prompt-injection protection). Rate limited with an atomic PostgreSQL reservation to
+ * TUTOR_DAILY_LIMIT per user per UTC day; identical questions hit the cache.
  */
 export async function POST(request: NextRequest) {
   const supabase = await getSupabaseServerClient();
@@ -40,26 +40,9 @@ export async function POST(request: NextRequest) {
   }
   const { questionId, studentQuestion, hintLevel } = parsed.data;
 
-  // Rate limit: count today's tutor calls for this user (ai_cache rows).
   const admin = getSupabaseAdmin();
   if (!admin) {
     return NextResponse.json({ error: "ai_not_configured" }, { status: 503 });
-  }
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
-  const { count: tutorCalls } = await admin
-    .from("ai_cache")
-    .select("id", { count: "exact", head: true })
-    .eq("model", `tutor:${user.id}`)
-    .gte("created_at", todayStart.toISOString());
-  if ((tutorCalls ?? 0) >= TUTOR_DAILY_LIMIT) {
-    return NextResponse.json(
-      {
-        error: "rate_limited",
-        message: `Você já usou o tutor ${TUTOR_DAILY_LIMIT} vezes hoje. Volte amanhã — ou reveja as dicas da questão!`,
-      },
-      { status: 429 },
-    );
   }
 
   // Fetch the question (server-only full row via admin).
@@ -78,6 +61,36 @@ export async function POST(request: NextRequest) {
     .select("name")
     .eq("id", question.topic_id)
     .single();
+
+  // The SQL RPC atomically reserves a slot *before* invoking any provider.
+  // Use a consistent UTC calendar day across all server instances.
+  const usageDate = new Date().toISOString().slice(0, 10);
+  const quotaArgs = { p_user_id: user.id, p_usage_date: usageDate };
+  const { data: allowed, error: quotaError } = await admin.rpc(
+    "claim_tutor_daily_turn",
+    { ...quotaArgs, p_daily_limit: TUTOR_DAILY_LIMIT },
+  );
+  if (quotaError) {
+    console.error("[tutor] quota reservation failed:", quotaError.message);
+    return NextResponse.json(
+      { error: "quota_unavailable", message: "O tutor está indisponível no momento. Tente novamente." },
+      { status: 503 },
+    );
+  }
+  if (allowed !== true) {
+    return NextResponse.json(
+      {
+        error: "rate_limited",
+        message: `Você já usou o tutor ${TUTOR_DAILY_LIMIT} vezes hoje (UTC). Volte amanhã — ou reveja as dicas da questão!`,
+      },
+      { status: 429 },
+    );
+  }
+
+  async function releaseSlot() {
+    const { error } = await admin.rpc("release_tutor_daily_turn", quotaArgs);
+    if (error) console.error("[tutor] quota release failed:", error.message);
+  }
 
   const messages = tutorPrompt({
     topicName: topic?.name ?? "Tópico",
@@ -102,6 +115,7 @@ export async function POST(request: NextRequest) {
     });
     text = response.text;
   } catch (err) {
+    await releaseSlot();
     console.error("[tutor] router failed:", (err as Error).message);
     return NextResponse.json(
       { error: "ai_unavailable", message: "O tutor está ocupado agora. Tente de novo em instantes." },
@@ -113,6 +127,7 @@ export async function POST(request: NextRequest) {
   try {
     parsedReply = tutorSchema.parse(extractJson(text));
   } catch {
+    await releaseSlot();
     console.error("[tutor] invalid model output");
     return NextResponse.json(
       { error: "ai_invalid", message: "O tutor se atrapalhou — pode perguntar de outro jeito?" },
@@ -120,7 +135,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Log usage for the rate limit.
+  // Keep best-effort usage history; the actual quota lives in tutor_daily_usage.
   await admin.from("ai_cache").insert({
     prompt_hash: `t:${user.id}:${Date.now()}:${cacheKey.slice(0, 40)}`,
     response: { ...parsedReply, questionId },
