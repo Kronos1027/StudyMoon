@@ -49,10 +49,9 @@ describe("AI essay correction contract", () => {
   });
 
   it("accepts a zero score without division-by-zero assumptions", () => {
-    const value = validCorrection();
+    const value = { ...validCorrection(), zero_reason: "em_branco" as const };
     for (const competency of value.competencies) competency.score = 0;
     value.total_score = 0;
-    value.zero_reason = "em_branco";
     expect(essayCorrectionSchema.safeParse(value).success).toBe(true);
   });
 });
