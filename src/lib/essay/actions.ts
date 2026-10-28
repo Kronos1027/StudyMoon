@@ -9,7 +9,7 @@ import { essayCorrectionPrompt } from "@/lib/ai/prompts";
 import { essayCorrectionSchema } from "@/lib/ai/schemas";
 import { extractJson } from "@/lib/ai/providers/types";
 import { createHash } from "node:crypto";
-import { FIXED_XP, levelFromXp, rankTitleFromLevel } from "@/lib/gamification/xp";
+import { FIXED_XP } from "@/lib/gamification/xp";
 
 const submitSchema = z.object({
   essayId: z.string().uuid(),
@@ -148,41 +148,18 @@ export async function correctEssay(
       throw new Error(`Falha ao concluir o status da redação: ${statusError?.message ?? "status alterado"}`);
     }
 
-    const { count: alreadyPaid } = await admin
-      .from("xp_events")
-      .select("amount", { count: "exact", head: true })
-      .eq("user_id", user.id)
-      .eq("kind", "essay")
-      .eq("ref_id", essay.id);
-    if ((alreadyPaid ?? 0) === 0) {
-      const { error: xpError } = await admin.from("xp_events").insert({
-        user_id: user.id,
-        amount: FIXED_XP.essaySubmitted,
-        kind: "essay",
-        ref_id: essay.id,
-      });
-      if (!xpError) {
-        const { data: profile } = await admin
-          .from("profiles")
-          .select("xp")
-          .eq("id", user.id)
-          .single();
-        if (profile) {
-          const totalXp = profile.xp + FIXED_XP.essaySubmitted;
-          const level = levelFromXp(totalXp);
-          const { error: profileError } = await admin
-            .from("profiles")
-            .update({
-              xp: totalXp,
-              level,
-              rank_title: rankTitleFromLevel(level),
-            })
-            .eq("id", user.id);
-          if (profileError) {
-            console.error("[essay] failed to update profile XP:", profileError.message);
-          }
-        }
-      }
+    // Single transactional award, including idempotency and profile level.
+    // A retry after a correction must never double-award essay XP.
+    const { error: xpError } = await admin.rpc("award_study_xp", {
+      p_user_id: user.id,
+      p_kind: "essay",
+      p_ref_id: essay.id,
+      p_requested: FIXED_XP.essaySubmitted,
+      p_daily_cap: null,
+    });
+    if (xpError) {
+      // Do not undo a successfully persisted correction due to a reward issue.
+      console.error("[essay] atomic XP award failed:", xpError.message);
     }
 
     revalidatePath("/redacao");
