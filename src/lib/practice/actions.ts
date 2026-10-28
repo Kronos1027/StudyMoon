@@ -164,6 +164,18 @@ export async function getNextQuestion(
 
   if (!full) return { question: null, reason: null };
 
+  // Register when the server actually serves a question. This ticket is
+  // consumed only once by record_practice_attempt with DB-measured timing.
+  const admin = getSupabaseAdmin();
+  if (!admin) throw new Error("Serviço de questões indisponível.");
+  const { data: issued, error: issueError } = await admin.rpc(
+    "issue_practice_question",
+    { p_user_id: user.id, p_question_id: full.id },
+  );
+  if (issueError || issued !== true) {
+    throw new Error("Não foi possível preparar sua questão. Tente novamente.");
+  }
+
   // Demo comes from the question's OWN SUBTOPIC (catalog in code), never
   // from the topic/area: question without a demo-bound subtopic → no demo.
   const { topics: topicEmbed, ...questionFields } = full;
@@ -191,6 +203,8 @@ export async function getNextQuestion(
 const submitSchema = z.object({
   questionId: z.string().uuid(),
   selected: z.enum(["A", "B", "C", "D", "E"]),
+  // Legacy client value retained for compatibility; never trusted for XP,
+  // FSRS grading or persisted attempt time after migration 0011.
   timeMs: z.number().int().min(0).max(3600_000),
   mode: z.enum(["practice", "review", "lesson_test"]).default("practice"),
 });
@@ -226,7 +240,7 @@ export async function submitAttempt(input: z.infer<typeof submitSchema>): Promis
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Sessão expirada." };
 
-  const { questionId, selected, timeMs, mode } = parsed.data;
+  const { questionId, selected, mode } = parsed.data;
 
   // 1. Fetch FULL question (server-only columns) with the admin client.
   const { data: question } = await admin
@@ -252,20 +266,27 @@ export async function submitAttempt(input: z.infer<typeof submitSchema>): Promis
     }
   }
 
-  const correct = selected === question.answer_key;
-
-  // 2. Insert attempt.
-  const { error: attemptError } = await admin.from("attempts").insert({
-    user_id: user.id,
-    question_id: questionId,
-    selected,
-    correct,
-    time_ms: timeMs,
-    mode: mode === "review" ? "review" : mode === "lesson_test" ? "lesson_test" : "practice",
-  });
-  if (attemptError) {
-    console.error("[submitAttempt] attempt insert:", attemptError.message);
-    return { ok: false, error: "Falha ao registrar. Tente novamente." };
+  // 2. The database validates the server-issued ticket, review eligibility
+  // and the answer, then inserts the attempt atomically. A duplicate submit
+  // cannot create a second attempt or alter the original answer.
+  const { data: attemptRows, error: attemptError } = await admin.rpc(
+    "record_practice_attempt",
+    {
+      p_user_id: user.id,
+      p_question_id: questionId,
+      p_selected: selected,
+      p_mode: mode,
+    },
+  );
+  const recorded = Array.isArray(attemptRows) ? attemptRows[0] : null;
+  const timeMs = Number(recorded?.recorded_time_ms);
+  const correct = recorded?.recorded_correct === true;
+  if (attemptError || !recorded || !Number.isFinite(timeMs)) {
+    console.error("[submitAttempt] secure attempt rejected:", attemptError?.message);
+    return {
+      ok: false,
+      error: "Esta questão já foi respondida ou expirou. Carregue uma nova questão.",
+    };
   }
 
   // 3. Elo mastery update.
