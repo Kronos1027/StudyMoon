@@ -75,6 +75,35 @@ begin
   end;
   if not v_denied then raise exception 'Duplicate submission was accepted'; end if;
 
+  -- A ticket cannot be reused by another student, even if that student
+  -- knows the public question UUID and the real answer.
+  v_denied := false;
+  begin
+    perform public.record_practice_attempt(
+      '22222222-2222-4222-8222-222222222222',
+      'cccccccc-cccc-4ccc-8ccc-cccccccccccc','B','practice');
+  exception when no_data_found then v_denied := true;
+  end;
+  if not v_denied then raise exception 'Cross-user ticket forged'; end if;
+
+  -- Reissuing creates a fresh ticket, but stale tickets older than four
+  -- hours must never allow a delayed or replayed answer.
+  perform public.issue_practice_question(
+    '11111111-1111-4111-8111-111111111111',
+    'cccccccc-cccc-4ccc-8ccc-cccccccccccc');
+  update public.practice_question_serves
+     set served_at = clock_timestamp() - interval '5 hours'
+   where user_id = '11111111-1111-4111-8111-111111111111'
+     and question_id = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+  v_denied := false;
+  begin
+    perform public.record_practice_attempt(
+      '11111111-1111-4111-8111-111111111111',
+      'cccccccc-cccc-4ccc-8ccc-cccccccccccc','B','practice');
+  exception when no_data_found then v_denied := true;
+  end;
+  if not v_denied then raise exception 'Expired question ticket accepted'; end if;
+
   -- The review flag is never sufficient: a future card is ineligible,
   -- even if the request possesses a valid server-issued ticket.
   insert into public.srs_cards
