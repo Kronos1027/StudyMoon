@@ -40,7 +40,7 @@ SQL
 for file in 0004_grants.sql 0005_indexes.sql 0006_question_subtopic.sql \
             0007_security_and_indexes.sql 0008_optimize_rls.sql \
             0009_atomic_xp_awards.sql 0010_tutor_daily_quota.sql \
-            0011_practice_ticket_integrity.sql; do
+            0011_practice_ticket_integrity.sql 0012_fix_srs_update_trigger.sql; do
   echo "==> $file"
   psql_test -f "supabase/migrations/$file" >/dev/null
 done
@@ -190,6 +190,8 @@ echo "==> Checking tutor daily quota, security and retry refunds"
 psql_test -f "tests/database/tutor-quota.sql"
 echo "==> Racing competing tutor requests"
 bash tests/database/tutor-concurrency.sh
+echo "==> Regression: existing FSRS cards must be reschedulable"
+psql_test -f "tests/database/srs-rescheduling.sql"
 echo "==> Verifying server-timed and single-use practice submissions"
 psql_test -f "tests/database/practice-ticket.sql"
 echo "PostgreSQL migration, RLS, practice, XP and tutor quota tests passed."
