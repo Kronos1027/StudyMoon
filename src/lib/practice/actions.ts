@@ -10,6 +10,7 @@ import type { SrsCard } from "@/lib/db/types";
 import {
   questionXp,
   FIXED_XP,
+  DAILY_XP_CAPS,
 } from "@/lib/gamification/xp";
 import { countsAsStudyDay, updateStreak, type StreakState } from "@/lib/gamification/streak";
 import { demoForQuestionRow } from "@/lib/demos/topic-binding";
@@ -357,7 +358,7 @@ export async function submitAttempt(input: z.infer<typeof submitSchema>): Promis
         p_kind: mode === "review" ? "review" : "question",
         p_ref_id: questionId,
         p_requested: amount,
-        p_daily_cap: mode === "review" ? 60 : 300,
+        p_daily_cap: mode === "review" ? DAILY_XP_CAPS.review : DAILY_XP_CAPS.question,
       },
     );
     if (awardError) {
