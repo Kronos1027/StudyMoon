@@ -83,6 +83,7 @@ export function QuestionCard({
   const [reportReason, setReportReason] = useState<string>("wrong_answer");
   const [reportDone, setReportDone] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [needsNewQuestion, setNeedsNewQuestion] = useState(false);
   const startRef = useRef(Date.now());
   const reduced = useReducedMotion();
 
@@ -105,6 +106,7 @@ export function QuestionCard({
     if (!selected || phase !== "answering") return;
     setPhase("submitting");
     setActionError(null);
+    setNeedsNewQuestion(false);
     const timeMs = Date.now() - startRef.current;
     let response: AttemptResult;
     try {
@@ -121,6 +123,7 @@ export function QuestionCard({
     }
     if (!response.ok) {
       setActionError(response.error ?? "Erro inesperado.");
+      setNeedsNewQuestion(response.errorCode === "ticket_unavailable");
       setPhase("answering");
       return;
     }
@@ -396,10 +399,17 @@ export function QuestionCard({
         </AnimatePresence>
 
         {actionError ? (
-          <p className="mt-4 flex items-center gap-2 text-sm text-destructive" role="alert">
-            <AlertTriangle className="h-4 w-4" aria-hidden="true" />
-            {actionError}
-          </p>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3" role="alert">
+            <p className="flex items-center gap-2 text-sm text-destructive">
+              <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden="true" />
+              {actionError}
+            </p>
+            {needsNewQuestion ? (
+              <Button type="button" size="sm" variant="outline" onClick={onNext}>
+                Carregar outra questão
+              </Button>
+            ) : null}
+          </div>
         ) : null}
 
         {/* Actions */}
