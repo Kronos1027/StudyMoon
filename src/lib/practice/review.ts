@@ -20,3 +20,10 @@ export function firstAvailableDueQuestion(
   const available = new Set(candidateIds);
   return orderedDueIds.find((id) => available.has(id)) ?? null;
 }
+
+/** A review reward is valid only for an existing, currently due FSRS card. */
+export function isReviewDue(due: string | null | undefined, now: Date): boolean {
+  if (!due) return false;
+  const dueTime = Date.parse(due);
+  return Number.isFinite(dueTime) && dueTime <= now.getTime();
+}
