@@ -10,6 +10,11 @@ on:
 permissions:
   contents: read
 
+# Test the latest PR commit, not every intermediate push in a long review.
+concurrency:
+  group: postgres-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   postgres-integration:
     name: Apply migrations and verify multi-user RLS
