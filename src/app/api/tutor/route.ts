@@ -88,6 +88,8 @@ export async function POST(request: NextRequest) {
   }
 
   async function releaseSlot() {
+    // Preserve the admin-null narrowing across the nested async function.
+    if (!admin) return;
     const { error } = await admin.rpc("release_tutor_daily_turn", quotaArgs);
     if (error) console.error("[tutor] quota release failed:", error.message);
   }
