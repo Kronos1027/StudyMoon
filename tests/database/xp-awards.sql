@@ -83,12 +83,25 @@ begin
   if v_awarded <> 5 or v_total <> 85
   then raise exception 'Review XP/independent cap mismatch'; end if;
 
+  -- A second distinct essay crosses the next level boundary: both the
+  -- numeric level and the rank title must update atomically.
+  select awarded_amount,total_xp,old_level,new_level
+    into v_awarded,v_total,v_old,v_new
+    from public.award_study_xp(
+      '11111111-1111-4111-8111-111111111111','essay',
+      'eeeeeeee-eeee-4eee-8eee-111111111111',50,null);
+  if v_awarded <> 50 or v_total <> 135 or v_old <> 2 or v_new <> 3
+  then raise exception 'Level boundary not updated by atomic award'; end if;
+
   select p.xp into v_profile_xp from public.profiles p
    where p.id='11111111-1111-4111-8111-111111111111';
   select count(*) into v_event_count from public.xp_events e
    where e.user_id='11111111-1111-4111-8111-111111111111';
-  if v_profile_xp <> 85 or v_event_count <> 4
-  then raise exception 'Profile XP and event ledger diverged'; end if;
+  if v_profile_xp <> 135 or v_event_count <> 5
+    or (select p.rank_title from public.profiles p
+         where p.id='11111111-1111-4111-8111-111111111111')
+       <> 'Observador do Céu'
+  then raise exception 'Profile XP, level, rank and event ledger diverged'; end if;
 
   -- Invalid unbounded question awards fail closed, with no writes.
   begin
