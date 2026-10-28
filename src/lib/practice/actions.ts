@@ -8,10 +8,7 @@ import { updateMastery, updateDifficulty } from "@/lib/elo";
 import { gradeFromAttempt, newCard, schedule } from "@/lib/srs";
 import type { SrsCard } from "@/lib/db/types";
 import {
-  applyDailyCap,
-  levelFromXp,
   questionXp,
-  rankTitleFromLevel,
   FIXED_XP,
 } from "@/lib/gamification/xp";
 import { countsAsStudyDay, updateStreak, type StreakState } from "@/lib/gamification/streak";
@@ -337,14 +334,12 @@ export async function submitAttempt(input: z.infer<typeof submitSchema>): Promis
     { onConflict: "user_id,question_id" },
   );
 
-  // 5. XP (anti-fraud: min time, no-repeat via unique index, daily cap).
+  // 5–6. Atomically award XP and update level/title in PostgreSQL.
+  // The server-only RPC locks the student's profile, checks one-shot
+  // deduplication, applies the daily cap and commits both tables together.
+  // Never silently rewrite profile XP with a stale value from another request.
   let xpEarned = 0;
-  const { data: profileRow } = await admin
-    .from("profiles")
-    .select("xp, level, rank_title")
-    .eq("id", user.id)
-    .single();
-
+  let newLevel: number | undefined;
   const amount = mode === "review"
     ? FIXED_XP.reviewCard
     : questionXp({
@@ -355,49 +350,25 @@ export async function submitAttempt(input: z.infer<typeof submitSchema>): Promis
       });
 
   if (amount > 0) {
-    const { count: todayXpCount } = await admin
-      .from("xp_events")
-      .select("amount", { count: "exact", head: true })
-      .eq("user_id", user.id)
-      .eq("kind", mode === "review" ? "review" : "question")
-      .gte("created_at", todayKey());
-    // Sum today's amounts of this kind (count alone is not enough).
-    const { data: todayXpRows } = await admin
-      .from("xp_events")
-      .select("amount")
-      .eq("user_id", user.id)
-      .eq("kind", mode === "review" ? "review" : "question")
-      .gte("created_at", todayKey());
-    const alreadyToday = (todayXpRows ?? []).reduce((s, r) => s + r.amount, 0);
-    void todayXpCount;
-
-    const capped = applyDailyCap(
-      mode === "review" ? "review" : "question",
-      amount,
-      alreadyToday,
+    const { data: awarded, error: awardError } = await admin.rpc(
+      "award_study_xp",
+      {
+        p_user_id: user.id,
+        p_kind: mode === "review" ? "review" : "question",
+        p_ref_id: questionId,
+        p_requested: amount,
+        p_daily_cap: mode === "review" ? 60 : 300,
+      },
     );
-    if (capped > 0) {
-      const { error: xpError } = await admin.from("xp_events").insert({
-        user_id: user.id,
-        amount: capped,
-        kind: mode === "review" ? "review" : "question",
-        ref_id: questionId,
-      });
-      // Unique violation -> no XP for repeating the same question: expected.
-      if (!xpError) xpEarned = capped;
+    if (awardError) {
+      console.error("[submitAttempt] atomic XP award failed:", awardError.message);
+    } else {
+      const result = Array.isArray(awarded) ? awarded[0] : null;
+      xpEarned = Number(result?.awarded_amount ?? 0);
+      if (xpEarned > 0 && result && result.new_level > result.old_level) {
+        newLevel = result.new_level;
+      }
     }
-  }
-
-  // 6. Level up (admin write on protected columns).
-  let newLevel: number | undefined;
-  if (xpEarned > 0 && profileRow) {
-    const totalXp = profileRow.xp + xpEarned;
-    const level = levelFromXp(totalXp);
-    await admin
-      .from("profiles")
-      .update({ xp: totalXp, level, rank_title: rankTitleFromLevel(level) })
-      .eq("id", user.id);
-    if (level > profileRow.level) newLevel = level;
   }
 
   // 7. Streak (minimum day: 10 min OR 5 questions — use today's questions).
