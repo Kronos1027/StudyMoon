@@ -111,10 +111,10 @@ begin
  if has_function_privilege(current_user,'public.handle_new_user()','execute') or
     has_function_privilege(current_user,'public.handle_new_profile()','execute')
  then raise exception 'Students may call privileged trigger functions'; end if;
-end $;
+end $$;
 -- RLS is not only read filtering: a user cannot edit or insert using the
 -- identifier of a different student even when the column itself is writable.
-do $
+do $$
 declare
   changed integer;
   denied boolean := false;
@@ -136,7 +136,7 @@ begin
     denied := true;
   end;
   if not denied then raise exception 'Cross-account essay INSERT succeeded'; end if;
-end $;
+end $$;
 -- Editable profile columns must remain writable by their owner.
 update public.profiles set apelido='Aluno A Editado'
 where id='11111111-1111-4111-8111-111111111111';
