@@ -130,3 +130,37 @@ A implementação anterior do endpoint `/api/tutor` contava as linhas em `ai_cac
 - `tests/database/tutor-concurrency.sh`: duas conexões disputam uma vaga; **exatamente uma** deve conseguir reservá-la.
 - `tests/database/postgres-integration.sh`: executa as migrações **0001 a 0010**, segurança RLS, premiação transacional de XP e testes de cota.
 - As novas funções não foram instaladas no Supabase de produção. **A publicação do código depende de aplicar as migrações 0007–0010 no ambiente de homologação e validá-las antes de qualquer implantação.**
+
+## Etapa 7 — respostas com tempo medido no servidor e correção de FSRS (28/10)
+
+### Problema 1: `timeMs` vinha do navegador
+
+O servidor recebia `timeMs` como argumento da ação de resposta e usava esse valor para avaliação de FSRS e concessão de XP. Portanto, um cliente modificado poderia enviar um tempo artificialmente alto e contornar as regras de engajamento.
+
+**Mitigação em `0011_practice_ticket_integrity.sql`**:
+
+- Cria `practice_question_serves` com RLS ativo e acesso exclusivo de `service_role`.
+- `getNextQuestion` só entrega uma questão depois de criar um ticket de exibição usando `issue_practice_question` no servidor.
+- `submitAttempt` passa a chamar `record_practice_attempt`; dentro de uma **única transação do banco** são verificados o ticket do estudante, a publicação da questão, a elegibilidade de revisão e a resposta correta. A tentativa é inserida com o **tempo medido pelo relógio do PostgreSQL**, e o ticket é consumido uma única vez.
+- Tickets com mais de quatro horas não são aceitos. O antigo campo `timeMs` permanece temporariamente no contrato da action por compatibilidade de UI, mas não influencia mais o XP nem os cartões FSRS.
+- Novo fluxo de recuperação na interface quando o ticket foi consumido ou expirou: botão `Carregar outra questão`.
+- **Limite de segurança:** a emissão de um novo ticket ainda é possível via ação autenticada de exibição; sistemas antifraude mais fortes exigiriam sessões de prova protegidas, rate limit adicional e desafios de autoria. A gravação de tentativas é atômica, mas os efeitos posteriores em domínio/Elo, cartões FSRS e metas diárias **ainda não estão na mesma transação**.
+
+### Problema 2: gatilho defeituoso em `srs_cards` (verificado no Supabase real)
+
+- A migração `0002_functions_triggers.sql` instalava `trg_srs_cards_updated_at` em `srs_cards`, mas o schema da tabela possui `last_update` e **não** `updated_at`.
+- Confirmado por consulta **somente de leitura** ao projeto real: a trigger existe e a coluna referida não existe. Um UPDATE da tabela pode falhar com `record new has no field updated_at`, impedindo reprogramações FSRS.
+- A migração `0012_fix_srs_update_trigger.sql` remove **somente** esse gatilho inválido, mantendo os demais gatilhos válidos. A própria rotina FSRS atualiza `last_update` explicitamente.
+- `tests/database/srs-rescheduling.sql` faz um UPDATE real na data, número de revisões e `last_update`, depois verifica a persistência. Assim, o problema passa a ser capturado automaticamente no CI.
+- `tests/database/practice-ticket.sql` testa submissão sem ticket, resposta duplicada, validação por data de revisão e tempo real do banco.
+- `tests/database/practice-concurrency.sh` submete a mesma resposta em conexões paralelas: exatamente uma gravação deve ser aceita.
+
+### Ordem obrigatória de homologação e publicação
+
+1. Usar banco Supabase de homologação separado (sem custo adicional não autorizado). Fazer backup antes de qualquer operação no projeto real.
+2. Aplicar, na ordem, **0007, 0008, 0009, 0010, 0011 e 0012** usando o migrador próprio do StudyMoon. Não pular a migração de correção do gatilho FSRS.
+3. Confirmar segurança RLS e privilégios da service role, cadastro de usuários, questões, revisão, pontuação, tutor e redações com autenticação real.
+4. **A versão nova do código depende das migrações até 0012**. Não mesclar/deployar ações novas antes de instalar o esquema correspondente.
+5. Só considerar produção após aprovação explícita, janela de rollback e backup testado.
+
+**Todas as alterações acima estão apenas no Pull Request de revisão; nenhuma migração 0007–0012 foi executada no Supabase de produção.**
