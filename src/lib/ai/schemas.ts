@@ -45,6 +45,10 @@ export const essayCorrectionSchema = z
       data.total_score ===
       data.competencies.reduce((sum, c) => sum + c.score, 0),
     { message: "total_score deve ser a soma das competências" },
+  )
+  .refine(
+    (data) => new Set(data.competencies.map((c) => c.key)).size === 5,
+    { message: "a correção deve conter C1, C2, C3, C4 e C5 sem repetição" },
   );
 export type EssayCorrectionOutput = z.infer<typeof essayCorrectionSchema>;
 
