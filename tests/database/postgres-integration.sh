@@ -194,4 +194,6 @@ echo "==> Regression: existing FSRS cards must be reschedulable"
 psql_test -f "tests/database/srs-rescheduling.sql"
 echo "==> Verifying server-timed and single-use practice submissions"
 psql_test -f "tests/database/practice-ticket.sql"
-echo "PostgreSQL migration, RLS, practice, XP and tutor quota tests passed."
+echo "==> Race simultaneous duplicate attempts"
+bash tests/database/practice-concurrency.sh
+echo "PostgreSQL migration, RLS, practice concurrency, XP and tutor quota tests passed."
