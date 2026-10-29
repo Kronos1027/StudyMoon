@@ -9,6 +9,9 @@
 -- 10-minute threshold was never possible with fewer than 5 answers.
 -- Thus five eligible attempts is the exact effective threshold in that flow.
 --
+alter table public.streaks
+  add column if not exists last_freeze_used_on date;
+
 -- The existing streak row is locked BEFORE counting today's attempts, so a
 -- concurrent insert cannot observe a stale counter after acquiring the lock.
 -- Both the attempt and streak change commit or roll back together.
@@ -29,6 +32,7 @@ declare
   v_freeze_week date;
   v_gap integer;
   v_next integer;
+  v_used_freeze boolean := false;
 begin
   if new.mode not in ('practice','review','lesson_test') then
     return new;
@@ -76,6 +80,7 @@ begin
   elsif v_gap = 2 and v_freezes > 0 then
     v_next := v_current + 1;
     v_freezes := v_freezes - 1;
+    v_used_freeze := true;
   else
     v_next := 1;
   end if;
@@ -86,6 +91,8 @@ begin
          last_study_date = v_day,
          freezes_available = v_freezes,
          last_freeze_week = v_week_monday,
+         last_freeze_used_on = case when v_used_freeze then v_day
+                                    else s.last_freeze_used_on end,
          updated_at = clock_timestamp()
    where s.user_id = new.user_id;
 
