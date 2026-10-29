@@ -466,43 +466,9 @@ export async function submitAttempt(input: z.infer<typeof submitSchema>): Promis
       { onConflict: "user_id" },
     );
 
-  // 8. Daily goal.
-  const { data: goalRow } = await admin
-    .from("daily_goals")
-    .select("id, target_questions, done_questions")
-    .eq("user_id", user.id)
-    .eq("date", todayKey())
-    .single();
-
-  if (goalRow) {
-    const done = goalRow.done_questions + 1;
-    await admin
-      .from("daily_goals")
-      .update({
-        done_questions: done,
-        status:
-          done >= goalRow.target_questions
-            ? "done"
-            : done > 0
-              ? "partial"
-              : "pending",
-      })
-      .eq("id", goalRow.id);
-  } else {
-    const { data: profileForGoal } = await admin
-      .from("profiles")
-      .select("daily_hours")
-      .eq("id", user.id)
-      .single();
-    await admin.from("daily_goals").insert({
-      user_id: user.id,
-      date: todayKey(),
-      target_questions: 10,
-      target_minutes: Math.round(Number(profileForGoal?.daily_hours ?? 2) * 60),
-      done_questions: 1,
-      status: "partial",
-    });
-  }
+  // 8. Daily goal progress is counted by the PostgreSQL AFTER INSERT
+  // trigger on attempts (migration 0013). It runs in the same transaction
+  // as record_practice_attempt and cannot lose concurrent increments.
 
   revalidatePath("/painel");
   revalidatePath("/estudo");
