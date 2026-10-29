@@ -207,3 +207,25 @@ A migração `0014_atomic_topic_mastery.sql` cria o gatilho `trg_attempt_mastery
 A primeira rodada de integração encontrou ausência do grant interno `service_role` para o helper; isso foi corrigido na migração e o teste PostgreSQL do commit revisado passou. O resultado anterior é preservado como regressão de configuração de papéis.
 
 **Limites:** O reagendamento FSRS, atualização de dificuldade da questão e sequência de estudos ainda não estão totalmente transacionais com o cadastro da tentativa. Eles precisam de análise própria para não introduzir inconsistências nem alterar a matemática FSRS. A migração `0014` **não foi aplicada à produção**. O novo código exige **0007–0014**, em ordem, no ambiente de homologação; backup, testes reais de Supabase Auth e aprovação para produção continuam obrigatórios.
+
+## Etapa 10 — persistência FSRS por revisão otimista (29/10)
+
+### Falha abordada
+
+Até a revisão anterior, `submitAttempt` buscava `srs_cards`, agendava um intervalo com a biblioteca TypeScript `ts-fsrs` e executava um `UPSERT` independente, **sem verificar erro da gravação**. Duas requisições com estado desatualizado podiam sobrescrever a data, a estabilidade e as repetições do cartão. Um erro de persistência podia ser ignorado e o aluno receber uma confirmação enganosa.
+
+### Migração `0015_srs_revision_guard.sql`
+
+- Acrescenta `srs_cards.revision BIGINT NOT NULL DEFAULT 0`, preservando todos os cartões já existentes.
+- Cria `commit_srs_schedule`, função `SECURITY INVOKER` com `search_path` fechado e `EXECUTE` permitido **somente** à `service_role`.
+- Novo cartão começa com versão 1. Atualização existente só funciona quando a versão lida continua igual à gravada no banco, a contagem FSRS de revisões avança exatamente um passo e `last_update` não retrocede.
+- Um conflito retorna `false`, sem sobrescrever os dados. O servidor relê o cartão e recalcula o agendamento com `ts-fsrs`, por até quatro tentativas. Assim não duplicamos o cálculo FSRS em SQL.
+- Se o agendamento não puder ser salvo, a interface avisa expressamente o estudante. A resposta da questão e o XP já registrados não são descartados.
+- `tests/database/srs-revision.sql` cobre primeira inserção, duas revisões consecutivas, gravação antiga, repetição duplicada, datas inválidas e permissões.
+- `tests/database/srs-concurrency.sh` corre duas transações contra a mesma versão: **exatamente uma** deve gravar e a outra detectar conflito. O GitHub Actions executa esses testes em um PostgreSQL descartável.
+
+### Limite importante
+
+Isso garante que um **UPSERT de FSRS não apague o estado mais recente**. Contudo, o agendamento ainda é uma chamada *posterior* à tentativa já gravada; uma falha permanente pode deixar uma resposta sem agendamento. A solução definitiva exigiria uma fila transacional de revisões pendentes e um reconciliador idempotente. A sequência diária também continua com um `SELECT/UPSERT` separado após a resposta e ainda merece tratamento concorrente.
+
+**A migração `0015` foi criada somente na branch do PR** e deve ser instalada em homologação na sequência **0007–0015**, antes do código dependente, com testes reais de autenticação, backup e aprovação explícita para produção.
