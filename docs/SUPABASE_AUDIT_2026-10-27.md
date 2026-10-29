@@ -287,3 +287,24 @@ As migrações 0011 e 0015 impediam duplicação de respostas e sobrescrita de c
 3. O processador trata lotes limitados (20 por execução do cron). Um volume grande de pendências pode levar várias execuções; acompanhar métricas da fila e configurar alertas de atraso.
 4. A fila oferece entrega **pelo menos uma vez**; a RPC garante que a aplicação **do mesmo evento** seja única. A disponibilidade final depende de o serviço voltar a processar eventos (não é uma garantia incondicional de prazo).
 5. O novo aplicativo exige que as migrações `0007–0017` sejam instaladas **em homologação isolada** e validadas com Auth real antes da implantação coordenada. Nenhuma alteração no Supabase de produção foi feita neste PR.
+
+
+## Etapa 13 — justiça da fila, tentativas progressivas e prevenção de bloqueio (29/10)
+
+A fila FSRS da etapa 12 já preservava eventos após falhas, mas o reconciliador buscava simplesmente os 20 eventos mais antigos. Se um desses eventos falhasse continuamente, ele seria selecionado novamente em todas as chamadas e poderia ocupar o lote junto com eventos posteriores do mesmo cartão, atrasando outros estudantes.
+
+### Migração 0018 — seleção justa e intervalo progressivo
+
+- `0018_srs_retry_backoff.sql` acrescenta `retry_count`, `next_retry_at` e `last_error` em `srs_replay_queue`; os registros existentes continuam preservados.
+- `get_ready_srs_replay`, acessível apenas ao `service_role`, retorna **somente o evento pendente mais antigo de cada par (estudante, questão)**, evitando que eventos posteriores pulem a fila daquele cartão. Eventos com nova tentativa agendada para o futuro não ocupam a execução atual.
+- `defer_srs_replay` incrementa o contador e aplica **espera exponencial: 15 s, 30 s, 60 s, ..., no máximo 1 hora**. O evento permanece no banco; não existe descarte automático de falhas.
+- `src/lib/srs/reconcile.ts` agora executa rodadas limitadas: quando um cartão termina, pode avançar para o próximo evento desse cartão na mesma execução. Em falha, o evento é marcado para nova tentativa, sem impedir os estudantes independentes. Também verifica se outro worker concluiu o evento antes de considerá-lo falha.
+- `tests/database/srs-retry.sql` verifica privilégios, seleção justa, precedência cronológica, isolamento por usuário, progressão e teto de backoff, truncamento seguro de diagnósticos, recuperação posterior e ausência de reprocessamento após sucesso.
+- O workflow do PostgreSQL descartável executa as **18 migrações** e inclui esses testes. É obrigatório verificar a execução final do CI do commit antes de qualquer merge.
+
+### Limites e operação
+
+- Um cartão com evento defeituoso continuará aguardando tentativas e deve aparecer em monitoramento: registrar contagem e idade do evento mais antigo, alertar quando ultrapassar o limiar operacional, investigar manualmente erros permanentes. Não apagar eventos de estudantes automaticamente.
+- O cron depende de `APP_URL` e `CRON_SECRET` configurados e da publicação do endpoint. Em produção, o job rodará a cada 15 minutos; o valor de backoff é um **mínimo**, não uma promessa de conclusão nesse prazo.
+- A lógica do PostgreSQL foi verificada em banco local descartável, não é substituto de testes com Auth real no Supabase e de planejamento de backup/rollback.
+- **Migrações 0007–0018 são apenas propostas no PR; o banco real continua em 0001–0006.**
