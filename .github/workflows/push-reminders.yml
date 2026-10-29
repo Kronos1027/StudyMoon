@@ -22,3 +22,21 @@ jobs:
             "${{ vars.APP_URL }}/api/cron/reminders" \
             --max-time 55 | tee response.json
           grep -q '"ok":true' response.json || (echo "Resposta inesperada"; exit 1)
+
+  fsrs-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Reconciliar cartões FSRS pendentes
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          test -n "$APP_URL" && test -n "$CRON_SECRET"
+          curl --fail-with-body --silent --show-error --retry 2 \
+            -X POST \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            "$APP_URL/api/cron/reconcile-srs" \
+            --max-time 55 | tee response.json
+          grep -q '"ok":true' response.json
