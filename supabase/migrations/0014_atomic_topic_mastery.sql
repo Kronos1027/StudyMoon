@@ -94,6 +94,10 @@ $function$;
 
 revoke all on function public.next_study_elo(integer, integer, boolean, integer)
   from public, anon, authenticated;
+-- SECURITY INVOKER triggers execute with the inserting role. Explicitly
+-- authorize the server-only role to use this pure scoring helper.
+grant execute on function public.next_study_elo(integer, integer, boolean, integer)
+  to service_role;
 revoke all on function public.update_mastery_from_attempt()
   from public, anon, authenticated;
 
