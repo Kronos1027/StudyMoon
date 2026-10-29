@@ -189,3 +189,21 @@ O fluxo anterior de `submitAttempt` lia `daily_goals.done_questions` e depois fa
 ### Limites restantes
 
 O progresso da meta está transacional com a **inserção da tentativa**, mas a pontuação Elo, o reagendamento FSRS e o estado das sequências diárias ainda são atualizados em outras chamadas. Essas etapas exigem uma refatoração transacional separada com validação de regras e concorrência. A migração 0013 **não foi aplicada à produção**. A nova versão do código exige as migrações **0007–0013** antes de qualquer implantação; homologação com Supabase Auth real, backup e aprovação explícita continuam obrigatórios.
+
+## Etapa 9 — domínio Elo transacional (29/10)
+
+### Falha de concorrência corrigida no PR
+
+Antes, `submitAttempt` realizava `SELECT` em `topic_mastery`, calculava Elo em JS e depois fazia um `UPSERT` do registro inteiro. Duas respostas simultâneas no mesmo tópico podiam gravar o **mesmo contador de tentativas** e sobrescrever uma atualização de Elo/confiança.
+
+A migração `0014_atomic_topic_mastery.sql` cria o gatilho `trg_attempt_mastery` em `public.attempts`. Ele executa `ON CONFLICT DO UPDATE` sobre a linha **(estudante, tópico)**, sob bloqueio do próprio PostgreSQL, na mesma transação da resposta. A fórmula reproduz os fatores K 48/32/24/16 e a atualização da confiança do módulo TypeScript original, mantendo os limites Elo entre 400 e 2600.
+
+- Apenas os modos `practice`, `review` e `lesson_test` entram no domínio automático; tentativas de simulados têm fluxo separado.
+- A função de cálculo `next_study_elo` não é executável por `anon` ou `authenticated`; somente `service_role` tem EXECUTE para permitir o gatilho `SECURITY INVOKER`.
+- A action passa a **apenas ler** o valor já persistido para exibir a porcentagem. Não executa mais atualizações concorrentes no registro de domínio.
+- `tests/database/topic-mastery.sql` verifica Elo inicial, acertos/erros, fatores K, confiança, isolamento por estudante e atualização após a segunda resposta.
+- `tests/database/mastery-concurrency.sh` responde a **duas questões diferentes do mesmo tópico simultaneamente** e exige a soma correta de duas atualizações do domínio, sem perda de contagem.
+
+A primeira rodada de integração encontrou ausência do grant interno `service_role` para o helper; isso foi corrigido na migração e o teste PostgreSQL do commit revisado passou. O resultado anterior é preservado como regressão de configuração de papéis.
+
+**Limites:** O reagendamento FSRS, atualização de dificuldade da questão e sequência de estudos ainda não estão totalmente transacionais com o cadastro da tentativa. Eles precisam de análise própria para não introduzir inconsistências nem alterar a matemática FSRS. A migração `0014` **não foi aplicada à produção**. O novo código exige **0007–0014**, em ordem, no ambiente de homologação; backup, testes reais de Supabase Auth e aprovação para produção continuam obrigatórios.
