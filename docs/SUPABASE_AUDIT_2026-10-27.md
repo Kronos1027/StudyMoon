@@ -308,3 +308,20 @@ A fila FSRS da etapa 12 já preservava eventos após falhas, mas o reconciliador
 - O cron depende de `APP_URL` e `CRON_SECRET` configurados e da publicação do endpoint. Em produção, o job rodará a cada 15 minutos; o valor de backoff é um **mínimo**, não uma promessa de conclusão nesse prazo.
 - A lógica do PostgreSQL foi verificada em banco local descartável, não é substituto de testes com Auth real no Supabase e de planejamento de backup/rollback.
 - **Migrações 0007–0018 são apenas propostas no PR; o banco real continua em 0001–0006.**
+
+
+## Etapa 14 — monitoramento da fila FSRS e segurança do agendador (29/10)
+
+A migração `0018` já separa revisões por cartão e adiciona espera progressiva. Esta etapa torna **visível o estado de saúde** da recuperação, sem revelar identidades, perguntas ou respostas dos estudantes.
+
+- `src/lib/srs/health.ts`: função pura `assessSrsBacklog`, que classifica a fila como `clear` (vazia), `normal` (recente), `delayed` (ao menos uma nova tentativa ou espera de 60 minutos) ou `stale` (revisão pendente há 360 minutos ou timestamp inválido).
+- `src/lib/srs/monitor.ts`: usa apenas a chave de servidor para consultar número total de eventos pendentes, número com `retry_count > 0` e horário do evento mais antigo. Retorna **somente agregados**. Uma falha de consulta não retorna falso sucesso.
+- `POST /api/cron/reconcile-srs`: após recuperar um lote, também devolve a saúde da fila. Registra alertas apenas com agregados quando encontra `delayed` ou `stale`; responde com HTTP 503 em caso de backlog severamente atrasado, erros de recuperação ou falha de monitoramento. Isto torna a falha visível no workflow de cron.
+- `tests/unit/srs-health.test.ts`: cobre fila vazia, fresca, primeiro retry, limiares de 60/360 minutos, timestamps inválidos, contagens inconsistentes e diferença de relógio. Logs/endpoint não retornam user_id, question_id nem conteúdo das respostas.
+- **Segurança de credencial:** `/api/cron/reminders` não aceita mais `?secret=` na URL, evitando gravar o segredo em logs e históricos. Exige `Authorization: Bearer <CRON_SECRET>`, já empregado no workflow `.github/workflows/push-reminders.yml`.
+
+### Validações ainda exigidas
+- Verificar lint, typecheck, testes unitários, build e Playwright no **último SHA** do PR; não extrapolar aprovação de commits anteriores.
+- Validar ambiente de homologação real com autenticação Supabase, configuração do cron e alertas controlados.
+- No deploy, examinar se integrações externas antigas dependiam da query `secret` antes de removê-las definitivamente.
+- Ainda **não instalar migrações 0007–0018 na produção**, que continua separada do PR em rascunho.
