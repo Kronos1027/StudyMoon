@@ -229,3 +229,30 @@ Até a revisão anterior, `submitAttempt` buscava `srs_cards`, agendava um inter
 Isso garante que um **UPSERT de FSRS não apague o estado mais recente**. Contudo, o agendamento ainda é uma chamada *posterior* à tentativa já gravada; uma falha permanente pode deixar uma resposta sem agendamento. A solução definitiva exigiria uma fila transacional de revisões pendentes e um reconciliador idempotente. A sequência diária também continua com um `SELECT/UPSERT` separado após a resposta e ainda merece tratamento concorrente.
 
 **A migração `0015` foi criada somente na branch do PR** e deve ser instalada em homologação na sequência **0007–0015**, antes do código dependente, com testes reais de autenticação, backup e aprovação explícita para produção.
+
+## Etapa 11 — sequências de estudos transacionais (29/10)
+
+### Defeito encontrado na produção (leitura do esquema)
+
+A action `submitAttempt` lia uma sequência de `streaks` e a regravava com `UPSERT` **depois** de registrar a resposta. Duas respostas simultâneas poderiam calcular a partir do mesmo estado antigo e perder atualizações. **Outro defeito confirmado:** o código tentava gravar uma string ISO week (ex.: `2026-W44`) em `streaks.last_freeze_week`, mas o PostgreSQL usa o tipo **DATE**. A correção muda as datas para a segunda-feira real da semana ISO em UTC.
+
+### Migração `0016_atomic_study_streaks.sql`
+
+- Adiciona a coluna opcional `streaks.last_freeze_used_on date`, sem apagar os dados anteriores; distingue **quando** um congelamento foi usado, oferecendo feedback preciso.
+- Função `track_streak_from_attempt` com `SECURITY INVOKER` e `search_path` fixo, sem `EXECUTE` para `anon`/`authenticated`. Gatilho `AFTER INSERT` roda na **mesma transação** que registra a tentativa, após o gatilho da meta diária.
+- Bloqueia a linha da sequência do aluno com `FOR UPDATE` **antes** de contar tentativas do dia. Com cinco tentativas elegíveis em UTC, contabiliza a data **uma vez**, mesmo quando respostas chegam simultaneamente; tentativas posteriores no mesmo dia não incrementam novamente.
+- Em dias consecutivos, soma 1 à sequência. Em intervalo de dois dias, usa um congelamento da semana atual; em intervalo maior, ou sem congelamento, reinicia a sequência em 1. A maior sequência nunca retrocede.
+- A semântica anterior da action convertia `n` respostas em `round(n × 1,2)` minutos. Nessa contagem, cinco respostas já satisfazem a regra de qualificação antes de dez minutos; por isso **o limiar efetivo é cinco respostas**, sem mudança nos resultados esperados para essa rota.
+- O app passa a **somente ler** `current`, `last_study_date` e `last_freeze_used_on`; não escreve mais valores de sequência calculados de forma concorrente.
+
+### Testes
+
+- `tests/database/streaks.sql`: primeira sequência aos cinco exercícios, idempotência no mesmo dia, continuidade, congelamento, bloqueio do segundo uso na mesma semana, renovação por nova semana e isolamento dos alunos.
+- `tests/database/streaks-concurrency.sh`: três tentativas iniciais e outras duas em **sessões PostgreSQL simultâneas**; exige exatamente cinco tentativas e incremento **único** da sequência.
+- O CI executa todas as migrações `0001–0016` no PostgreSQL isolado; testes de login com Supabase Auth hospedado ainda são necessários antes da publicação.
+
+### Ainda não resolvido
+
+- O agendamento FSRS tem proteção contra sobrescrita (migração `0015`), mas ainda é feito após a tentativa. Falhas permanentes de agendamento exigem uma fila transacional/reconciliador.
+- O registro da tentativa, a recompensa de XP e o ajuste da dificuldade empírica ainda não compartilham uma única transação completa; já há proteções parciais (revisão/XP/goal/Elo/streak).
+- **Nenhuma migração `0007–0016` foi aplicada ao banco de produção**. O código novo depende delas; fazer homologação, backup testado e implantação coordenada antes de publicar.
