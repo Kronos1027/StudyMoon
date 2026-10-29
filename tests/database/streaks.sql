@@ -103,7 +103,7 @@ begin
   -- Another student's row must remain untouched.
   if (select current from public.streaks
       where user_id='22222222-2222-4222-8222-222222222222')<>0
-  then raise exception 'A student's streak leaked to another student'; end if;
+  then raise exception 'Student streak leaked to another student'; end if;
 end;
 $assert$;
 rollback;
