@@ -40,7 +40,8 @@ SQL
 for file in 0004_grants.sql 0005_indexes.sql 0006_question_subtopic.sql \
             0007_security_and_indexes.sql 0008_optimize_rls.sql \
             0009_atomic_xp_awards.sql 0010_tutor_daily_quota.sql \
-            0011_practice_ticket_integrity.sql 0012_fix_srs_update_trigger.sql; do
+            0011_practice_ticket_integrity.sql 0012_fix_srs_update_trigger.sql \
+            0013_atomic_daily_goals.sql; do
   echo "==> $file"
   psql_test -f "supabase/migrations/$file" >/dev/null
 done
@@ -182,6 +183,8 @@ begin
 end $$;
 rollback;
 SQL
+echo "==> Verifying daily goals track committed attempts and preserve custom targets"
+psql_test -f "tests/database/daily-goals.sql"
 echo "==> Verifying atomic, idempotent XP awards on the test database"
 psql_test -f "tests/database/xp-awards.sql"
 echo "==> Racing two concurrent XP awards on a single student"
@@ -196,4 +199,6 @@ echo "==> Verifying server-timed and single-use practice submissions"
 psql_test -f "tests/database/practice-ticket.sql"
 echo "==> Race simultaneous duplicate attempts"
 bash tests/database/practice-concurrency.sh
-echo "PostgreSQL migration, RLS, practice concurrency, XP and tutor quota tests passed."
+echo "==> Racing two daily-goal increments under concurrent attempt inserts"
+bash tests/database/daily-goals-concurrency.sh
+echo "PostgreSQL migration, RLS, daily goal, practice, XP and tutor concurrency tests passed."
