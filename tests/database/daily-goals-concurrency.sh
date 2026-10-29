@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Concurrent goal progress in disposable PostgreSQL only.
 set -euo pipefail
-if [[ "\${PGHOST:-}" != "localhost" && "\${PGHOST:-}" != "127.0.0.1" ]]; then
+if [[ "${PGHOST:-}" != "localhost" && "${PGHOST:-}" != "127.0.0.1" ]]; then
   echo "Refusing daily-goal race on non-local PostgreSQL" >&2
   exit 1
 fi
-: "\${PGDATABASE:?}" "\${PGUSER:?}" "\${PGPASSWORD:?}"
+: "${PGDATABASE:?}" "${PGUSER:?}" "${PGPASSWORD:?}"
 tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"' EXIT
 
