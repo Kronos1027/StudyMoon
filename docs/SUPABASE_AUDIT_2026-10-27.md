@@ -164,3 +164,28 @@ O servidor recebia `timeMs` como argumento da ação de resposta e usava esse va
 5. Só considerar produção após aprovação explícita, janela de rollback e backup testado.
 
 **Todas as alterações acima estão apenas no Pull Request de revisão; nenhuma migração 0007–0012 foi executada no Supabase de produção.**
+
+## Etapa 8 — metas diárias transacionais (28/10)
+
+### Problema corrigido no PR
+
+O fluxo anterior de `submitAttempt` lia `daily_goals.done_questions` e depois fazia `UPDATE` com o valor incrementado, ou tentava um `INSERT` para o primeiro registro do dia. Duas respostas quase simultâneas do mesmo aluno podiam sobrescrever o contador uma da outra. Além disso, um erro na atualização da meta era ignorado mesmo depois da tentativa ser persistida.
+
+### Migração `0013_atomic_daily_goals.sql`
+
+- Instala `trg_attempt_daily_goal` em `public.attempts`, executado `AFTER INSERT` **na mesma transação da tentativa**.
+- A função `public.track_daily_goal_from_attempt()` é `SECURITY INVOKER`, com `search_path` fechado, e revoga `EXECUTE` público explícito.
+- `INSERT ... ON CONFLICT (user_id, date) DO UPDATE` incrementa `done_questions` do valor atual sob bloqueio de linha, sem perda de incrementos; preserva os alvos personalizados `target_questions` e `target_minutes`.
+- Restringe a contabilização aos modos `practice`, `review`, `lesson_test`, preservando a semântica anterior, sem contar `mock_exam` indevidamente.
+- A data continua em UTC, como o `todayKey()` do aplicativo. O tempo-meta inicial é derivado do campo `profiles.daily_hours`.
+- Remove o código redundante de leitura/alteração da meta em `src/lib/practice/actions.ts`, evitando contagem dupla.
+
+### Testes de regressão
+
+- `tests/database/daily-goals.sql`: registra respostas de dois estudantes, verifica que alterações personalizadas na meta permanecem e que status muda para `done` no alvo; descarta as mudanças ao fim da transação.
+- `tests/database/daily-goals-concurrency.sh`: cria aluno temporário **no PostgreSQL descartável**, grava duas tentativas paralelas, confere contagem exata de 2 e conclusão ao atingir 3; elimina o aluno temporário ao final.
+- `tests/database/postgres-integration.sh`: aplica as migrações até **0013** e roda esses testes junto a RLS, FSRS, tutor e concorrência de XP.
+
+### Limites restantes
+
+O progresso da meta está transacional com a **inserção da tentativa**, mas a pontuação Elo, o reagendamento FSRS e o estado das sequências diárias ainda são atualizados em outras chamadas. Essas etapas exigem uma refatoração transacional separada com validação de regras e concorrência. A migração 0013 **não foi aplicada à produção**. A nova versão do código exige as migrações **0007–0013** antes de qualquer implantação; homologação com Supabase Auth real, backup e aprovação explícita continuam obrigatórios.
