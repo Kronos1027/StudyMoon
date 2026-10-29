@@ -217,4 +217,6 @@ echo "==> Racing the fifth streak question across two sessions"
 bash tests/database/streaks-concurrency.sh
 echo "==> Verifying durable, ordered and idempotent FSRS replay after failures"
 psql_test -f "tests/database/srs-outbox.sql"
+echo "==> Racing two recovery workers on one FSRS queue event"
+bash tests/database/srs-outbox-concurrency.sh
 echo "PostgreSQL migration, RLS, mastery, streak, daily goal, FSRS outbox, XP and tutor concurrency tests passed."
