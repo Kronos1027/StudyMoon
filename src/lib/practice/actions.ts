@@ -221,6 +221,7 @@ export interface AttemptResult {
   streakCurrent?: number;
   streakUsedFreeze?: boolean;
   masteryPercent?: number;
+  reviewSaveWarning?: boolean;
 }
 
 /**
@@ -323,38 +324,59 @@ export async function submitAttempt(input: z.infer<typeof submitSchema>): Promis
       .eq("id", questionId);
   }
 
-  // 4. FSRS card.
-  const { data: cardRow } = await admin
-    .from("srs_cards")
-    .select("*")
-    .eq("user_id", user.id)
-    .eq("question_id", questionId)
-    .maybeSingle();
-
+  // 4. Recalculate from the latest FSRS card with optimistic concurrency.
+  // The SQL RPC increments revision only if the stored revision still matches.
+  // If another request saved a newer revision, reload and reschedule instead
+  // of overwriting that student's progress with a stale SRS card.
   const expectedMs = Math.max(15_000, question.statement_md.length * 220);
   const grade = gradeFromAttempt(correct, timeMs, expectedMs);
-  const baseCard: SrsCard = cardRow ?? newCard(user.id, questionId);
-  const scheduled = schedule(baseCard, grade);
+  let srsSaved = false;
 
-  await admin.from("srs_cards").upsert(
-    {
-      id: cardRow?.id,
-      user_id: user.id,
-      question_id: questionId,
-      concept_key: null,
-      due: scheduled.card.due,
-      stability: scheduled.card.stability,
-      difficulty_fsrs: scheduled.card.difficulty_fsrs,
-      elapsed_days: scheduled.card.elapsed_days,
-      scheduled_days: scheduled.card.scheduled_days,
-      reps: scheduled.card.reps,
-      lapses: scheduled.card.lapses,
-      learning_steps: scheduled.card.learning_steps,
-      state: scheduled.card.state,
-      last_update: scheduled.card.last_update,
-    },
-    { onConflict: "user_id,question_id" },
-  );
+  for (let tryNumber = 0; tryNumber < 4 && !srsSaved; tryNumber++) {
+    const { data: cardRow, error: cardError } = await admin
+      .from("srs_cards")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("question_id", questionId)
+      .maybeSingle();
+
+    if (cardError) {
+      console.error("[submitAttempt] read FSRS card:", cardError.message);
+      break;
+    }
+
+    const baseCard: SrsCard = cardRow ?? newCard(user.id, questionId);
+    const scheduled = schedule(baseCard, grade);
+    const { data: committed, error: scheduleError } = await admin.rpc(
+      "commit_srs_schedule",
+      {
+        p_user_id: user.id,
+        p_question_id: questionId,
+        p_expected_revision: Number(cardRow?.revision ?? 0),
+        p_due: scheduled.card.due,
+        p_stability: scheduled.card.stability,
+        p_difficulty: scheduled.card.difficulty_fsrs,
+        p_elapsed_days: scheduled.card.elapsed_days,
+        p_scheduled_days: scheduled.card.scheduled_days,
+        p_reps: scheduled.card.reps,
+        p_lapses: scheduled.card.lapses,
+        p_learning_steps: scheduled.card.learning_steps,
+        p_state: scheduled.card.state,
+        p_last_update: scheduled.card.last_update,
+      },
+    );
+
+    if (scheduleError) {
+      console.error("[submitAttempt] commit FSRS card:", scheduleError.message);
+      break;
+    }
+    srsSaved = committed === true;
+  }
+  if (!srsSaved) {
+    // The answer already committed; keep the user's correct/XP result and
+    // explicitly surface that a review card may need a retry/reconciliation.
+    console.error("[submitAttempt] FSRS card not persisted after retries");
+  }
 
   // 5–6. Atomically award XP and update level/title in PostgreSQL.
   // The server-only RPC locks the student's profile, checks one-shot
@@ -466,6 +488,7 @@ export async function submitAttempt(input: z.infer<typeof submitSchema>): Promis
     newLevel,
     streakCurrent: streakUpdate.current,
     streakUsedFreeze: streakUpdate.usedFreeze,
+    reviewSaveWarning: !srsSaved,
     masteryPercent: mastery
       ? Math.round(((mastery.elo - 400) / 1400) * 100)
       : undefined,
