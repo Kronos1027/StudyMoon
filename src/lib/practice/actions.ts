@@ -5,8 +5,7 @@ import { z } from "zod";
 import { getSupabaseServerClient } from "@/lib/db/server";
 import { getSupabaseAdmin } from "@/lib/db/admin";
 import { updateDifficulty } from "@/lib/elo";
-import { gradeFromAttempt, newCard, schedule } from "@/lib/srs";
-import type { SrsCard } from "@/lib/db/types";
+import { reconcilePendingSrs } from "@/lib/srs/reconcile";
 import {
   questionXp,
   FIXED_XP,
@@ -47,6 +46,10 @@ export async function getNextQuestion(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { question: null, reason: null };
+
+  // Repair any previously recorded but unscheduled review before choosing a
+  // question. The shared background cron also drains this durable queue.
+  await reconcilePendingSrs({ userId: user.id, limit: 20 });
 
   // Candidates: validated questions (public columns), optional area filter.
   let topicsQuery = supabase
@@ -319,59 +322,16 @@ export async function submitAttempt(input: z.infer<typeof submitSchema>): Promis
       .eq("id", questionId);
   }
 
-  // 4. Recalculate from the latest FSRS card with optimistic concurrency.
-  // The SQL RPC increments revision only if the stored revision still matches.
-  // If another request saved a newer revision, reload and reschedule instead
-  // of overwriting that student's progress with a stale SRS card.
-  const expectedMs = Math.max(15_000, question.statement_md.length * 220);
-  const grade = gradeFromAttempt(correct, timeMs, expectedMs);
-  let srsSaved = false;
-
-  for (let tryNumber = 0; tryNumber < 4 && !srsSaved; tryNumber++) {
-    const { data: cardRow, error: cardError } = await admin
-      .from("srs_cards")
-      .select("*")
-      .eq("user_id", user.id)
-      .eq("question_id", questionId)
-      .maybeSingle();
-
-    if (cardError) {
-      console.error("[submitAttempt] read FSRS card:", cardError.message);
-      break;
-    }
-
-    const baseCard: SrsCard = cardRow ?? newCard(user.id, questionId);
-    const scheduled = schedule(baseCard, grade);
-    const { data: committed, error: scheduleError } = await admin.rpc(
-      "commit_srs_schedule",
-      {
-        p_user_id: user.id,
-        p_question_id: questionId,
-        p_expected_revision: Number(cardRow?.revision ?? 0),
-        p_due: scheduled.card.due,
-        p_stability: scheduled.card.stability,
-        p_difficulty: scheduled.card.difficulty_fsrs,
-        p_elapsed_days: scheduled.card.elapsed_days,
-        p_scheduled_days: scheduled.card.scheduled_days,
-        p_reps: scheduled.card.reps,
-        p_lapses: scheduled.card.lapses,
-        p_learning_steps: scheduled.card.learning_steps,
-        p_state: scheduled.card.state,
-        p_last_update: scheduled.card.last_update,
-      },
-    );
-
-    if (scheduleError) {
-      console.error("[submitAttempt] commit FSRS card:", scheduleError.message);
-      break;
-    }
-    srsSaved = committed === true;
-  }
-  if (!srsSaved) {
-    // The answer already committed; keep the user's correct/XP result and
-    // explicitly surface that a review card may need a retry/reconciliation.
-    console.error("[submitAttempt] FSRS card not persisted after retries");
-  }
+  // 4. Attempt insert already queued an immutable FSRS replay event in
+  // PostgreSQL (migration 0017). This reconciler processes the event and
+  // commits the card AND completion marker in one database transaction.
+  // A cron task will retry after any process/network crash.
+  const fsrs = await reconcilePendingSrs({
+    userId: user.id,
+    questionId,
+    limit: 20,
+  });
+  const srsSaved = fsrs.failed === 0 && fsrs.remaining === 0;
 
   // 5–6. Atomically award XP and update level/title in PostgreSQL.
   // The server-only RPC locks the student's profile, checks one-shot
