@@ -41,7 +41,8 @@ for file in 0004_grants.sql 0005_indexes.sql 0006_question_subtopic.sql \
             0007_security_and_indexes.sql 0008_optimize_rls.sql \
             0009_atomic_xp_awards.sql 0010_tutor_daily_quota.sql \
             0011_practice_ticket_integrity.sql 0012_fix_srs_update_trigger.sql \
-            0013_atomic_daily_goals.sql 0014_atomic_topic_mastery.sql; do
+            0013_atomic_daily_goals.sql 0014_atomic_topic_mastery.sql \
+            0015_srs_revision_guard.sql; do
   echo "==> $file"
   psql_test -f "supabase/migrations/$file" >/dev/null
 done
@@ -205,4 +206,8 @@ echo "==> Racing two daily-goal increments under concurrent attempt inserts"
 bash tests/database/daily-goals-concurrency.sh
 echo "==> Racing two correct answers on one topic from separate sessions"
 bash tests/database/mastery-concurrency.sh
-echo "PostgreSQL migration, RLS, mastery, daily goal, practice, XP and tutor concurrency tests passed."
+echo "==> Checking FSRS revision compare-and-swap and server-only permissions"
+psql_test -f "tests/database/srs-revision.sql"
+echo "==> Racing simultaneous FSRS revision submissions"
+bash tests/database/srs-concurrency.sh
+echo "PostgreSQL migration, RLS, mastery, daily goal, FSRS, XP and tutor concurrency tests passed."
