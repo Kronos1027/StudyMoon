@@ -64,15 +64,39 @@ begin
      'B',true,22000,'practice',v_base + interval '2 minutes')
   returning id into v_other;
 
-  if (select count(*) from public.get_ready_srs_replay(null,null,20)) <> 2
+  if (select count(*) from (
+         select * from public.get_ready_srs_replay(null,null,20)
+         where user_id in (
+           '88888888-8888-4888-8888-888888888888',
+           '99999999-9999-4999-8999-999999999999'
+         )
+       ) as ready) <> 2
      or not exists (
-       select 1 from public.get_ready_srs_replay(null,null,20)
+       select 1 from (
+         select * from public.get_ready_srs_replay(null,null,20)
+         where user_id in (
+           '88888888-8888-4888-8888-888888888888',
+           '99999999-9999-4999-8999-999999999999'
+         )
+       ) as ready
         where attempt_id=v_first
      ) or not exists (
-       select 1 from public.get_ready_srs_replay(null,null,20)
+       select 1 from (
+         select * from public.get_ready_srs_replay(null,null,20)
+         where user_id in (
+           '88888888-8888-4888-8888-888888888888',
+           '99999999-9999-4999-8999-999999999999'
+         )
+       ) as ready
         where attempt_id=v_other
      ) or exists (
-       select 1 from public.get_ready_srs_replay(null,null,20)
+       select 1 from (
+         select * from public.get_ready_srs_replay(null,null,20)
+         where user_id in (
+           '88888888-8888-4888-8888-888888888888',
+           '99999999-9999-4999-8999-999999999999'
+         )
+       ) as ready
         where attempt_id=v_second
      )
   then raise exception 'Ready selection not fair or not chronological'; end if;
@@ -89,9 +113,21 @@ begin
 
   -- The newer event for student A must remain blocked, but student B can
   -- progress during A's backoff, even if A's event is oldest globally.
-  if (select count(*) from public.get_ready_srs_replay(null,null,20)) <> 1
+  if (select count(*) from (
+         select * from public.get_ready_srs_replay(null,null,20)
+         where user_id in (
+           '88888888-8888-4888-8888-888888888888',
+           '99999999-9999-4999-8999-999999999999'
+         )
+       ) as ready) <> 1
      or not exists (
-       select 1 from public.get_ready_srs_replay(null,null,20)
+       select 1 from (
+         select * from public.get_ready_srs_replay(null,null,20)
+         where user_id in (
+           '88888888-8888-4888-8888-888888888888',
+           '99999999-9999-4999-8999-999999999999'
+         )
+       ) as ready
         where attempt_id=v_other
      ) or
      (select count(*) from public.get_ready_srs_replay(
