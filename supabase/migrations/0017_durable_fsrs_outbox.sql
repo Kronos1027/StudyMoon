@@ -25,7 +25,7 @@ create index idx_srs_replay_retry
 
 alter table public.srs_replay_queue enable row level security;
 revoke all on public.srs_replay_queue from public, anon, authenticated;
-grant select, insert, update, delete, usage on public.srs_replay_queue to service_role;
+grant select, insert, update, delete on public.srs_replay_queue to service_role;
 grant usage, select on sequence public.srs_replay_queue_id_seq to service_role;
 
 create or replace function public.enqueue_srs_replay()
