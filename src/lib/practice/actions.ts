@@ -12,7 +12,6 @@ import {
   FIXED_XP,
   DAILY_XP_CAPS,
 } from "@/lib/gamification/xp";
-import { countsAsStudyDay, updateStreak, type StreakState } from "@/lib/gamification/streak";
 import { demoForQuestionRow } from "@/lib/demos/topic-binding";
 import type { QuestionPublic } from "@/lib/db/types";
 import { firstAvailableDueQuestion, isReviewDue } from "@/lib/practice/review";
@@ -30,10 +29,6 @@ const nextQuestionSchema = z.object({
 export interface NextQuestionResult {
   question: QuestionPublic | null;
   reason: string | null;
-}
-
-function todayKey(): string {
-  return new Date().toISOString().split("T")[0];
 }
 
 function isoWeekAgo(): string {
@@ -415,62 +410,17 @@ export async function submitAttempt(input: z.infer<typeof submitSchema>): Promis
     }
   }
 
-  // 7. Streak (minimum day: 10 min OR 5 questions — use today's questions).
-  const { count: todayQuestionsCount } = await admin
-    .from("attempts")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", user.id)
-    .gte("created_at", todayKey());
-  const todayQuestions = todayQuestionsCount ?? 0;
-  const { data: streakRow } = await admin
+  // 7. Streaks now update under the same PostgreSQL transaction as the
+  // attempt (migration 0016). Read ONLY for student feedback: no stale
+  // read-modify-write can overwrite the progress of simultaneous attempts.
+  const { data: streak, error: streakError } = await admin
     .from("streaks")
-    .select("*")
+    .select("current, last_study_date, last_freeze_used_on")
     .eq("user_id", user.id)
-    .single();
-
-  const streakState: StreakState = streakRow
-    ? {
-        current: streakRow.current,
-        longest: streakRow.longest,
-        lastStudyDate: streakRow.last_study_date,
-        freezesAvailable: streakRow.freezes_available,
-        lastFreezeWeek: streakRow.last_freeze_week,
-      }
-    : {
-        current: 0,
-        longest: 0,
-        lastStudyDate: null,
-        freezesAvailable: 1,
-        lastFreezeWeek: null,
-      };
-
-  const studiedToday = countsAsStudyDay({
-    minutes: Math.round(todayQuestions * 1.2),
-    questions: todayQuestions,
-  });
-  const streakUpdate = updateStreak(streakState, studiedToday, new Date());
-
-  await admin
-    .from("streaks")
-    .upsert(
-      {
-        user_id: user.id,
-        current: streakUpdate.current,
-        longest: streakUpdate.longest,
-        freezes_available: streakUpdate.freezesAvailable,
-        last_freeze_week:
-          streakUpdate.usedFreeze || streakState.lastFreezeWeek
-            ? (streakUpdate.usedFreeze
-                ? isoWeekKeyNow()
-                : streakState.lastFreezeWeek)
-            : null,
-        last_study_date: studiedToday
-          ? todayKey()
-          : streakState.lastStudyDate,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id" },
-    );
+    .maybeSingle();
+  if (streakError) {
+    console.error("[submitAttempt] streak read:", streakError.message);
+  }
 
   // 8. Daily goal progress is counted by the PostgreSQL AFTER INSERT
   // trigger on attempts (migration 0013). It runs in the same transaction
@@ -486,26 +436,16 @@ export async function submitAttempt(input: z.infer<typeof submitSchema>): Promis
     explanationMd: question.explanation_md,
     xpEarned,
     newLevel,
-    streakCurrent: streakUpdate.current,
-    streakUsedFreeze: streakUpdate.usedFreeze,
+    streakCurrent: streak?.current ?? undefined,
+    streakUsedFreeze: Boolean(
+      streak?.last_study_date === new Date().toISOString().slice(0, 10)
+      && streak?.last_freeze_used_on === streak?.last_study_date,
+    ),
     reviewSaveWarning: !srsSaved,
     masteryPercent: mastery
       ? Math.round(((mastery.elo - 400) / 1400) * 100)
       : undefined,
   };
-}
-
-function isoWeekKeyNow(): string {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
-  const week1 = new Date(d.getFullYear(), 0, 4);
-  const week =
-    1 +
-    Math.round(
-      ((d.getTime() - week1.getTime()) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7,
-    );
-  return `${d.getFullYear()}-W${String(week).padStart(2, "0")}`;
 }
 
 // ---------------------------------------------------------------------------
