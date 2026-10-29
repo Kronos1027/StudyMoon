@@ -366,6 +366,14 @@ export function QuestionCard({
                 </p>
               </div>
 
+              {result.reviewSaveWarning ? (
+                <p className="flex items-start gap-2 rounded-xl border border-warning/40 bg-warning/5 p-3 text-sm" role="alert">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                  Sua resposta foi registrada, mas não foi possível confirmar o agendamento da próxima revisão.
+                  Volte ao painel de revisões para conferir seus cartões.
+                </p>
+              ) : null}
+
               <div className="rounded-xl border border-border p-4">
                 <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Resolução passo a passo
