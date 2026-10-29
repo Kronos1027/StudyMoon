@@ -42,7 +42,8 @@ for file in 0004_grants.sql 0005_indexes.sql 0006_question_subtopic.sql \
             0009_atomic_xp_awards.sql 0010_tutor_daily_quota.sql \
             0011_practice_ticket_integrity.sql 0012_fix_srs_update_trigger.sql \
             0013_atomic_daily_goals.sql 0014_atomic_topic_mastery.sql \
-            0015_srs_revision_guard.sql 0016_atomic_study_streaks.sql; do
+            0015_srs_revision_guard.sql 0016_atomic_study_streaks.sql \
+            0017_durable_fsrs_outbox.sql; do
   echo "==> $file"
   psql_test -f "supabase/migrations/$file" >/dev/null
 done
@@ -214,4 +215,6 @@ echo "==> Checking transactional streaks, freezes and UTC week dates"
 psql_test -f "tests/database/streaks.sql"
 echo "==> Racing the fifth streak question across two sessions"
 bash tests/database/streaks-concurrency.sh
-echo "PostgreSQL migration, RLS, mastery, streak, daily goal, FSRS, XP and tutor concurrency tests passed."
+echo "==> Verifying durable, ordered and idempotent FSRS replay after failures"
+psql_test -f "tests/database/srs-outbox.sql"
+echo "PostgreSQL migration, RLS, mastery, streak, daily goal, FSRS outbox, XP and tutor concurrency tests passed."
