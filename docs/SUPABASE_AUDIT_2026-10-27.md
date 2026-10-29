@@ -256,3 +256,34 @@ A action `submitAttempt` lia uma sequência de `streaks` e a regravava com `UPSE
 - O agendamento FSRS tem proteção contra sobrescrita (migração `0015`), mas ainda é feito após a tentativa. Falhas permanentes de agendamento exigem uma fila transacional/reconciliador.
 - O registro da tentativa, a recompensa de XP e o ajuste da dificuldade empírica ainda não compartilham uma única transação completa; já há proteções parciais (revisão/XP/goal/Elo/streak).
 - **Nenhuma migração `0007–0016` foi aplicada ao banco de produção**. O código novo depende delas; fazer homologação, backup testado e implantação coordenada antes de publicar.
+
+
+## Etapa 12 — recuperação durável de FSRS (29/10)
+
+### Problema
+
+As migrações 0011 e 0015 impediam duplicação de respostas e sobrescrita de cartões, mas `submitAttempt` ainda precisava executar o agendamento em uma **segunda transação** após gravar a tentativa. Reinicialização do servidor, timeouts ou indisponibilidade temporária poderiam deixar uma resposta definitiva sem alteração de `srs_cards`. A notificação visual detectava algumas falhas, porém não recuperava a revisão sem outro processo.
+
+### Migração 0017 — fila transacional e reconciliador idempotente
+
+- `supabase/migrations/0017_durable_fsrs_outbox.sql`: tabela `srs_replay_queue` com **RLS ativado**, acesso somente ao serviço, `attempt_id` único, nota original, tempo real da tentativa, comprimento esperado e instante exato da resposta.
+- O gatilho `trg_attempt_srs_replay` cria o evento **no mesmo commit da tentativa**. Se uma operação daquele commit falhar, a tentativa e seu evento são revertidos juntos.
+- A RPC `complete_srs_replay`, disponível somente para `service_role`, bloqueia o evento pendente e aplica `commit_srs_schedule` (controle de revisão da migração 0015). O **cartão FSRS e a marcação de evento processado** são gravados na mesma transação. Se a gravação falha, o evento permanece pendente.
+- A RPC rejeita eventos fora de ordem para o mesmo cartão. Concorrentes não conseguem registrar duas vezes a mesma tentativa.
+- `src/lib/srs/reconcile.ts`: reconstrução da nota com `ts-fsrs`, considerando o **timestamp original** da tentativa e cartões atuais; processamento em lotes limitados, com repetição controlada em conflitos de revisão.
+- `getNextQuestion` tenta recuperar eventos antigos antes de selecionar a próxima questão; `submitAttempt` tenta processar a fila após a gravação e avisa quando ainda restam pendências.
+- `/api/cron/reconcile-srs`: POST autenticado exclusivamente por `Authorization: Bearer <CRON_SECRET>`, sem entrada externa para usuário ou cartão; processa lotes limitados e devolve resultado. O workflow existente `.github/workflows/push-reminders.yml` ganhou um job de recuperação independente usando `vars.APP_URL` e `secrets.CRON_SECRET` a cada 15 minutos **quando a versão for publicada na branch principal**.
+
+### Testes
+
+- `tests/database/srs-outbox.sql`: fila criada junto à tentativa, ordem temporal obrigatória, aplicação única, retomada após falha de função, proteção de permissões e sincronização da marcação de processamento com o cartão.
+- `tests/database/srs-outbox-concurrency.sh`: dois recuperadores competem pela **mesma tentativa**; exatamente um marca sucesso, e cartão/evento terminam consistentes.
+- Resultado do PostgreSQL isolado: https://github.com/Kronos1027/StudyMoon/actions/runs/40931717224 — aprovado, inclusive os testes novos. Executou as **17 migrações** em banco descartável.
+
+### Limitações e condições antes de produção
+
+1. Esta solução vale para tentativas **registradas após a instalação da migração 0017**. Ela não cria eventos retroativos para tentativas antigas.
+2. O job agendado só funcionará depois do merge/publicação e se `APP_URL`, `CRON_SECRET` e o segredo de conexão do Supabase estiverem corretamente configurados. Conferir respostas e logs da rotina agendada.
+3. O processador trata lotes limitados (20 por execução do cron). Um volume grande de pendências pode levar várias execuções; acompanhar métricas da fila e configurar alertas de atraso.
+4. A fila oferece entrega **pelo menos uma vez**; a RPC garante que a aplicação **do mesmo evento** seja única. A disponibilidade final depende de o serviço voltar a processar eventos (não é uma garantia incondicional de prazo).
+5. O novo aplicativo exige que as migrações `0007–0017` sejam instaladas **em homologação isolada** e validadas com Auth real antes da implantação coordenada. Nenhuma alteração no Supabase de produção foi feita neste PR.
