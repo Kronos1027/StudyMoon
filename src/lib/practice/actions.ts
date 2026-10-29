@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getSupabaseServerClient } from "@/lib/db/server";
 import { getSupabaseAdmin } from "@/lib/db/admin";
-import { updateMastery, updateDifficulty } from "@/lib/elo";
+import { updateDifficulty } from "@/lib/elo";
 import { gradeFromAttempt, newCard, schedule } from "@/lib/srs";
 import type { SrsCard } from "@/lib/db/types";
 import {
@@ -291,36 +291,20 @@ export async function submitAttempt(input: z.infer<typeof submitSchema>): Promis
     };
   }
 
-  // 3. Elo mastery update.
-  const { data: mastery } = await admin
+  // 3. Elo, confidence and attempts_count are updated by the PostgreSQL
+  // AFTER INSERT trigger (migration 0014) in the same transaction as
+  // record_practice_attempt. Reading the committed row is for display only.
+  // Do not write a stale Elo value back from the application process.
+  const { data: mastery, error: masteryError } = await admin
     .from("topic_mastery")
-    .select("elo, attempts_count, confidence")
+    .select("elo")
     .eq("user_id", user.id)
     .eq("topic_id", question.topic_id)
-    .single();
-
-  const attemptsCount = mastery?.attempts_count ?? 0;
-  const currentElo = mastery?.elo ?? 1200;
-  const masteryUpdate = updateMastery(
-    currentElo,
-    question.difficulty,
-    correct,
-    attemptsCount,
-  );
+    .maybeSingle();
+  if (masteryError) {
+    console.error("[submitAttempt] read mastery:", masteryError.message);
+  }
   const lastAttemptAt = new Date().toISOString();
-
-  await admin.from("topic_mastery").upsert(
-    {
-      user_id: user.id,
-      topic_id: question.topic_id,
-      elo: masteryUpdate.elo,
-      confidence: masteryUpdate.confidence,
-      attempts_count: attemptsCount + 1,
-      last_attempt_at: lastAttemptAt,
-      updated_at: lastAttemptAt,
-    },
-    { onConflict: "user_id,topic_id" },
-  );
 
   // 3b. Question difficulty drift (empirical, gentle).
   const { count: questionAttempts } = await admin
@@ -482,7 +466,9 @@ export async function submitAttempt(input: z.infer<typeof submitSchema>): Promis
     newLevel,
     streakCurrent: streakUpdate.current,
     streakUsedFreeze: streakUpdate.usedFreeze,
-    masteryPercent: Math.round(((masteryUpdate.elo - 400) / 1400) * 100),
+    masteryPercent: mastery
+      ? Math.round(((mastery.elo - 400) / 1400) * 100)
+      : undefined,
   };
 }
 
