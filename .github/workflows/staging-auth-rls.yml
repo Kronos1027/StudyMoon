@@ -1,0 +1,50 @@
+name: Staging Supabase Auth + RLS (manual only)
+
+# Never run this workflow on push or PR. It uses real hosted Auth and creates
+# two disposable test accounts, so it requires an explicit dispatch.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: studymoon-staging-auth
+  cancel-in-progress: false
+
+jobs:
+  hosted-auth-rls:
+    name: Verify isolated staging schema and hosted Auth
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: staging
+    env:
+      STUDYMOON_ENV: staging
+      STUDYMOON_STAGING_PROJECT_REF: ${{ vars.STAGING_SUPABASE_PROJECT_REF }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ vars.STAGING_SUPABASE_URL }}
+      DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.STAGING_SUPABASE_ANON_KEY }}
+      SUPABASE_SECRET_KEY: ${{ secrets.STAGING_SUPABASE_SECRET_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.10.1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Reject wrong project (no network or writes)
+        run: pnpm staging:check
+
+      - name: Inspect staging schema read-only
+        run: pnpm staging:schema-check
+
+      - name: Verify hosted sign-in and cross-user RLS
+        run: pnpm db:test-rls
