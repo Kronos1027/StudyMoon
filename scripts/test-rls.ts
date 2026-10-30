@@ -50,16 +50,22 @@ async function main() {
     email_confirm: true,
     user_metadata: { apelido: "TesteA" },
   });
+  // Register each returned identity immediately, not after BOTH requests:
+  // a failure creating B must not leave A orphaned in staging.
+  if (userA.data.user) created.push(userA.data.user.id);
+  if (userA.error || !userA.data.user) {
+    throw new Error(`RLS setup A failed: ${userA.error?.message ?? "no user returned"}`);
+  }
+
   const userB = await admin.auth.admin.createUser({
     email: emailB,
     password,
     email_confirm: true,
     user_metadata: { apelido: "TesteB" },
   });
-  if (userA.data.user) created.push(userA.data.user.id);
   if (userB.data.user) created.push(userB.data.user.id);
-  if (userA.error || userB.error || !userA.data.user || !userB.data.user) {
-    throw new Error(`RLS setup failed: ${userA.error?.message ?? ""} ${userB.error?.message ?? ""}`);
+  if (userB.error || !userB.data.user) {
+    throw new Error(`RLS setup B failed: ${userB.error?.message ?? "no user returned"}`);
   }
 
   // --- sign in as A and B (anon-key clients, like a real browser) ---
