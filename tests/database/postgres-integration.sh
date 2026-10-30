@@ -44,7 +44,7 @@ for file in 0004_grants.sql 0005_indexes.sql 0006_question_subtopic.sql \
             0013_atomic_daily_goals.sql 0014_atomic_topic_mastery.sql \
             0015_srs_revision_guard.sql 0016_atomic_study_streaks.sql \
             0017_durable_fsrs_outbox.sql 0018_srs_retry_backoff.sql \
-            0019_atomic_essay_finalization.sql; do
+            0019_atomic_essay_finalization.sql 0020_atomic_mock_exam.sql; do
   echo "==> $file"
   psql_test -f "supabase/migrations/$file" >/dev/null
 done
@@ -226,4 +226,8 @@ echo "==> Verifying atomic essay correction and legacy feedback consistency"
 psql_test -f "tests/database/essay-finalization.sql"
 echo "==> Racing two essay correction workers"
 bash tests/database/essay-finalization-concurrency.sh
-echo "PostgreSQL migration, RLS, mastery, streak, essay correction, daily goal, FSRS outbox, retry fairness, XP and tutor concurrency tests passed."
+echo "==> Verify mock exam scoring, idempotent XP and tamper rejection"
+psql_test -f "tests/database/mock-exam.sql"
+echo "==> Race two attempts to finish one mock exam"
+bash tests/database/mock-exam-concurrency.sh
+echo "PostgreSQL migration, RLS, mastery, streak, essay correction, mock exams, daily goal, FSRS outbox, retry fairness, XP and tutor concurrency tests passed."
