@@ -16,6 +16,8 @@
     "verify": "pnpm lint && pnpm typecheck && pnpm test",
     "verify:full": "pnpm verify && pnpm build",
     "setup": "tsx scripts/setup.ts",
+    "staging:check": "tsx scripts/check-staging.ts",
+    "staging:schema-check": "tsx scripts/check-staging-schema.ts",
     "db:migrate": "tsx scripts/migrate.ts",
     "db:seed": "tsx scripts/seed.ts",
     "db:test-rls": "tsx scripts/test-rls.ts",

@@ -24,6 +24,7 @@ interface EssayEditorProps {
   themeTitle: string;
   motivatingTexts: Array<{ source: string; text: string }>;
   mode: "training" | "exam";
+  initialContent?: string;
 }
 
 const TRAINING_SECONDS = 30 * 60;
@@ -39,16 +40,19 @@ export function EssayEditor({
   themeTitle,
   motivatingTexts,
   mode,
+  initialContent = "",
 }: EssayEditorProps) {
   const router = useRouter();
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState(initialContent);
   const [timerRunning, setTimerRunning] = useState(mode === "training");
   const [secondsLeft, setSecondsLeft] = useState(TRAINING_SECONDS);
-  const [saved, setSaved] = useState<"idle" | "saving" | "saved">("idle");
+  const [saved, setSaved] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<EssayCorrectionResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const contentRef = useRef("");
+  const contentRef = useRef(initialContent);
+  const lastSavedRef = useRef(initialContent);
+  const saveQueueRef = useRef<Promise<boolean>>(Promise.resolve(true));
   const reduced = useReducedMotion();
 
   // Keep the ref in sync outside render (autosave reads it in callbacks).
@@ -72,28 +76,55 @@ export function EssayEditor({
   }, [timerRunning, secondsLeft]);
 
   // Autosave.
-  const save = useCallback(async () => {
-    if (!contentRef.current) return;
-    setSaved("saving");
-    await saveEssayDraft({ essayId, content: contentRef.current });
-    setSaved("saved");
+  const save = useCallback((): Promise<boolean> => {
+    // Serialize saves: a slow older request must not overwrite a newer draft.
+    const task = saveQueueRef.current.then(async () => {
+      const snapshot = contentRef.current;
+      if (snapshot === lastSavedRef.current) {
+        setSaved("saved");
+        return true;
+      }
+      setSaved("saving");
+      try {
+        const response = await saveEssayDraft({ essayId, content: snapshot });
+        if (response.ok) lastSavedRef.current = snapshot;
+        setSaved(response.ok
+          ? (snapshot === contentRef.current ? "saved" : "idle")
+          : "error");
+        return response.ok;
+      } catch {
+        setSaved("error");
+        return false;
+      }
+    });
+    saveQueueRef.current = task;
+    return task;
   }, [essayId]);
 
   useEffect(() => {
+    if (submitting || result?.ok) return;
     const interval = setInterval(() => void save(), AUTOSAVE_MS);
     return () => clearInterval(interval);
-  }, [save]);
+  }, [save, submitting, result?.ok]);
 
-  // Save on unload.
+  // Save shortly after typing stops, instead of risking 15 seconds of edits.
   useEffect(() => {
-    const handler = () => {
-      if (contentRef.current) {
-        void saveEssayDraft({ essayId, content: contentRef.current });
+    if (submitting || result?.ok) return;
+    const timeout = setTimeout(() => void save(), 1_500);
+    return () => clearTimeout(timeout);
+  }, [content, save, submitting, result?.ok]);
+
+  // Browsers may cancel requests on unload; try a regular save as soon
+  // as the tab becomes hidden, without relying on unload for durability.
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "hidden" && !submitting && !result?.ok) {
+        void save();
       }
     };
-    window.addEventListener("beforeunload", handler);
-    return () => window.removeEventListener("beforeunload", handler);
-  }, [essayId]);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, [save, submitting, result?.ok]);
 
   const words = content.trim().split(/\s+/).filter(Boolean).length;
   const lines = Math.max(0, Math.ceil(words / 14)); // ~14 words/handwritten line
@@ -106,16 +137,25 @@ export function EssayEditor({
     }
     setError(null);
     setSubmitting(true);
-    await save();
-    const response = await correctEssay({ essayId });
-    setSubmitting(false);
-    setResult(response);
-    if (response.ok) router.refresh();
+    try {
+      if (!(await save())) {
+        setError("Não foi possível salvar sua redação. Confira sua conexão antes de enviar.");
+        return;
+      }
+      const response = await correctEssay({ essayId });
+      setResult(response);
+      if (response.ok) router.refresh();
+      else setError(response.error ?? "A correção não foi concluída. Tente novamente.");
+    } catch {
+      setError("Erro de conexão durante a correção. Sua redação não foi perdida se o último salvamento foi confirmado.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   // ---------- Correction result ----------
   if (result?.ok) {
-    const maxScore = Math.max(...(result.competencies?.map((c) => c.score) ?? [0]));
+    // Each ENEM competency is scored out of 200; zeroes are valid.
     return (
       <div className="mx-auto w-full max-w-2xl px-4 py-6">
         <motion.div
@@ -159,7 +199,7 @@ export function EssayEditor({
                     <motion.div
                       className="h-full rounded-full bg-brand-gradient"
                       initial={reduced ? { width: `${(c.score / 200) * 100}%` } : { width: 0 }}
-                      animate={{ width: `${(c.score / maxScore) * 100}%` }}
+                      animate={{ width: `${(c.score / 200) * 100}%` }}
                       transition={{ duration: reduced ? 0 : 0.8 }}
                     />
                   </div>
@@ -237,7 +277,12 @@ export function EssayEditor({
       <div className="rounded-2xl border border-border bg-card p-4">
         <Textarea
           value={content}
-          onChange={(e) => setContent(e.target.value)}
+          onChange={(e) => {
+            setContent(e.target.value);
+            contentRef.current = e.target.value;
+            setSaved("idle");
+          }}
+          onBlur={() => void save()}
           placeholder="Escreva sua redação aqui. Estrutura sugerida: introdução com tese, 2 parágrafos de desenvolvimento e conclusão com proposta de intervenção completa."
           className="min-h-[420px] resize-none border-0 bg-transparent text-base leading-7 focus-visible:ring-0"
           aria-label="Sua redação"
@@ -258,6 +303,8 @@ export function EssayEditor({
                   <Save className="h-3 w-3" aria-hidden="true" />
                   salvo automaticamente
                 </>
+              ) : saved === "error" ? (
+                <span role="alert" className="text-destructive">Falha ao salvar. Tente novamente.</span>
               ) : null}
             </span>
           </div>

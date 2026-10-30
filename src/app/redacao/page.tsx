@@ -82,7 +82,7 @@ export default async function RedacaoPage() {
               {essays.map((essay) => (
                 <li key={essay.id}>
                   <Link
-                    href={`/redacao/${essay.id}`}
+                    href={essay.status === "draft" ? `/redacao/${essay.id}/editar` : `/redacao/${essay.id}`}
                     className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 transition-colors hover:border-primary/60"
                   >
                     <div className="min-w-0">

@@ -6,6 +6,7 @@
 import postgres from "postgres";
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
+import { assertSafeStagingDatabaseTarget, getStagingGuardInput } from "./staging-guard";
 
 const DATABASE_URL = process.env.DATABASE_URL;
 if (!DATABASE_URL) {
@@ -23,6 +24,7 @@ async function main() {
     console.error("DATABASE_URL is not set.");
     process.exit(1);
   }
+  assertSafeStagingDatabaseTarget(getStagingGuardInput());
   const sql = postgres(databaseUrl, {
     ssl: "prefer",
     max: 1,
