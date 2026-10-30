@@ -119,6 +119,11 @@ export async function startMockExam(
   }));
   const { error: itemsError } = await admin.from("mock_exam_items").insert(items);
   if (itemsError) {
+    // Avoid leaving an empty, permanently in-progress exam after an insert
+    // error. Its child rows (if any) cascade when the parent is deleted.
+    const { error: cleanupError } = await admin.from("mock_exams")
+      .delete().eq("id", exam.id).eq("user_id", user.id);
+    if (cleanupError) console.error("[mock-exam] cleanup:", cleanupError.message);
     return { ok: false, error: "Não foi possível montar o simulado." };
   }
 
@@ -213,120 +218,31 @@ export async function finishMockExam(
     return { ok: false, error: "Este simulado já foi finalizado." };
   }
 
-  // Load items + full questions (with answer keys) + topics/areas.
-  const { data: items } = await admin
-    .from("mock_exam_items")
-    .select("id, question_id, position")
-    .eq("exam_id", exam.id)
-    .order("position");
-  if (!items || items.length === 0) {
-    return { ok: false, error: "Simulado vazio." };
-  }
-
-  const questionIds = items.map((i) => i.question_id);
-  const { data: questions } = await admin
-    .from("questions")
-    .select("id, answer_key, topic_id, difficulty")
-    .in("id", questionIds);
-  const questionMap = new Map((questions ?? []).map((q) => [q.id, q]));
-
-  const topicIds = [...new Set((questions ?? []).map((q) => q.topic_id))];
-  const { data: topics } = await admin
-    .from("topics")
-    .select("id, area_id")
-    .in("id", topicIds);
-  const { data: areas } = await admin.from("areas").select("id, name");
-  const topicToArea = new Map((topics ?? []).map((t) => [t.id, t.area_id]));
-  const areaNames = new Map((areas ?? []).map((a) => [a.id, a.name]));
-
-  const answersMap = new Map(
-    parsed.data.answers.map((a) => [a.questionId, a]),
+  // One server-only PostgreSQL RPC locks the exam, grades exclusively
+  // against question keys in the database, saves every item + score and
+  // awards one-shot XP/level in a SINGLE transaction (migration 0020).
+  // Two concurrent submissions cannot partially grade or double-award.
+  const { data: reportRows, error: finishError } = await admin.rpc(
+    "finalize_mock_exam",
+    {
+      p_user_id: user.id,
+      p_exam_id: exam.id,
+      p_answers: parsed.data.answers,
+    },
   );
-
-  // Grade + update rows.
-  const byAreaAgg = new Map<string, { correct: number; total: number }>();
-  let correctCount = 0;
-
-  for (const item of items) {
-    const question = questionMap.get(item.question_id);
-    const answer = answersMap.get(item.question_id);
-    const selected = answer?.selected ?? null;
-    const correct = selected !== null && question ? selected === question.answer_key : false;
-    if (correct) correctCount += 1;
-
-    await admin
-      .from("mock_exam_items")
-      .update({
-        selected,
-        correct,
-        flagged: answer?.flagged ?? false,
-      })
-      .eq("id", item.id);
-
-    const areaId = question ? topicToArea.get(question.topic_id) : undefined;
-    const areaName = areaId ? (areaNames.get(areaId) ?? "—") : "—";
-    const agg = byAreaAgg.get(areaName) ?? { correct: 0, total: 0 };
-    agg.total += 1;
-    if (correct) agg.correct += 1;
-    byAreaAgg.set(areaName, agg);
-  }
-
-  // Simple, clearly-labeled estimate: percentage → 0-1000 scale.
-  const total = items.length;
-  const estimated = Math.round((correctCount / total) * 1000);
-
-  await admin
-    .from("mock_exams")
-    .update({
-      status: "finished",
-      finished_at: new Date().toISOString(),
-      score_estimate: {
-        correct: correctCount,
-        total,
-        estimated,
-        note: "estimativa simples (percentual de acertos × 1000), não TRI",
-        byArea: [...byAreaAgg.entries()].map(([area, v]) => ({
-          area,
-          correct: v.correct,
-          total: v.total,
-        })),
-      },
-    })
-    .eq("id", exam.id);
-
-  // One-time XP.
-  const { error: xpError } = await admin.from("xp_events").insert({
-    user_id: user.id,
-    amount: 100,
-    kind: "mock_exam",
-    ref_id: exam.id,
-  });
-  if (!xpError) {
-    const { data: profile } = await admin
-      .from("profiles")
-      .select("xp")
-      .eq("id", user.id)
-      .single();
-    if (profile) {
-      await admin
-        .from("profiles")
-        .update({ xp: profile.xp + 100 })
-        .eq("id", user.id);
-    }
+  const report = Array.isArray(reportRows) ? reportRows[0] : null;
+  if (finishError || !report) {
+    console.error("[mock-exam] atomic finish failed:", finishError?.message);
+    return { ok: false, error: "Não foi possível finalizar seu simulado. Tente novamente." };
   }
 
   revalidatePath("/simulado");
 
   return {
     ok: true,
-    totalQuestions: total,
-    correct: correctCount,
-    estimatedScore: estimated,
-    byArea: [...byAreaAgg.entries()].map(([area, v]) => ({
-      area,
-      correct: v.correct,
-      total: v.total,
-      percent: Math.round((v.correct / v.total) * 100),
-    })),
+    totalQuestions: report.total_questions,
+    correct: report.correct_count,
+    estimatedScore: report.estimated_score,
+    byArea: report.by_area as NonNullable<ExamReport["byArea"]>,
   };
 }
