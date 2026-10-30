@@ -10,6 +10,7 @@
  * Run: pnpm db:test-rls  (requires NEXT_PUBLIC_SUPABASE_URL + keys)
  */
 import { createClient } from "@supabase/supabase-js";
+import { assertSafeStagingAuthTarget, getStagingGuardInput } from "./staging-guard";
 
 let failures = 0;
 function check(name: string, condition: boolean) {
@@ -24,6 +25,8 @@ const password = `MoonRLS-${stamp}!9`;
 const created: string[] = [];
 
 async function main() {
+  // Never create temporary Auth users unless the URL is provably staging.
+  assertSafeStagingAuthTarget(getStagingGuardInput());
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const secret = process.env.SUPABASE_SECRET_KEY;
