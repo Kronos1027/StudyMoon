@@ -119,33 +119,27 @@ export async function correctEssay(
 
     const correction = essayCorrectionSchema.parse(extractJson(response.text));
 
-    // Never mark a submission corrected unless its actual feedback exists.
-    // Supabase write errors are returned as values rather than thrown.
-    const { error: feedbackError } = await admin.from("essay_feedback").insert({
-      essay_id: essay.id,
-      total_score: correction.total_score,
-      competencies: correction.competencies,
-      highlights: correction.highlights,
-      improvements: correction.improvements,
-      rewrite_example_md: correction.rewrite_example_md,
-      is_ai_estimate: true,
-      model_used: response.provider,
-    });
-    if (feedbackError) {
-      throw new Error(`Falha ao persistir a correção: ${feedbackError.message}`);
-    }
-
-    const { data: marked, error: statusError } = await admin
-      .from("essays")
-      .update({ status: "corrected" })
-      .eq("id", essay.id)
-      .eq("status", "correcting")
-      .select("id")
-      .maybeSingle();
-    if (statusError || !marked) {
-      // Feedback has already been saved; keep it for recovery/auditing.
-      // Do not claim successful grading if its status was not persisted.
-      throw new Error(`Falha ao concluir o status da redação: ${statusError?.message ?? "status alterado"}`);
+    // Insert feedback and transition the essay to "corrected" inside the
+    // SAME PostgreSQL transaction (migration 0019). A network failure or
+    // retry must never leave orphaned feedback or create a duplicate grade.
+    const { data: finalizedRows, error: finalizeError } = await admin.rpc(
+      "finalize_essay_correction",
+      {
+        p_user_id: user.id,
+        p_essay_id: essay.id,
+        p_total_score: correction.total_score,
+        p_competencies: correction.competencies,
+        p_highlights: correction.highlights,
+        p_improvements: correction.improvements,
+        p_rewrite_example_md: correction.rewrite_example_md,
+        p_model_used: response.provider,
+      },
+    );
+    const persisted = Array.isArray(finalizedRows) ? finalizedRows[0] : null;
+    if (finalizeError || !persisted) {
+      throw new Error(
+        `Falha ao concluir a correção: ${finalizeError?.message ?? "sem resultado persistido"}`,
+      );
     }
 
     // Single transactional award, including idempotency and profile level.
@@ -166,11 +160,13 @@ export async function correctEssay(
 
     return {
       ok: true,
-      totalScore: correction.total_score,
-      competencies: correction.competencies,
-      improvements: correction.improvements,
-      highlights: correction.highlights,
-      rewriteExample: correction.rewrite_example_md,
+      // A retry may have found feedback saved by an older application.
+      // Always display the correction actually persisted in PostgreSQL.
+      totalScore: persisted.total_score,
+      competencies: persisted.competencies as typeof correction.competencies,
+      improvements: persisted.improvements as typeof correction.improvements,
+      highlights: persisted.highlights as typeof correction.highlights,
+      rewriteExample: persisted.rewrite_example_md,
       zeroReason: correction.zero_reason,
     };
   } catch (err) {
