@@ -5,6 +5,7 @@
  */
 import { execFileSync } from "node:child_process";
 import path from "node:path";
+import { assertSafeStagingDatabaseTarget, getStagingGuardInput } from "./staging-guard";
 
 function run(label: string, script: string) {
   console.log(`\n=== ${label} ===`);
@@ -29,6 +30,8 @@ async function main() {
     );
     process.exit(1);
   }
+
+  assertSafeStagingDatabaseTarget(getStagingGuardInput());
 
   run("Migrações (tabelas + RLS)", "migrate.ts");
   run("Validação determinística do conteúdo", "validate-content.ts");
