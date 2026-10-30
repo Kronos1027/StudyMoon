@@ -55,7 +55,6 @@ export async function assertStagingSchemaReady(): Promise<void> {
       tickets_read: boolean;
       review_rpc: boolean;
       xp_rpc: boolean;
-      anon_profile_read: boolean;
     }[]>`
       select
         has_table_privilege('authenticated', 'public.attempts', 'INSERT')
@@ -75,9 +74,7 @@ export async function assertStagingSchemaReady(): Promise<void> {
           'authenticated',
           'public.award_study_xp(uuid,public.xp_kind,uuid,integer,integer)',
           'EXECUTE'
-        ) as xp_rpc,
-        has_table_privilege('anon', 'public.profiles', 'SELECT')
-          as anon_profile_read
+        ) as xp_rpc
     `;
     if (!permissions) {
       throw new Error("Staging schema permission audit returned no data.");
