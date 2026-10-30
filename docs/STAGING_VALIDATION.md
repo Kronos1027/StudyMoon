@@ -27,6 +27,8 @@ export DATABASE_URL='postgresql://postgres:<SENHA>@db.<REF_EXCLUSIVO_DA_HOMOLOGA
 
 Para pooler, a conta PostgreSQL pode ter formato `postgres.<REF_EXCLUSIVO_DA_HOMOLOGACAO>` no hostname `*.pooler.supabase.com`. O guard reconhece apenas os formatos conhecidos e exige que URL de Auth e projeto do banco coincidam.
 
+**Verificação prévia sem escrever nem conectar ao banco:** executar `pnpm staging:check` após configurar o ambiente. O comando rejeita URLs inconsistentes e imprime somente a referência pública da homologação, jamais a senha. Se falhar, não prosseguir.
+
 **Proteção obrigatória e sem override:** `scripts/staging-guard.ts` é executado antes de qualquer escrita por `db:migrate`, `db:seed`, `setup` e `db:test-rls`. Ele exige `STUDYMOON_ENV=staging`, uma referência válida, os hosts correspondentes e bloqueia explicitamente o identificador conhecido do projeto de produção. Conexões localhost, URLs arbitrárias, projeto não reconhecido ou modo ausente são recusados. Para futura implantação de produção será necessário criar um **procedimento separado**, com revisão, backup, autorização e janela de rollback; não contornar o guard.
 
 ## 3. Validação de banco antes de Auth
