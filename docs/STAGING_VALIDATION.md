@@ -38,6 +38,14 @@ Para pooler, a conta PostgreSQL pode ter formato `postgres.<REF_EXCLUSIVO_DA_HOM
 - Aplicar `pnpm db:migrate` **somente no staging validado**. Verificar `_studymoon.migrations` de `0001` até `0018` (não reaplicar migrações já registradas).
 - Executar `pnpm db:seed` só com conteúdo sintético, se necessário; inspecionar grants, RLS e funções `service_role`. Não importar sessões, perfis ou tentativas reais.
 
+### Fluxo manual de validação de hospedagem
+
+O arquivo `.github/workflows/staging-auth-rls.yml` é executado **somente por acionamento manual** (Actions → *Staging Supabase Auth + RLS (manual only)* → *Run workflow*), nunca por PR/push. Configure previamente um **Environment** chamado `staging` com aprovação de revisores, se possível. Nesse ambiente use variáveis `STAGING_SUPABASE_PROJECT_REF` e `STAGING_SUPABASE_URL`, além dos secrets `STAGING_DATABASE_URL`, `STAGING_SUPABASE_ANON_KEY` e `STAGING_SUPABASE_SECRET_KEY`. Não compartilhe esses secrets com a produção.
+
+No workflow são realizados, nesta ordem, `pnpm staging:check` (sem rede), `pnpm staging:schema-check` (**somente SELECT** no banco, conferindo histórico completo `0001–0018` e RLS em todas as tabelas públicas) e, somente depois, `pnpm db:test-rls` (cria e remove dois usuários temporários na homologação). Qualquer falha nas validações interrompe o processo. **Esse workflow NÃO executa migrações nem importa conteúdo** — a preparação de esquema da homologação é operação separada, precedida por backup, revisão e autorização.
+
+Para checar o banco com o mesmo mecanismo antes de testar autenticação, execute `pnpm staging:schema-check` (somente leitura). Se faltar qualquer migração ou aparecer alguma inesperada, não prossiga para os testes de Auth.
+
 ## 4. Autenticação real e fluxos completos
 
 `pnpm db:test-rls` cria dois estudantes **temporários** no projeto de homologação, autentica os dois com a chave pública e tenta remover essas contas no `finally`. O teste falha se qualquer login não funcionar; não usa dados reais.
