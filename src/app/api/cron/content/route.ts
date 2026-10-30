@@ -11,10 +11,10 @@ export const maxDuration = 60;
  * (keeps serverless execution short); the workflow repeats calls.
  */
 export async function POST(request: NextRequest) {
-  const secret =
-    request.headers.get("authorization")?.replace("Bearer ", "") ??
-    request.nextUrl.searchParams.get("secret");
-  if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
+  // Credentials in query parameters leak into access logs and URLs.
+  // Require the exact Bearer header, as every scheduled workflow already uses.
+  if (!process.env.CRON_SECRET ||
+      request.headers.get("authorization") !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
