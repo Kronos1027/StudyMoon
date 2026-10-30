@@ -339,3 +339,32 @@ O último commit anterior a esta etapa teve **CI e PostgreSQL integration totalm
 - Passos completos em `docs/STAGING_VALIDATION.md`. Não existe atualmente uma branch Supabase de homologação do StudyMoon disponível, e **nenhum projeto novo foi criado**.
 
 **Limitação de verificação:** A suíte hospedada ainda não foi executada; configurar staging separado e suas credenciais exigirá autorização para possíveis custos. GitHub Actions SQL descartável e CI comum seguem sendo validados separadamente. Em produção continuam somente `0001–0006`.
+
+
+## Etapa 18 — redações finalizadas atomicamente (30/10)
+
+**Defeito confirmado:** `correctEssay` inseria o feedback e depois marcava a redação como corrigida em duas chamadas Supabase distintas. Uma falha após o primeiro commit deixava feedback sem status final. Como `essay_feedback` não tinha índice único por redação, um novo pedido podia persistir feedback duplicado.
+
+A migração `0019_atomic_essay_finalization.sql` cria índice único `essay_feedback(essay_id)` e a RPC **service-only** `finalize_essay_correction`, que bloqueia a redação, conserva um feedback anterior já existente, grava (ou reutiliza) o feedback e muda `status` para `corrected` **na mesma transação PostgreSQL**. A action devolve o feedback realmente persistido, não uma nova saída da IA que possa ter sido descartada. Valida a identidade do aluno e exige `status='correcting'`.
+
+Regressões: `tests/database/essay-finalization.sql` cobre status, replay, isolamento, erro de payload, preservação de feedback legado; `essay-finalization-concurrency.sh` envia duas finalizações simultâneas e exige uma única gravação. O PostgreSQL descartável da CI executou a nova migração e passou esses testes. Em consulta **agregada e somente leitura** ao Supabase de produção nesta data foram encontrados **0 grupos de feedback duplicado e 0 feedbacks com status diferente de corrigido**; isso não substitui nova checagem antes da futura migração.
+
+## Etapa 19 — correção de simulados e XP transacionais (30/10)
+
+**Defeito confirmado:** `finishMockExam` gravava respostas individualmente, depois o status/nota, depois criava o evento de XP e atualizava `profiles.xp` via `SELECT + UPDATE`. Em falhas ou duas requisições simultâneas, poderia surgir simulado parcialmente finalizado e perda de XP.
+
+A migração `0020_atomic_mock_exam.sql` cria a RPC **service-only** `finalize_mock_exam`, com bloqueio `FOR UPDATE` do simulado. A resposta é corrigida exclusivamente contra os gabaritos do banco, **jamais** contra campos enviados pelo navegador; cada item, score e status são concluídos em uma única transação, juntamente com o prêmio de XP. A função `award_study_xp` foi ampliada para `mock_exam`, mantendo trava do perfil, limite diário de 100 XP e idempotência por (aluno,simulado), protegida por índice único parcial. O relatório separa explicitamente estimativa percentual de TRI verdadeira.
+
+Regressões: `tests/database/mock-exam.sql` cobre 5 itens, omissão de resposta, pontuação por área, antifraude, resposta repetida, usuário errado e recompensa única. `mock-exam-concurrency.sh` faz duas finalizações simultâneas e exige um único prêmio de XP. A primeira execução mostrou um bug de `flagged=null` para questões não respondidas; a migração foi corrigida para `coalesce(flagged,false)` e reenviada à CI. Em consulta **somente leitura** à produção foram encontrados 0 grupos duplicados de XP do tipo `mock_exam` e 0 simulados finalizados sem score registrado. Revalidar esses valores antes da implantação.
+
+## Etapa 20 — jobs mais seguros e falhas visíveis (30/10)
+
+O endpoint de geração de conteúdo e o keepalive ainda permitiam `?secret=`, expondo credenciais a logs/URLs. Agora só aceitam o cabeçalho `Authorization: Bearer`, como os workflows já utilizavam. A geração noturna passa a devolver HTTP 503 quando qualquer lote falha; os workflows `content-nightly.yml` e `keepalive.yml` não suprimem mais erros HTTP com `|| true` e usam `curl --fail-with-body`. Testes `tests/unit/cron-hardening.test.ts` verificam os contratos.
+
+### Restrições reais para afirmar funcionamento completo
+
+- Testes unitários, Playwright smoke e PostgreSQL descartável **não substituem** login real com Supabase hospedado nem tráfego concorrente com usuários reais. O workflow de homologação com Auth foi preparado, mas **não executado**, pois não há staging separado configurado.
+- A atualização de dificuldade de questões ainda é uma operação pós-resposta separada; nivelamento adaptativo e outros caminhos devem ser auditados quanto a idempotência e concorrência.
+- A reserva da correção de redação `status='correcting'` pode persistir se o processo cair durante a chamada de IA; ainda precisa de protocolo seguro para expiração/reclamação de tarefas sem duplicar correções.
+- A migração **0020** depende de **0019** e todas as anteriores, e o aplicativo novo deve ser implantado apenas após migrar um staging isolado e aprovar testes reais.
+- **Não publicar nem mesclar o PR sem staging, testes Auth hospedados, backup/rollback verificados e aprovação expressa.** Produção permanece com **0001–0006**.
