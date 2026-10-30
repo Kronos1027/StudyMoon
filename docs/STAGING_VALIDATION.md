@@ -44,6 +44,10 @@ O arquivo `.github/workflows/staging-auth-rls.yml` **não executa em pushes ou a
 
 No workflow são realizados, nesta ordem, `pnpm staging:check` (sem rede), `pnpm staging:schema-check` (**somente SELECT** no banco, conferindo histórico completo `0001–0018` e RLS em todas as tabelas públicas) e, somente depois, `pnpm db:test-rls` (cria e remove dois usuários temporários na homologação). Qualquer falha nas validações interrompe o processo. **Esse workflow NÃO executa migrações nem importa conteúdo** — a preparação de esquema da homologação é operação separada, precedida por backup, revisão e autorização.
 
+A checagem de esquema também valida **grants reais de tabelas, colunas e funções** para os papéis `anon` e `authenticated` — inclusive tentativa/XP, fila FSRS, tickets e colunas de XP/nível do perfil. Isso evita resultados enganosos quando uma requisição REST falha por outro motivo, como chave estrangeira inválida ou problema de rede.
+
+O teste de Auth classifica como bloqueio apenas os erros de privilégio/RLS reconhecíveis. Contas de teste são registradas para limpeza **imediatamente após cada criação bem-sucedida**, inclusive se a criação seguinte falhar.
+
 Para checar o banco com o mesmo mecanismo antes de testar autenticação, execute `pnpm staging:schema-check` (somente leitura). Se faltar qualquer migração ou aparecer alguma inesperada, não prossiga para os testes de Auth.
 
 ## 4. Autenticação real e fluxos completos
