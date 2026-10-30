@@ -12,6 +12,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { assertSafeStagingAuthTarget, getStagingGuardInput } from "./staging-guard";
 import { assertStagingSchemaReady } from "./check-staging-schema";
+import { isAccessDenied } from "./staging-assertions";
 
 let failures = 0;
 function check(name: string, condition: boolean) {
@@ -91,13 +92,13 @@ async function main() {
 
   // 1. isolation: A cannot read B's rows
   const bProfile = await clientA.from("profiles").select("*").eq("id", idB);
-  check("A não lê o perfil de B", bProfile.data?.length === 0);
+  check("A não lê o perfil de B", !bProfile.error && bProfile.data?.length === 0);
 
   const bAttempts = await clientA.from("attempts").select("*").eq("user_id", idB);
-  check("A não lê tentativas de B", bAttempts.data?.length === 0);
+  check("A não lê tentativas de B", !bAttempts.error && bAttempts.data?.length === 0);
 
   const bStreak = await clientA.from("streaks").select("*").eq("user_id", idB);
-  check("A não lê sequência de B", bStreak.data?.length === 0);
+  check("A não lê sequência de B", !bStreak.error && bStreak.data?.length === 0);
 
   // 2. public curriculum readable by authenticated users
   const areas = await clientA.from("areas").select("id").limit(1);
@@ -122,7 +123,7 @@ async function main() {
     .limit(1);
   check("metadados seguros da demo são legíveis", !demoMetadata.error);
   const numericKey = await clientA.from("questions").select("id, numeric_expr").limit(1);
-  check("numeric_expr (possível resultado) não vaza", Boolean(numericKey.error));
+  check("numeric_expr (possível resultado) não vaza", isAccessDenied(numericKey.error));
   const qPublic = await clientA
     .from("questions")
     .select("id, statement_md, alternatives")
@@ -135,7 +136,7 @@ async function main() {
     amount: 999999,
     kind: "question",
   });
-  check("A não insere XP diretamente", Boolean(xpInsert.error));
+  check("A não insere XP diretamente", isAccessDenied(xpInsert.error));
 
   const attemptInsert = await clientA.from("attempts").insert({
     user_id: idA,
@@ -143,18 +144,18 @@ async function main() {
     selected: "A",
     correct: true,
   });
-  check("A não insere tentativas diretamente", Boolean(attemptInsert.error));
+  check("A não insere tentativas diretamente", isAccessDenied(attemptInsert.error));
 
   // The new FSRS queue and internal RPCs are service-only, even for a logged-in
   // student. Test the real hosted Data API, not just static SQL definitions.
   const queueRead = await clientA.from("srs_replay_queue").select("id").limit(1);
-  check("fila FSRS é privada do servidor", Boolean(queueRead.error));
+  check("fila FSRS é privada do servidor", isAccessDenied(queueRead.error));
 
   const ticketRead = await clientA.from("practice_question_serves").select("user_id").limit(1);
-  check("tickets de questões são privados do servidor", Boolean(ticketRead.error));
+  check("tickets de questões são privados do servidor", isAccessDenied(ticketRead.error));
 
   const hiddenRpc = await clientA.rpc("get_ready_srs_replay", { p_limit: 1 });
-  check("RPC de recuperação não é executável pelo estudante", Boolean(hiddenRpc.error));
+  check("RPC de recuperação não é executável pelo estudante", isAccessDenied(hiddenRpc.error, true));
 
   const secretXpRpc = await clientA.rpc("award_study_xp", {
     p_user_id: idA,
@@ -163,18 +164,18 @@ async function main() {
     p_requested: 500,
     p_daily_cap: 1000,
   });
-  check("RPC de XP não é executável pelo estudante", Boolean(secretXpRpc.error));
+  check("RPC de XP não é executável pelo estudante", isAccessDenied(secretXpRpc.error, true));
 
   const selfXp = await clientA
     .from("profiles")
     .update({ xp: 999999, level: 99 })
     .eq("id", idA);
-  check("A não se auto-atribui XP/nível", Boolean(selfXp.error));
+  check("A não se auto-atribui XP/nível", isAccessDenied(selfXp.error));
 
   // 5. anon cannot read protected tables
   const anonClient = createClient(url, anon);
   const anonProfiles = await anonClient.from("profiles").select("id").limit(1);
-  check("anônimo não lê perfis", anonProfiles.data?.length === 0);
+  check("anônimo não lê perfis", !anonProfiles.error && anonProfiles.data?.length === 0);
 
   console.log(
     failures === 0
