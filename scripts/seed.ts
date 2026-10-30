@@ -6,6 +6,7 @@
 import postgres from "postgres";
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
+import { assertSafeStagingDatabaseTarget, getStagingGuardInput } from "./staging-guard";
 import {
   curriculumSchema,
   lessonsFileSchema,
@@ -18,6 +19,7 @@ async function main() {
     console.error("DATABASE_URL is not set (see docs/SETUP.md).");
     process.exit(1);
   }
+  assertSafeStagingDatabaseTarget(getStagingGuardInput());
   const sql = postgres(databaseUrl, { ssl: "prefer", max: 1 });
 
   const contentDir = path.join(process.cwd(), "content");
