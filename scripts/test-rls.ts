@@ -63,11 +63,23 @@ async function main() {
   // --- sign in as A and B (anon-key clients, like a real browser) ---
   const clientA = createClient(url, anon);
   const clientB = createClient(url, anon);
-  await clientA.auth.signInWithPassword({ email: emailA, password });
-  await clientB.auth.signInWithPassword({ email: emailB, password });
+  const { data: sessionA, error: signInErrorA } =
+    await clientA.auth.signInWithPassword({ email: emailA, password });
+  const { data: sessionB, error: signInErrorB } =
+    await clientB.auth.signInWithPassword({ email: emailB, password });
 
   const idA = userA.data.user.id;
   const idB = userB.data.user.id;
+  if (
+    signInErrorA || signInErrorB ||
+    !sessionA.session || !sessionB.session ||
+    sessionA.user?.id !== idA || sessionB.user?.id !== idB
+  ) {
+    throw new Error("RLS test aborted: one of the staging Auth sign-ins failed.");
+  }
+
+  const ownProfile = await clientA.from("profiles").select("id").eq("id", idA).single();
+  check("usuário autenticado enxerga seu próprio perfil", !ownProfile.error && ownProfile.data?.id === idA);
 
   // 1. isolation: A cannot read B's rows
   const bProfile = await clientA.from("profiles").select("*").eq("id", idB);
@@ -124,6 +136,26 @@ async function main() {
     correct: true,
   });
   check("A não insere tentativas diretamente", Boolean(attemptInsert.error));
+
+  // The new FSRS queue and internal RPCs are service-only, even for a logged-in
+  // student. Test the real hosted Data API, not just static SQL definitions.
+  const queueRead = await clientA.from("srs_replay_queue").select("id").limit(1);
+  check("fila FSRS é privada do servidor", Boolean(queueRead.error));
+
+  const ticketRead = await clientA.from("practice_question_serves").select("user_id").limit(1);
+  check("tickets de questões são privados do servidor", Boolean(ticketRead.error));
+
+  const hiddenRpc = await clientA.rpc("get_ready_srs_replay", { p_limit: 1 });
+  check("RPC de recuperação não é executável pelo estudante", Boolean(hiddenRpc.error));
+
+  const secretXpRpc = await clientA.rpc("award_study_xp", {
+    p_user_id: idA,
+    p_kind: "question",
+    p_ref_id: "00000000-0000-0000-0000-000000000000",
+    p_requested: 500,
+    p_daily_cap: 1000,
+  });
+  check("RPC de XP não é executável pelo estudante", Boolean(secretXpRpc.error));
 
   const selfXp = await clientA
     .from("profiles")
