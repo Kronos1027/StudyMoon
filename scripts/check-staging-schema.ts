@@ -55,15 +55,24 @@ export async function assertStagingSchemaReady(): Promise<void> {
       tickets_read: boolean;
       review_rpc: boolean;
       xp_rpc: boolean;
+      anon_attempts_insert: boolean;
+      anon_xp_insert: boolean;
+      anon_replay_read: boolean;
+      anon_tickets_read: boolean;
+      anon_review_rpc: boolean;
+      anon_xp_rpc: boolean;
+      profile_xp_update: boolean;
+      profile_level_update: boolean;
+      profile_rank_update: boolean;
     }[]>`
       select
-        has_table_privilege('authenticated', 'public.attempts', 'INSERT')
+        has_any_column_privilege('authenticated', 'public.attempts', 'INSERT')
           as attempts_insert,
-        has_table_privilege('authenticated', 'public.xp_events', 'INSERT')
+        has_any_column_privilege('authenticated', 'public.xp_events', 'INSERT')
           as xp_insert,
-        has_table_privilege('authenticated', 'public.srs_replay_queue', 'SELECT')
+        has_any_column_privilege('authenticated', 'public.srs_replay_queue', 'SELECT')
           as replay_read,
-        has_table_privilege('authenticated', 'public.practice_question_serves', 'SELECT')
+        has_any_column_privilege('authenticated', 'public.practice_question_serves', 'SELECT')
           as tickets_read,
         has_function_privilege(
           'authenticated',
@@ -74,7 +83,31 @@ export async function assertStagingSchemaReady(): Promise<void> {
           'authenticated',
           'public.award_study_xp(uuid,public.xp_kind,uuid,integer,integer)',
           'EXECUTE'
-        ) as xp_rpc
+        ) as xp_rpc,
+        has_any_column_privilege('anon', 'public.attempts', 'INSERT')
+          as anon_attempts_insert,
+        has_any_column_privilege('anon', 'public.xp_events', 'INSERT')
+          as anon_xp_insert,
+        has_any_column_privilege('anon', 'public.srs_replay_queue', 'SELECT')
+          as anon_replay_read,
+        has_any_column_privilege('anon', 'public.practice_question_serves', 'SELECT')
+          as anon_tickets_read,
+        has_function_privilege(
+          'anon',
+          'public.get_ready_srs_replay(uuid,uuid,integer)',
+          'EXECUTE'
+        ) as anon_review_rpc,
+        has_function_privilege(
+          'anon',
+          'public.award_study_xp(uuid,public.xp_kind,uuid,integer,integer)',
+          'EXECUTE'
+        ) as anon_xp_rpc,
+        has_column_privilege('authenticated', 'public.profiles', 'xp', 'UPDATE')
+          as profile_xp_update,
+        has_column_privilege('authenticated', 'public.profiles', 'level', 'UPDATE')
+          as profile_level_update,
+        has_column_privilege('authenticated', 'public.profiles', 'rank_title', 'UPDATE')
+          as profile_rank_update
     `;
     if (!permissions) {
       throw new Error("Staging schema permission audit returned no data.");
