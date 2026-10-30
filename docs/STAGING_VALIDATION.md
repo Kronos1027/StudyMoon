@@ -31,9 +31,11 @@ Para pooler, a conta PostgreSQL pode ter formato `postgres.<REF_EXCLUSIVO_DA_HOM
 
 **Proteção obrigatória e sem override:** `scripts/staging-guard.ts` é executado antes de qualquer escrita por `db:migrate`, `db:seed`, `setup` e `db:test-rls`. Ele exige `STUDYMOON_ENV=staging`, uma referência válida, os hosts correspondentes e bloqueia explicitamente o identificador conhecido do projeto de produção. Conexões localhost, URLs arbitrárias, projeto não reconhecido ou modo ausente são recusados. Para futura implantação de produção será necessário criar um **procedimento separado**, com revisão, backup, autorização e janela de rollback; não contornar o guard.
 
+Antes da atualização de código, conferir **duplicações históricas** que impediriam os índices únicos: `essay_feedback.essay_id` e `xp_events(user_id,kind,ref_id)` para `kind='mock_exam'`. Não remover histórico automaticamente: investigar se houver duplicatas.
+
 ## 3. Validação de banco antes de Auth
 
-- Executar os testes PostgreSQL **descartáveis** do GitHub Actions; confirmar as 18 migrações, permissões RLS, triggers e condições de corrida.
+- Executar os testes PostgreSQL **descartáveis** do GitHub Actions; confirmar as 20 migrações, permissões RLS, triggers e condições de corrida.
 - Fazer inventário e backup do **projeto de homologação**. Inspecionar migrações pendentes via consulta somente de leitura a `_studymoon.migrations`; cuidado: este projeto usa essa tabela personalizada, não necessariamente o histórico da Supabase CLI.
 - Aplicar `pnpm db:migrate` **somente no staging validado**. Verificar `_studymoon.migrations` de `0001` até `0018` (não reaplicar migrações já registradas).
 - Executar `pnpm db:seed` só com conteúdo sintético, se necessário; inspecionar grants, RLS e funções `service_role`. Não importar sessões, perfis ou tentativas reais.
@@ -42,7 +44,7 @@ Para pooler, a conta PostgreSQL pode ter formato `postgres.<REF_EXCLUSIVO_DA_HOM
 
 O arquivo `.github/workflows/staging-auth-rls.yml` **não executa em pushes ou atualizações normais do PR**. Antes da mesclagem, ele pode ser disparado **somente pela adição intencional da label `verify-supabase-staging` ao PR**; depois de o arquivo existir na branch padrão, também fica disponível o `workflow_dispatch` manual na aba Actions. Isso contorna a restrição oficial do GitHub: `workflow_dispatch` não funciona para workflows que existem apenas na branch do PR. Não aplique essa label sem ter configurado e aprovado a homologação isolada. Configure previamente um **Environment** chamado `staging` com aprovação de revisores, se possível. Nesse ambiente use variáveis `STAGING_SUPABASE_PROJECT_REF` e `STAGING_SUPABASE_URL`, além dos secrets `STAGING_DATABASE_URL`, `STAGING_SUPABASE_ANON_KEY` e `STAGING_SUPABASE_SECRET_KEY`. Não compartilhe esses secrets com a produção.
 
-No workflow são realizados, nesta ordem, `pnpm staging:check` (sem rede), `pnpm staging:schema-check` (**somente SELECT** no banco, conferindo histórico completo `0001–0018` e RLS em todas as tabelas públicas) e, somente depois, `pnpm db:test-rls` (cria e remove dois usuários temporários na homologação). Qualquer falha nas validações interrompe o processo. **Esse workflow NÃO executa migrações nem importa conteúdo** — a preparação de esquema da homologação é operação separada, precedida por backup, revisão e autorização.
+No workflow são realizados, nesta ordem, `pnpm staging:check` (sem rede), `pnpm staging:schema-check` (**somente SELECT** no banco, conferindo histórico completo `0001–0020` e RLS em todas as tabelas públicas) e, somente depois, `pnpm db:test-rls` (cria e remove dois usuários temporários na homologação). Qualquer falha nas validações interrompe o processo. **Esse workflow NÃO executa migrações nem importa conteúdo** — a preparação de esquema da homologação é operação separada, precedida por backup, revisão e autorização.
 
 A checagem de esquema também valida **grants reais de tabelas, colunas e funções** para os papéis `anon` e `authenticated` — inclusive tentativa/XP, fila FSRS, tickets e colunas de XP/nível do perfil. Isso evita resultados enganosos quando uma requisição REST falha por outro motivo, como chave estrangeira inválida ou problema de rede.
 
