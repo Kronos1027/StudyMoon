@@ -51,5 +51,11 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  return NextResponse.json({ ok: true, batches: results });
+  // A partial batch failure must fail the scheduled workflow visibly.
+  // Previously ok:true was returned even after providers/database errors.
+  const hasErrors = results.some((result) => "error" in result);
+  return NextResponse.json(
+    { ok: !hasErrors, batches: results },
+    { status: hasErrors ? 503 : 200 },
+  );
 }
