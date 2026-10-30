@@ -1,9 +1,13 @@
 name: Staging Supabase Auth + RLS (manual only)
 
-# Never run this workflow on push or PR. It uses real hosted Auth and creates
-# two disposable test accounts, so it requires an explicit dispatch.
+# Never run on push or ordinary PR updates. Hosted Auth tests require
+# EITHER an explicit manual dispatch (after workflow lands in default branch)
+# OR adding the special PR label before merge. The staging environment should
+# require reviewer approval before its secrets are exposed.
 on:
   workflow_dispatch:
+  pull_request:
+    types: [labeled]
 
 permissions:
   contents: read
@@ -15,6 +19,11 @@ concurrency:
 jobs:
   hosted-auth-rls:
     name: Verify isolated staging schema and hosted Auth
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' &&
+       github.event.action == 'labeled' &&
+       github.event.label.name == 'verify-supabase-staging')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: staging
