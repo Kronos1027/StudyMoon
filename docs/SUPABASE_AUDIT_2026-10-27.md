@@ -325,3 +325,17 @@ A migração `0018` já separa revisões por cartão e adiciona espera progressi
 - Validar ambiente de homologação real com autenticação Supabase, configuração do cron e alertas controlados.
 - No deploy, examinar se integrações externas antigas dependiam da query `secret` antes de removê-las definitivamente.
 - Ainda **não instalar migrações 0007–0018 na produção**, que continua separada do PR em rascunho.
+
+
+## Etapa 16 — workflow manual de Supabase Auth e auditoria de esquema (30/10)
+
+O último commit anterior a esta etapa teve **CI e PostgreSQL integration totalmente verdes**, mas isso não constitui uma homologação com o serviço Supabase Auth hospedado.
+
+- `.github/workflows/staging-auth-rls.yml` é um workflow **exclusivamente `workflow_dispatch`**, com ambiente protegido `staging`. Não há gatilho de push/PR, deploy, seed ou migração; executa apenas verificações e cria/deleta duas contas sintéticas temporárias por meio de `test-rls.ts`.
+- `scripts/staging-schema-check.ts` compara por conjunto **todos os nomes do diretório `supabase/migrations`** com `_studymoon.migrations`. Se houver migrações ausentes ou inesperadas, aborta. Funções puras testadas em `tests/unit/staging-schema-check.test.ts`.
+- `scripts/check-staging-schema.ts` conecta ao banco **após o staging guard** e executa somente `SELECT` para comparar migrações e identificar tabelas públicas sem RLS. Não cria schemas/tabelas, não insere e não aplica SQL de migração. `pnpm staging:schema-check` executa essa checagem isoladamente.
+- `scripts/test-rls.ts` agora exige a checagem de esquema antes de criar qualquer conta temporária; aborta também se a autenticação dos dois estudantes falhar, evitando false positives. Acrescentou verificações hospedadas de acesso negado às filas de FSRS, tickets e RPCs internos.
+- Variáveis de staging (não produção) exigidas pelo workflow: `vars.STAGING_SUPABASE_PROJECT_REF`, `vars.STAGING_SUPABASE_URL`, `secrets.STAGING_DATABASE_URL`, `secrets.STAGING_SUPABASE_ANON_KEY` e `secrets.STAGING_SUPABASE_SECRET_KEY`. O ambiente `staging` deve exigir aprovação de revisores.
+- Passos completos em `docs/STAGING_VALIDATION.md`. Não existe atualmente uma branch Supabase de homologação do StudyMoon disponível, e **nenhum projeto novo foi criado**.
+
+**Limitação de verificação:** A suíte hospedada ainda não foi executada; configurar staging separado e suas credenciais exigirá autorização para possíveis custos. GitHub Actions SQL descartável e CI comum seguem sendo validados separadamente. Em produção continuam somente `0001–0006`.
