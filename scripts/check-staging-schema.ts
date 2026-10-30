@@ -64,6 +64,10 @@ export async function assertStagingSchemaReady(): Promise<void> {
       profile_xp_update: boolean;
       profile_level_update: boolean;
       profile_rank_update: boolean;
+      essay_finalize_rpc: boolean;
+      mock_finalize_rpc: boolean;
+      anon_essay_finalize_rpc: boolean;
+      anon_mock_finalize_rpc: boolean;
     }[]>`
       select
         has_any_column_privilege('authenticated', 'public.attempts', 'INSERT')
@@ -107,7 +111,27 @@ export async function assertStagingSchemaReady(): Promise<void> {
         has_column_privilege('authenticated', 'public.profiles', 'level', 'UPDATE')
           as profile_level_update,
         has_column_privilege('authenticated', 'public.profiles', 'rank_title', 'UPDATE')
-          as profile_rank_update
+          as profile_rank_update,
+        has_function_privilege(
+          'authenticated',
+          'public.finalize_essay_correction(uuid,uuid,integer,jsonb,jsonb,jsonb,text,text)',
+          'EXECUTE'
+        ) as essay_finalize_rpc,
+        has_function_privilege(
+          'authenticated',
+          'public.finalize_mock_exam(uuid,uuid,jsonb)',
+          'EXECUTE'
+        ) as mock_finalize_rpc,
+        has_function_privilege(
+          'anon',
+          'public.finalize_essay_correction(uuid,uuid,integer,jsonb,jsonb,jsonb,text,text)',
+          'EXECUTE'
+        ) as anon_essay_finalize_rpc,
+        has_function_privilege(
+          'anon',
+          'public.finalize_mock_exam(uuid,uuid,jsonb)',
+          'EXECUTE'
+        ) as anon_mock_finalize_rpc
     `;
     if (!permissions) {
       throw new Error("Staging schema permission audit returned no data.");
