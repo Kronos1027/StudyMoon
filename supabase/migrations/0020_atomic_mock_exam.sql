@@ -197,7 +197,7 @@ begin
     update public.mock_exam_items
        set selected=v_selected,
            correct=(v_selected is not null and v_selected=v_item.answer_key),
-           flagged=v_flagged
+           flagged=coalesce(v_flagged,false)
      where id=v_item.id;
   end loop;
 
