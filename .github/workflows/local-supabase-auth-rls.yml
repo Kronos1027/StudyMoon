@@ -1,0 +1,72 @@
+name: Supabase local Auth and RLS integration
+
+# Isolated, ephemeral local stack: no hosted project, secrets, or production URL.
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: studymoon-local-auth-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  local-auth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.81.3
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.10.1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install application dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Start disposable local Supabase
+        run: |
+          set -euo pipefail
+          # The repository has a custom migration naming scheme. Move them
+          # out before CLI startup and apply explicitly in sorted order.
+          mv supabase/migrations "$RUNNER_TEMP/studymoon-migrations"
+          supabase init
+          supabase start -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor,mailpit
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql-client
+
+      - name: Apply all StudyMoon migrations and run real Auth / RLS tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          supabase status -o env > "$RUNNER_TEMP/studymoon-local.env"
+          set -a
+          source "$RUNNER_TEMP/studymoon-local.env"
+          set +a
+          test "$API_URL" = "http://127.0.0.1:54321"
+          test "$DB_URL" = "postgresql://postgres:postgres@127.0.0.1:54322/postgres"
+          for migration in "$RUNNER_TEMP"/studymoon-migrations/*.sql; do
+            echo "Applying ${migration##*/}"
+            psql -X --set ON_ERROR_STOP=1 "$DB_URL" -f "$migration" > /dev/null
+          done
+          export NEXT_PUBLIC_SUPABASE_URL="$API_URL"
+          export NEXT_PUBLIC_SUPABASE_ANON_KEY="$ANON_KEY"
+          export SUPABASE_SECRET_KEY="$SERVICE_ROLE_KEY"
+          pnpm exec tsx scripts/test-local-auth-rls.ts
+
+      - name: Stop disposable stack
+        if: always()
+        run: supabase stop || true
