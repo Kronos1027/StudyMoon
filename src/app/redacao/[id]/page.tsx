@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, PenLine } from "lucide-react";
 import { AppShell } from "@/components/app/app-shell";
 import { Markdown } from "@/components/content/markdown";
 import { getSupabaseServerClient } from "@/lib/db/server";
@@ -65,6 +65,16 @@ export default async function EssayDetailPage({ params }: PageProps) {
             {essay.status === "corrected" ? "corrigida" : "rascunho"}
           </p>
         </header>
+
+        {essay.status === "draft" ? (
+          <Link
+            href={`/redacao/${essay.id}/editar`}
+            className="mb-5 inline-flex items-center gap-2 rounded-xl bg-brand-gradient px-4 py-2.5 text-sm font-medium text-white hover:opacity-90"
+          >
+            <PenLine className="h-4 w-4" aria-hidden="true" />
+            Continuar escrevendo
+          </Link>
+        ) : null}
 
         {feedback ? (
           <div className="mb-6 rounded-2xl bg-brand-gradient p-6 text-center text-white">

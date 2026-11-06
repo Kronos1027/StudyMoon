@@ -62,6 +62,27 @@ describe("schedule", () => {
   });
 });
 
+describe("optimistic FSRS revision prerequisites", () => {
+  it.each(["again", "hard", "good", "easy"] as const)(
+    "increments reps by exactly one for %s (required by SQL CAS)",
+    (grade) => {
+      const now = new Date("2026-10-29T12:00:00Z");
+      const first = schedule(newCard("student", "question", now), grade, now);
+      expect(first.card.reps).toBe(1);
+
+      const nextAt = new Date(Math.max(
+        new Date(first.card.due).getTime(),
+        now.getTime() + 1000,
+      ));
+      const second = schedule(first.card, grade, nextAt);
+      expect(second.card.reps).toBe(first.card.reps + 1);
+      expect(new Date(second.card.last_update).getTime()).toBeGreaterThanOrEqual(
+        new Date(first.card.last_update).getTime(),
+      );
+    },
+  );
+});
+
 describe("gradeFromAttempt", () => {
   it("wrong answers are always 'again'", () => {
     expect(gradeFromAttempt(false, 10_000, 20_000)).toBe("again");

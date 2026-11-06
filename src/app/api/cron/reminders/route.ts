@@ -74,10 +74,12 @@ function pick<T>(list: readonly T[]): T {
  * Never during quiet hours (22h-7h), max 2/day (notification_log).
  */
 export async function POST(request: NextRequest) {
-  const secret =
-    request.headers.get("authorization")?.replace("Bearer ", "") ??
-    request.nextUrl.searchParams.get("secret");
-  if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
+  // Never accept credentials in URL query strings: URLs may be persisted
+  // in access logs, traces and referrers. Only an exact Bearer header works.
+  if (
+    !process.env.CRON_SECRET ||
+    request.headers.get("authorization") !== `Bearer ${process.env.CRON_SECRET}`
+  ) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
