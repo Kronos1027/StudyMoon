@@ -1,0 +1,258 @@
+[
+  {
+    "id": "li01",
+    "area": "Linguagens",
+    "assunto": "Interpretação",
+    "contexto": "Uma moradora escreveu sobre a reforma do bairro: “Plantaram postes onde havia árvores. A rua ficou mais iluminada, mas a caminhada perdeu a sombra e o canto dos pássaros.”",
+    "enunciado": "O contraste da fala destaca principalmente",
+    "alternativas": [
+      "a rejeição a qualquer iluminação pública.",
+      "um benefício urbano acompanhado de perda ambiental e de qualidade de vida.",
+      "a necessidade de impedir o tráfego de pedestres.",
+      "a ausência de pessoas nas ruas à noite.",
+      "a vantagem de trocar todas as árvores por edificações."
+    ],
+    "resposta": 1,
+    "explicacao": "A autora reconhece a iluminação como benefício, mas contrapõe a ela a retirada das árvores e os efeitos sobre a experiência de caminhar. A questão pede leitura do contraste, não apenas de uma frase."
+  },
+  {
+    "id": "li02",
+    "area": "Linguagens",
+    "assunto": "Funções da linguagem",
+    "contexto": "Um cartaz de uma biblioteca comunitária anuncia: “Doe um livro. Compartilhe histórias. Transforme seu bairro!”",
+    "enunciado": "Nesse anúncio, predomina a função",
+    "alternativas": [
+      "conativa, pois procura mobilizar o leitor por meio de comandos.",
+      "metalinguística, pois explica o funcionamento da gramática.",
+      "fática, pois testa a qualidade do canal de comunicação.",
+      "referencial, pois apresenta uma pesquisa estatística.",
+      "emotiva, pois se limita a descrever os sentimentos do autor."
+    ],
+    "resposta": 0,
+    "explicacao": "O uso dos verbos no imperativo — doe, compartilhe, transforme — procura provocar uma ação do destinatário. Isso caracteriza a função conativa ou apelativa."
+  },
+  {
+    "id": "li03",
+    "area": "Linguagens",
+    "assunto": "Figuras de linguagem",
+    "contexto": "Ao descrever uma longa espera, uma escritora afirma: “O relógio mastigava lentamente as horas daquela tarde.”",
+    "enunciado": "A atribuição de uma ação animada ao relógio caracteriza",
+    "alternativas": [
+      "linguagem exclusivamente denotativa.",
+      "um eufemismo para suavizar uma notícia.",
+      "uma enumeração de acontecimentos.",
+      "uma comparação introduzida pela palavra 'como'.",
+      "personificação, ao atribuir ao relógio a ação de mastigar."
+    ],
+    "resposta": 4,
+    "explicacao": "Um relógio não mastiga literalmente; a ação atribuída a ele dá vida ao objeto e intensifica a sensação de demora. Trata-se de personificação (prosopopeia)."
+  },
+  {
+    "id": "li04",
+    "area": "Linguagens",
+    "assunto": "Variação linguística",
+    "contexto": "Uma jovem diz aos amigos: “A gente se vê mais tarde, beleza?” Ao escrever um requerimento, usa: “Solicito informações sobre o horário de atendimento.”",
+    "enunciado": "A diferença entre as duas falas ilustra",
+    "alternativas": [
+      "a proibição de usos informais do português.",
+      "a ausência de normas nos gêneros escritos.",
+      "a adequação linguística às diferentes situações de comunicação.",
+      "a incapacidade de compreender um texto formal.",
+      "a existência de apenas uma variedade legítima da língua."
+    ],
+    "resposta": 2,
+    "explicacao": "Os contextos exigem registros distintos. A fala coloquial e a escrita formal cumprem funções comunicativas diferentes; uma variedade não indica inferioridade intelectual de seus falantes."
+  },
+  {
+    "id": "li05",
+    "area": "Linguagens",
+    "assunto": "Conectivos",
+    "contexto": "Embora a previsão indicasse chuva, os organizadores mantiveram a feira de ciências ao ar livre.",
+    "enunciado": "A palavra “embora” introduz uma ideia de",
+    "alternativas": [
+      "finalidade.",
+      "concessão.",
+      "conclusão.",
+      "proporção.",
+      "explicação de causa obrigatória."
+    ],
+    "resposta": 1,
+    "explicacao": "A chuva seria um obstáculo esperado, mas a feira foi mantida. Esse contraste entre impedimento esperado e fato realizado expressa concessão."
+  },
+  {
+    "id": "li06",
+    "area": "Linguagens",
+    "assunto": "Inglês instrumental",
+    "contexto": "A sign at a school library says: “All borrowed books must be returned by Friday. Late returns may prevent new loans.”",
+    "enunciado": "De acordo com o aviso, os estudantes devem",
+    "alternativas": [
+      "comprar novos livros até sexta-feira.",
+      "emprestar livros apenas aos professores.",
+      "evitar utilizar a biblioteca às sextas-feiras.",
+      "devolver os livros emprestados até sexta-feira para não prejudicar futuros empréstimos.",
+      "pagar uma taxa antecipada por todo empréstimo."
+    ],
+    "resposta": 3,
+    "explicacao": "“Must be returned by Friday” significa “devem ser devolvidos até sexta-feira”. “Late returns” são devoluções atrasadas, que podem impedir novos empréstimos."
+  },
+  {
+    "id": "li07",
+    "area": "Linguagens",
+    "assunto": "Literatura brasileira",
+    "contexto": "Um grupo de escritores rompe com a rigidez de modelos tradicionais e valoriza versos livres, humor, cotidiano urbano e marcas da fala brasileira.",
+    "enunciado": "Essas características são particularmente associadas ao",
+    "alternativas": [
+      "Modernismo brasileiro.",
+      "Trovadorismo medieval.",
+      "Quinhentismo de informação.",
+      "Arcadismo de idealização pastoril.",
+      "Parnasianismo de rigor formal."
+    ],
+    "resposta": 0,
+    "explicacao": "O Modernismo brasileiro, especialmente a partir de 1922, questionou padrões acadêmicos e experimentou novas linguagens, aproximando a literatura de aspectos cotidianos e da fala."
+  },
+  {
+    "id": "li08",
+    "area": "Linguagens",
+    "assunto": "Fato e opinião",
+    "contexto": "Uma notícia informa: “A exposição recebeu 3.200 visitantes no fim de semana. Segundo uma estudante entrevistada, foi a mostra mais emocionante do ano.”",
+    "enunciado": "A expressão que representa uma avaliação subjetiva é",
+    "alternativas": [
+      "“A exposição recebeu”.",
+      "“3.200 visitantes”.",
+      "“no fim de semana”.",
+      "“uma estudante entrevistada”.",
+      "“a mostra mais emocionante do ano”."
+    ],
+    "resposta": 4,
+    "explicacao": "A ideia de ser a “mais emocionante” depende da avaliação de uma pessoa. Número de visitantes e período de ocorrência são dados que podem ser conferidos."
+  },
+  {
+    "id": "hu01",
+    "area": "Humanas",
+    "assunto": "História do Brasil",
+    "contexto": "Na colonização portuguesa, grandes propriedades produziam açúcar com trabalho escravizado, tendo como principal destino os mercados europeus.",
+    "enunciado": "O sistema descrito combinava",
+    "alternativas": [
+      "produção industrial e distribuição igualitária de terras.",
+      "pequenas propriedades de agricultura exclusivamente familiar.",
+      "latifúndio, monocultura exportadora e escravização.",
+      "trabalho assalariado universal e autonomia econômica colonial.",
+      "reforma agrária e ausência de comércio externo."
+    ],
+    "resposta": 2,
+    "explicacao": "O modelo agroexportador colonial organizou extensos latifúndios, monocultura e trabalho de pessoas escravizadas, articulados ao comércio atlântico."
+  },
+  {
+    "id": "hu02",
+    "area": "Humanas",
+    "assunto": "Escravização e resistência",
+    "contexto": "Durante o período escravista, grupos de pessoas que escapavam do cativeiro criaram comunidades e redes de proteção, algumas das quais se tornaram quilombos.",
+    "enunciado": "Os quilombos evidenciam",
+    "alternativas": [
+      "formas de resistência, autonomia e organização coletiva.",
+      "aceitação passiva e unânime da ordem escravista.",
+      "o encerramento imediato da escravização em todo o país.",
+      "a inexistência de conflitos na sociedade colonial.",
+      "a concessão universal de direitos políticos por Portugal."
+    ],
+    "resposta": 0,
+    "explicacao": "A formação de quilombos é uma expressão histórica da resistência à escravização e da construção de comunidades autônomas."
+  },
+  {
+    "id": "hu03",
+    "area": "Humanas",
+    "assunto": "Primeira República",
+    "contexto": "Em uma cidade da Primeira República, um chefe político condicionava favores e empregos ao voto em candidatos apoiados por sua rede de influência.",
+    "enunciado": "Essa prática se relaciona ao",
+    "alternativas": [
+      "sufrágio feminino universal já consolidado.",
+      "controle eleitoral por lideranças locais, associado ao coronelismo.",
+      "processo de abolição da escravização no período colonial.",
+      "pleno anonimato do voto em todas as regiões.",
+      "fim das relações clientelistas na política."
+    ],
+    "resposta": 1,
+    "explicacao": "O coronelismo era um sistema de poder local relacionado a clientelismo e pressão sobre eleitores. O chamado voto de cabresto exemplifica esse controle."
+  },
+  {
+    "id": "hu04",
+    "area": "Humanas",
+    "assunto": "Cidadania e pós-abolição",
+    "contexto": "A Lei Áurea, de 1888, encerrou juridicamente a escravização no Brasil. Ela não estabeleceu, por si só, um programa abrangente de acesso à terra, moradia e escolarização para a população liberta.",
+    "enunciado": "A leitura do trecho permite concluir que",
+    "alternativas": [
+      "a abolição eliminou imediatamente todas as desigualdades raciais.",
+      "a população liberta recebeu automaticamente propriedades rurais.",
+      "a escravização continuou legalmente autorizada após 1888.",
+      "a liberdade jurídica não foi acompanhada de medidas suficientes de inclusão socioeconômica.",
+      "todos os conflitos relativos à cidadania foram resolvidos pela lei."
+    ],
+    "resposta": 3,
+    "explicacao": "A abolição legal foi uma conquista fundamental, mas a insuficiência de políticas de integração contribuiu para a persistência de desigualdades estruturais."
+  },
+  {
+    "id": "hu05",
+    "area": "Humanas",
+    "assunto": "Revolução Industrial",
+    "contexto": "No século XIX, trabalhadores de diversas fábricas enfrentavam longas jornadas e baixos salários. Ao mesmo tempo, surgiram associações organizadas para reivindicar melhorias.",
+    "enunciado": "Uma consequência dessas condições foi",
+    "alternativas": [
+      "a extinção de todos os conflitos entre patrões e empregados.",
+      "a substituição imediata de máquinas por artesanato.",
+      "a adoção universal de jornadas reduzidas antes de qualquer mobilização.",
+      "a inexistência de migrações para as cidades.",
+      "o fortalecimento de movimentos operários e reivindicações por direitos."
+    ],
+    "resposta": 4,
+    "explicacao": "As transformações da industrialização geraram conflitos sociais e estimularam sindicatos, associações e lutas por direitos trabalhistas."
+  },
+  {
+    "id": "hu06",
+    "area": "Humanas",
+    "assunto": "Guerra Fria",
+    "contexto": "Entre a metade e o fim do século XX, duas superpotências lideraram alianças rivais, disputaram influência global e apoiaram lados opostos em diferentes conflitos regionais.",
+    "enunciado": "O trecho se refere principalmente à",
+    "alternativas": [
+      "expansão do Império Romano.",
+      "crise do sistema feudal na Europa.",
+      "Guerra Fria entre Estados Unidos e União Soviética.",
+      "ocupação portuguesa da América no século XVI.",
+      "Revolução Neolítica."
+    ],
+    "resposta": 2,
+    "explicacao": "A Guerra Fria foi marcada pela rivalidade entre Estados Unidos e União Soviética, com competição geopolítica, tecnológica e ideológica, incluindo conflitos indiretos."
+  },
+  {
+    "id": "hu07",
+    "area": "Humanas",
+    "assunto": "Geografia urbana",
+    "contexto": "Em uma cidade, áreas verdes foram substituídas por asfalto e concreto. Durante chuvas intensas, cresceram as enxurradas e os pontos de alagamento.",
+    "enunciado": "A alteração urbana que ajuda a explicar esse problema é",
+    "alternativas": [
+      "a impermeabilização do solo, que diminui a infiltração e acelera o escoamento.",
+      "o aumento da infiltração da água por superfícies asfaltadas.",
+      "o fim do escoamento superficial em ruas pavimentadas.",
+      "a suspensão do ciclo da água por ações urbanas.",
+      "a redução obrigatória do volume de chuva por pavimentação."
+    ],
+    "resposta": 0,
+    "explicacao": "Pavimentos impermeáveis dificultam a entrada da água no solo. Mais água escorre pela superfície em pouco tempo, elevando o risco de alagamentos."
+  },
+  {
+    "id": "hu08",
+    "area": "Humanas",
+    "assunto": "Cartografia",
+    "contexto": "Em um mapa de escala 1:100.000, a distância entre uma escola e um parque é representada por um segmento de 4 cm.",
+    "enunciado": "A distância real aproximada entre esses lugares é",
+    "alternativas": [
+      "400 metros.",
+      "40 quilômetros.",
+      "400 quilômetros.",
+      "4 quilômetros.",
+      "40 metros."
+    ],
+    "resposta": 3,
+    "explicacao": "Em uma escala 1:100.000, 1 cm no mapa corresponde a 100.000 cm no terreno, ou 1 km. Portanto, 4 cm equivalem a 4 km."
+  }
+]
