@@ -53,6 +53,13 @@ export default async function SplashPage() {
               criar conta
             </Link>
           </p>
+          <Link
+            href="/revisao-enem"
+            className="mt-2 inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-5 py-3 text-sm font-semibold text-accent-2-ink transition-colors hover:bg-primary/20"
+          >
+            Revisão rápida do ENEM — estudar sem cadastro
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
         </div>
 
         <ul className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
