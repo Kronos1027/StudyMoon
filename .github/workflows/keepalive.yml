@@ -11,6 +11,6 @@ jobs:
     steps:
       - name: Ping no banco (evita pausa do plano free)
         run: |
-          curl -sS \
+          curl --fail-with-body --silent --show-error --retry 2 \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             "${{ vars.APP_URL }}/api/cron/keepalive" --max-time 30

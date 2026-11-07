@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { BookOpen, Loader2, PartyPopper, RefreshCw, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,8 @@ export function PracticeSession({ topicSlug, mode, testLength }: PracticeSession
   const [question, setQuestion] = useState<QuestionPublic | null>(null);
   const [loading, setLoading] = useState(true);
   const [finished, setFinished] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [emptyReason, setEmptyReason] = useState<string | null>(null);
   const [count, setCount] = useState(0);
   const [correct, setCorrect] = useState(0);
   const [xpTotal, setXpTotal] = useState(0);
@@ -34,16 +37,25 @@ export function PracticeSession({ topicSlug, mode, testLength }: PracticeSession
 
   const loadNext = useCallback(async () => {
     setLoading(true);
-    const result = await getNextQuestion({
-      topicSlug: effectiveTopic,
-      mode: mode === "review" ? "review" : "practice",
-    });
-    setQuestion(result.question);
-    setLoading(false);
-    if (!result.question) setFinished(true);
+    setQuestion(null);
+    setLoadError(null);
+    setFinished(false);
+    try {
+      const result = await getNextQuestion({
+        topicSlug: effectiveTopic,
+        mode: mode === "review" ? "review" : "practice",
+      });
+      setQuestion(result.question);
+      setEmptyReason(result.reason);
+      if (!result.question) setFinished(true);
+    } catch {
+      setLoadError("Não foi possível carregar a próxima questão. Verifique sua conexão e tente novamente.");
+    } finally {
+      setLoading(false);
+    }
   }, [effectiveTopic, mode]);
 
-  // Initial load: async setState only (no sync setState inside the effect).
+  // Initial load. Ignore a stale response if the route or mode changes.
   useEffect(() => {
     let cancelled = false;
     getNextQuestion({
@@ -52,8 +64,13 @@ export function PracticeSession({ topicSlug, mode, testLength }: PracticeSession
     }).then((result) => {
       if (cancelled) return;
       setQuestion(result.question);
-      setLoading(false);
+      setEmptyReason(result.reason);
+      setLoadError(null);
       if (!result.question) setFinished(true);
+    }).catch(() => {
+      if (!cancelled) setLoadError("Não foi possível carregar a questão. Tente novamente.");
+    }).finally(() => {
+      if (!cancelled) setLoading(false);
     });
     return () => {
       cancelled = true;
@@ -99,6 +116,18 @@ export function PracticeSession({ topicSlug, mode, testLength }: PracticeSession
     );
   }
 
+  if (loadError && !question) {
+    return (
+      <div role="alert" className="flex flex-col items-center gap-4 rounded-2xl border border-destructive/30 bg-card px-5 py-10 text-center">
+        <p className="max-w-sm text-sm text-muted-foreground">{loadError}</p>
+        <Button onClick={() => void loadNext()}>
+          <RefreshCw className="h-4 w-4" aria-hidden="true" />
+          Tentar novamente
+        </Button>
+      </div>
+    );
+  }
+
   if (finished || !question) {
     return (
       <motion.div
@@ -139,9 +168,9 @@ export function PracticeSession({ topicSlug, mode, testLength }: PracticeSession
           <>
             <BookOpen className="h-10 w-10 text-muted-foreground" aria-hidden="true" />
             <p className="max-w-sm text-sm text-muted-foreground">
-              Ainda não há questões disponíveis
-              {effectiveTopic ? " para este tópico" : ""}. O gerador noturno
-              está produzindo mais — volte amanhã ou escolha outro tópico.
+              {mode === "review" || emptyReason === "no_due_reviews"
+                ? "Você está em dia com as revisões disponíveis. Continue praticando e novos cartões serão agendados no momento certo."
+                : `Ainda não há questões disponíveis${effectiveTopic ? " para este tópico" : ""}. Experimente outra matéria ou tente novamente mais tarde.`}
             </p>
           </>
         )}
@@ -151,10 +180,16 @@ export function PracticeSession({ topicSlug, mode, testLength }: PracticeSession
               Voltar
             </Button>
           ) : null}
-          <Button onClick={restart}>
-            <RefreshCw className="h-4 w-4" aria-hidden="true" />
-            Nova sessão
-          </Button>
+          {count > 0 ? (
+            <Button onClick={restart}>
+              <RefreshCw className="h-4 w-4" aria-hidden="true" />
+              Nova sessão
+            </Button>
+          ) : (
+            <Button asChild>
+              <Link href="/estudo">Explorar matérias</Link>
+            </Button>
+          )}
         </div>
       </motion.div>
     );
@@ -162,6 +197,25 @@ export function PracticeSession({ topicSlug, mode, testLength }: PracticeSession
 
   return (
     <div>
+      {!testLength ? (
+        <div className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-border bg-card/70 px-3 py-2 text-xs text-muted-foreground">
+          <span>
+            {mode === "review" ? "Revisão espaçada" : "Prática adaptativa"}
+            <span className="ml-2 tabular-nums">{count} respondidas · {correct} acertos</span>
+          </span>
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            onClick={() => {
+              setFinished(true);
+              setQuestion(null);
+            }}
+          >
+            Encerrar
+          </Button>
+        </div>
+      ) : null}
       {testLength ? (
         <p className="mb-4 text-center text-sm text-muted-foreground">
           Teste do tópico: {Math.min(count, testLength)}/{testLength} respondidas

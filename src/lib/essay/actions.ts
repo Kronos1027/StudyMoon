@@ -61,6 +61,9 @@ export async function correctEssay(
   if (essay.status === "corrected") {
     return { ok: false, error: "Esta redação já foi corrigida." };
   }
+  if (essay.status === "correcting") {
+    return { ok: false, error: "Esta redação já está sendo corrigida." };
+  }
   if (countWords(essay.content_md) < 30) {
     return {
       ok: false,
@@ -92,10 +95,18 @@ export async function correctEssay(
     .update(`essay-v1:${essay.prompt_title}:${essay.content_md}`)
     .digest("hex");
 
-  await admin
+  // Claim the correction atomically. Two simultaneous submissions must
+  // never start two AI requests for the same essay.
+  const { data: claimed, error: claimError } = await admin
     .from("essays")
     .update({ status: "correcting" })
-    .eq("id", essay.id);
+    .eq("id", essay.id)
+    .in("status", ["draft", "submitted", "failed"])
+    .select("id")
+    .maybeSingle();
+  if (claimError || !claimed) {
+    return { ok: false, error: "Não foi possível iniciar a correção. Verifique se ela já está em andamento." };
+  }
 
   try {
     const response = await routeLlmCached(cacheKey, {
@@ -108,65 +119,69 @@ export async function correctEssay(
 
     const correction = essayCorrectionSchema.parse(extractJson(response.text));
 
-    await admin.from("essay_feedback").insert({
-      essay_id: essay.id,
-      total_score: correction.total_score,
-      competencies: correction.competencies,
-      highlights: correction.highlights,
-      improvements: correction.improvements,
-      rewrite_example_md: correction.rewrite_example_md,
-      is_ai_estimate: true,
-      model_used: response.provider,
-    });
-    await admin
-      .from("essays")
-      .update({ status: "corrected" })
-      .eq("id", essay.id);
+    // Insert feedback and transition the essay to "corrected" inside the
+    // SAME PostgreSQL transaction (migration 0019). A network failure or
+    // retry must never leave orphaned feedback or create a duplicate grade.
+    const { data: finalizedRows, error: finalizeError } = await admin.rpc(
+      "finalize_essay_correction",
+      {
+        p_user_id: user.id,
+        p_essay_id: essay.id,
+        p_total_score: correction.total_score,
+        p_competencies: correction.competencies,
+        p_highlights: correction.highlights,
+        p_improvements: correction.improvements,
+        p_rewrite_example_md: correction.rewrite_example_md,
+        p_model_used: response.provider,
+      },
+    );
+    const persisted = Array.isArray(finalizedRows) ? finalizedRows[0] : null;
+    if (finalizeError || !persisted) {
+      throw new Error(
+        `Falha ao concluir a correção: ${finalizeError?.message ?? "sem resultado persistido"}`,
+      );
+    }
 
-    const { count: alreadyPaid } = await admin
-      .from("xp_events")
-      .select("amount", { count: "exact", head: true })
-      .eq("user_id", user.id)
-      .eq("kind", "essay")
-      .eq("ref_id", essay.id);
-    if ((alreadyPaid ?? 0) === 0) {
-      const { error: xpError } = await admin.from("xp_events").insert({
-        user_id: user.id,
-        amount: FIXED_XP.essaySubmitted,
-        kind: "essay",
-        ref_id: essay.id,
-      });
-      if (!xpError) {
-        const { data: profile } = await admin
-          .from("profiles")
-          .select("xp")
-          .eq("id", user.id)
-          .single();
-        if (profile) {
-          await admin
-            .from("profiles")
-            .update({ xp: profile.xp + FIXED_XP.essaySubmitted })
-            .eq("id", user.id);
-        }
-      }
+    // Single transactional award, including idempotency and profile level.
+    // A retry after a correction must never double-award essay XP.
+    const { error: xpError } = await admin.rpc("award_study_xp", {
+      p_user_id: user.id,
+      p_kind: "essay",
+      p_ref_id: essay.id,
+      p_requested: FIXED_XP.essaySubmitted,
+      p_daily_cap: null,
+    });
+    if (xpError) {
+      // Do not undo a successfully persisted correction due to a reward issue.
+      console.error("[essay] atomic XP award failed:", xpError.message);
     }
 
     revalidatePath("/redacao");
 
     return {
       ok: true,
-      totalScore: correction.total_score,
-      competencies: correction.competencies,
-      improvements: correction.improvements,
-      highlights: correction.highlights,
-      rewriteExample: correction.rewrite_example_md,
+      // A retry may have found feedback saved by an older application.
+      // Always display the correction actually persisted in PostgreSQL.
+      totalScore: persisted.total_score,
+      competencies: persisted.competencies as typeof correction.competencies,
+      improvements: persisted.improvements as typeof correction.improvements,
+      highlights: persisted.highlights as typeof correction.highlights,
+      rewriteExample: persisted.rewrite_example_md,
       zeroReason: correction.zero_reason,
     };
   } catch (err) {
-    await admin
+    // Let the student edit and retry after an AI provider failure.
+    // The status lock only applies while correction is in progress.
+    // Only release a still-in-progress claim. Never undo a completed grade
+    // because a later non-critical step (XP/cache revalidation) failed.
+    const { error: recoveryError } = await admin
       .from("essays")
-      .update({ status: "submitted" })
-      .eq("id", essay.id);
+      .update({ status: "draft" })
+      .eq("id", essay.id)
+      .eq("status", "correcting");
+    if (recoveryError) {
+      console.error("[essay] failed to release correction claim:", recoveryError.message);
+    }
     console.error("[essay] correction failed:", (err as Error).message);
     return {
       ok: false,
@@ -193,15 +208,19 @@ export async function saveEssayDraft(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false };
 
-  await supabase
+  // Autosave must not overwrite an essay after submission or grading.
+  const { data: saved, error } = await supabase
     .from("essays")
     .update({
       content_md: parsed.data.content,
       word_count: countWords(parsed.data.content),
     })
     .eq("id", parsed.data.essayId)
-    .eq("user_id", user.id);
-  return { ok: true };
+    .eq("user_id", user.id)
+    .eq("status", "draft")
+    .select("id")
+    .maybeSingle();
+  return { ok: !error && Boolean(saved) };
 }
 
 const createSchema = z.object({

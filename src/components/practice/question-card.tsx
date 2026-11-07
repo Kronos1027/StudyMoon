@@ -83,6 +83,7 @@ export function QuestionCard({
   const [reportReason, setReportReason] = useState<string>("wrong_answer");
   const [reportDone, setReportDone] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [needsNewQuestion, setNeedsNewQuestion] = useState(false);
   const startRef = useRef(Date.now());
   const reduced = useReducedMotion();
 
@@ -105,15 +106,24 @@ export function QuestionCard({
     if (!selected || phase !== "answering") return;
     setPhase("submitting");
     setActionError(null);
+    setNeedsNewQuestion(false);
     const timeMs = Date.now() - startRef.current;
-    const response = await submitter({
-      questionId: question.id,
-      selected,
-      timeMs,
-      mode,
-    });
+    let response: AttemptResult;
+    try {
+      response = await submitter({
+        questionId: question.id,
+        selected,
+        timeMs,
+        mode,
+      });
+    } catch {
+      setActionError("Não foi possível registrar sua resposta. Verifique a conexão e tente novamente.");
+      setPhase("answering");
+      return;
+    }
     if (!response.ok) {
       setActionError(response.error ?? "Erro inesperado.");
+      setNeedsNewQuestion(response.errorCode === "ticket_unavailable");
       setPhase("answering");
       return;
     }
@@ -132,7 +142,13 @@ export function QuestionCard({
   // Keyboard: 1-5/A-E select, Enter submit/advance.
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
-      if (reportOpen) return;
+      if (reportOpen || event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
+      // Never hijack typing in the tutor, report dialogs, inputs or editors.
+      const target = event.target;
+      if (target instanceof HTMLElement &&
+          (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT", "BUTTON"].includes(target.tagName))) {
+        return;
+      }
       if (phase === "answering") {
         const key = event.key.toUpperCase();
         const map: Record<string, "A" | "B" | "C" | "D" | "E"> = {
@@ -350,6 +366,14 @@ export function QuestionCard({
                 </p>
               </div>
 
+              {result.reviewSaveWarning ? (
+                <p className="flex items-start gap-2 rounded-xl border border-warning/40 bg-warning/5 p-3 text-sm" role="alert">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                  Sua resposta foi registrada, mas não foi possível confirmar o agendamento da próxima revisão.
+                  Volte ao painel de revisões para conferir seus cartões.
+                </p>
+              ) : null}
+
               <div className="rounded-xl border border-border p-4">
                 <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Resolução passo a passo
@@ -383,10 +407,17 @@ export function QuestionCard({
         </AnimatePresence>
 
         {actionError ? (
-          <p className="mt-4 flex items-center gap-2 text-sm text-destructive" role="alert">
-            <AlertTriangle className="h-4 w-4" aria-hidden="true" />
-            {actionError}
-          </p>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3" role="alert">
+            <p className="flex items-center gap-2 text-sm text-destructive">
+              <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden="true" />
+              {actionError}
+            </p>
+            {needsNewQuestion ? (
+              <Button type="button" size="sm" variant="outline" onClick={onNext}>
+                Carregar outra questão
+              </Button>
+            ) : null}
+          </div>
         ) : null}
 
         {/* Actions */}

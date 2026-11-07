@@ -4,19 +4,16 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getSupabaseServerClient } from "@/lib/db/server";
 import { getSupabaseAdmin } from "@/lib/db/admin";
-import { updateMastery, updateDifficulty } from "@/lib/elo";
-import { gradeFromAttempt, newCard, schedule } from "@/lib/srs";
-import type { SrsCard } from "@/lib/db/types";
+import { updateDifficulty } from "@/lib/elo";
+import { reconcilePendingSrs } from "@/lib/srs/reconcile";
 import {
-  applyDailyCap,
-  levelFromXp,
   questionXp,
-  rankTitleFromLevel,
   FIXED_XP,
+  DAILY_XP_CAPS,
 } from "@/lib/gamification/xp";
-import { countsAsStudyDay, updateStreak, type StreakState } from "@/lib/gamification/streak";
 import { demoForQuestionRow } from "@/lib/demos/topic-binding";
 import type { QuestionPublic } from "@/lib/db/types";
+import { firstAvailableDueQuestion, isReviewDue } from "@/lib/practice/review";
 
 // ---------------------------------------------------------------------------
 // Next question (adaptive selection)
@@ -31,10 +28,6 @@ const nextQuestionSchema = z.object({
 export interface NextQuestionResult {
   question: QuestionPublic | null;
   reason: string | null;
-}
-
-function todayKey(): string {
-  return new Date().toISOString().split("T")[0];
 }
 
 function isoWeekAgo(): string {
@@ -53,6 +46,10 @@ export async function getNextQuestion(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { question: null, reason: null };
+
+  // Repair any previously recorded but unscheduled review before choosing a
+  // question. The shared background cron also drains this durable queue.
+  await reconcilePendingSrs({ userId: user.id, limit: 20 });
 
   // Candidates: validated questions (public columns), optional area filter.
   let topicsQuery = supabase
@@ -75,57 +72,107 @@ export async function getNextQuestion(
   if (!topics || topics.length === 0) return { question: null, reason: null };
 
   const topicIds = new Set(topics.map((t) => t.id));
-  const { data: questions } = await supabase
+
+  // Review sessions MUST use the student's due FSRS cards, ordered by due
+  // date. Adaptive practice deliberately uses a different selection policy.
+  let dueQuestionIds: string[] | null = null;
+  if (parsed.data.mode === "review") {
+    const { data: dueCards, error: dueError } = await supabase
+      .from("srs_cards")
+      .select("question_id")
+      .eq("user_id", user.id)
+      .not("question_id", "is", null)
+      .lte("due", new Date().toISOString())
+      .order("due", { ascending: true })
+      .limit(100);
+    if (dueError) throw new Error("Não foi possível consultar suas revisões.");
+    dueQuestionIds = [...new Set((dueCards ?? [])
+      .map((card) => card.question_id)
+      .filter((id): id is string => typeof id === "string"))];
+    if (!dueQuestionIds.length) {
+      return { question: null, reason: "no_due_reviews" };
+    }
+  }
+
+  let questionsQuery = supabase
     .from("questions")
     .select("id, topic_id, difficulty")
-    .eq("status", "validated")
-    .limit(600);
-  if (!questions || questions.length === 0) return { question: null, reason: null };
+    .eq("status", "validated");
 
-  const candidates = questions
+  if (dueQuestionIds) {
+    questionsQuery = questionsQuery.in("id", dueQuestionIds);
+  }
+  const { data: questions, error: questionsError } = await questionsQuery.limit(600);
+  if (questionsError) throw new Error("Não foi possível carregar as questões.");
+
+  const candidates = (questions ?? [])
     .filter((q) => topicIds.has(q.topic_id))
     .map((q) => ({ id: q.id, topicId: q.topic_id, difficulty: q.difficulty }));
 
-  // Mastery + recent attempts for the user.
-  const [{ data: mastery }, { data: recent }] = await Promise.all([
-    supabase
-      .from("topic_mastery")
-      .select("topic_id, elo, confidence, attempts_count")
-      .eq("user_id", user.id),
-    supabase
-      .from("attempts")
-      .select("question_id, created_at")
-      .eq("user_id", user.id)
-      .gte("created_at", isoWeekAgo()),
-  ]);
+  let selectedId: string | null = null;
+  let selectedReason: string | null = null;
 
-  // Dynamic import keeps the pure selection module out of the action bundle.
-  const { selectNextQuestion } = await import("@/lib/practice/selection");
-  const selection = selectNextQuestion({
-    candidates,
-    mastery: (mastery ?? []).map((m) => ({
-      topicId: m.topic_id,
-      elo: m.elo,
-      confidence: m.confidence,
-    })),
-    recentAttempts: (recent ?? []).map((a) => ({
-      questionId: a.question_id,
-      attemptedAt: a.created_at,
-    })),
-    now: new Date(),
-  });
+  if (dueQuestionIds) {
+    selectedId = firstAvailableDueQuestion(
+      dueQuestionIds,
+      candidates.map((candidate) => candidate.id),
+    );
+    selectedReason = selectedId ? "review_due" : "no_due_reviews";
+  } else {
+    // Normal practice: use the existing adaptive 70/20/10 selector.
+    const [{ data: mastery }, { data: recent }] = await Promise.all([
+      supabase
+        .from("topic_mastery")
+        .select("topic_id, elo, confidence, attempts_count")
+        .eq("user_id", user.id),
+      supabase
+        .from("attempts")
+        .select("question_id, created_at")
+        .eq("user_id", user.id)
+        .gte("created_at", isoWeekAgo()),
+    ]);
 
-  if (!selection) return { question: null, reason: null };
+    const { selectNextQuestion } = await import("@/lib/practice/selection");
+    const selection = selectNextQuestion({
+      candidates,
+      mastery: (mastery ?? []).map((m) => ({
+        topicId: m.topic_id,
+        elo: m.elo,
+        confidence: m.confidence,
+      })),
+      recentAttempts: (recent ?? []).map((a) => ({
+        questionId: a.question_id,
+        attemptedAt: a.created_at,
+      })),
+      now: new Date(),
+    });
+    selectedId = selection?.question.id ?? null;
+    selectedReason = selection?.reason ?? null;
+  }
+
+  if (!selectedId) return { question: null, reason: selectedReason };
 
   const { data: full } = await supabase
     .from("questions")
     .select(
       "id, topic_id, subtopic, demo_params, difficulty, context_md, statement_md, alternatives, hints, status, source, license, origin, created_at, topics(slug)",
     )
-    .eq("id", selection.question.id)
+    .eq("id", selectedId)
     .single();
 
   if (!full) return { question: null, reason: null };
+
+  // Register when the server actually serves a question. This ticket is
+  // consumed only once by record_practice_attempt with DB-measured timing.
+  const admin = getSupabaseAdmin();
+  if (!admin) throw new Error("Serviço de questões indisponível.");
+  const { data: issued, error: issueError } = await admin.rpc(
+    "issue_practice_question",
+    { p_user_id: user.id, p_question_id: full.id },
+  );
+  if (issueError || issued !== true) {
+    throw new Error("Não foi possível preparar sua questão. Tente novamente.");
+  }
 
   // Demo comes from the question's OWN SUBTOPIC (catalog in code), never
   // from the topic/area: question without a demo-bound subtopic → no demo.
@@ -143,7 +190,7 @@ export async function getNextQuestion(
       demo_params: resolution?.params ?? null,
       alternatives: full.alternatives ?? [],
     } as QuestionPublic,
-    reason: selection.reason,
+    reason: selectedReason,
   };
 }
 
@@ -154,6 +201,8 @@ export async function getNextQuestion(
 const submitSchema = z.object({
   questionId: z.string().uuid(),
   selected: z.enum(["A", "B", "C", "D", "E"]),
+  // Legacy client value retained for compatibility; never trusted for XP,
+  // FSRS grading or persisted attempt time after migration 0011.
   timeMs: z.number().int().min(0).max(3600_000),
   mode: z.enum(["practice", "review", "lesson_test"]).default("practice"),
 });
@@ -161,6 +210,7 @@ const submitSchema = z.object({
 export interface AttemptResult {
   ok: boolean;
   error?: string;
+  errorCode?: "ticket_unavailable";
   correct?: boolean;
   answerKey?: "A" | "B" | "C" | "D" | "E";
   explanationMd?: string;
@@ -169,6 +219,7 @@ export interface AttemptResult {
   streakCurrent?: number;
   streakUsedFreeze?: boolean;
   masteryPercent?: number;
+  reviewSaveWarning?: boolean;
 }
 
 /**
@@ -189,7 +240,7 @@ export async function submitAttempt(input: z.infer<typeof submitSchema>): Promis
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Sessão expirada." };
 
-  const { questionId, selected, timeMs, mode } = parsed.data;
+  const { questionId, selected, mode } = parsed.data;
 
   // 1. Fetch FULL question (server-only columns) with the admin client.
   const { data: question } = await admin
@@ -201,52 +252,58 @@ export async function submitAttempt(input: z.infer<typeof submitSchema>): Promis
     return { ok: false, error: "Questão não encontrada ou indisponível." };
   }
 
-  const correct = selected === question.answer_key;
-
-  // 2. Insert attempt.
-  const { error: attemptError } = await admin.from("attempts").insert({
-    user_id: user.id,
-    question_id: questionId,
-    selected,
-    correct,
-    time_ms: timeMs,
-    mode: mode === "review" ? "review" : mode === "lesson_test" ? "lesson_test" : "practice",
-  });
-  if (attemptError) {
-    console.error("[submitAttempt] attempt insert:", attemptError.message);
-    return { ok: false, error: "Falha ao registrar. Tente novamente." };
+  // Do not trust the client-provided "review" mode. A crafted server-action
+  // call must not grant review XP for an unlearned/already-rescheduled card.
+  if (mode === "review") {
+    const { data: card, error: cardError } = await admin
+      .from("srs_cards")
+      .select("due")
+      .eq("user_id", user.id)
+      .eq("question_id", questionId)
+      .maybeSingle();
+    if (cardError || !isReviewDue(card?.due, new Date())) {
+      return { ok: false, error: "Esta revisão não está disponível agora. Atualize sua lista." };
+    }
   }
 
-  // 3. Elo mastery update.
-  const { data: mastery } = await admin
+  // 2. The database validates the server-issued ticket, review eligibility
+  // and the answer, then inserts the attempt atomically. A duplicate submit
+  // cannot create a second attempt or alter the original answer.
+  const { data: attemptRows, error: attemptError } = await admin.rpc(
+    "record_practice_attempt",
+    {
+      p_user_id: user.id,
+      p_question_id: questionId,
+      p_selected: selected,
+      p_mode: mode,
+    },
+  );
+  const recorded = Array.isArray(attemptRows) ? attemptRows[0] : null;
+  const timeMs = Number(recorded?.recorded_time_ms);
+  const correct = recorded?.recorded_correct === true;
+  if (attemptError || !recorded || !Number.isFinite(timeMs)) {
+    console.error("[submitAttempt] secure attempt rejected:", attemptError?.message);
+    return {
+      ok: false,
+      error: "Esta questão já foi respondida ou expirou. Carregue uma nova questão.",
+      errorCode: "ticket_unavailable",
+    };
+  }
+
+  // 3. Elo, confidence and attempts_count are updated by the PostgreSQL
+  // AFTER INSERT trigger (migration 0014) in the same transaction as
+  // record_practice_attempt. Reading the committed row is for display only.
+  // Do not write a stale Elo value back from the application process.
+  const { data: mastery, error: masteryError } = await admin
     .from("topic_mastery")
-    .select("elo, attempts_count, confidence")
+    .select("elo")
     .eq("user_id", user.id)
     .eq("topic_id", question.topic_id)
-    .single();
-
-  const attemptsCount = mastery?.attempts_count ?? 0;
-  const currentElo = mastery?.elo ?? 1200;
-  const masteryUpdate = updateMastery(
-    currentElo,
-    question.difficulty,
-    correct,
-    attemptsCount,
-  );
+    .maybeSingle();
+  if (masteryError) {
+    console.error("[submitAttempt] read mastery:", masteryError.message);
+  }
   const lastAttemptAt = new Date().toISOString();
-
-  await admin.from("topic_mastery").upsert(
-    {
-      user_id: user.id,
-      topic_id: question.topic_id,
-      elo: masteryUpdate.elo,
-      confidence: masteryUpdate.confidence,
-      attempts_count: attemptsCount + 1,
-      last_attempt_at: lastAttemptAt,
-      updated_at: lastAttemptAt,
-    },
-    { onConflict: "user_id,topic_id" },
-  );
 
   // 3b. Question difficulty drift (empirical, gentle).
   const { count: questionAttempts } = await admin
@@ -265,47 +322,23 @@ export async function submitAttempt(input: z.infer<typeof submitSchema>): Promis
       .eq("id", questionId);
   }
 
-  // 4. FSRS card.
-  const { data: cardRow } = await admin
-    .from("srs_cards")
-    .select("*")
-    .eq("user_id", user.id)
-    .eq("question_id", questionId)
-    .maybeSingle();
+  // 4. Attempt insert already queued an immutable FSRS replay event in
+  // PostgreSQL (migration 0017). This reconciler processes the event and
+  // commits the card AND completion marker in one database transaction.
+  // A cron task will retry after any process/network crash.
+  const fsrs = await reconcilePendingSrs({
+    userId: user.id,
+    questionId,
+    limit: 20,
+  });
+  const srsSaved = fsrs.failed === 0 && fsrs.remaining === 0;
 
-  const expectedMs = Math.max(15_000, question.statement_md.length * 220);
-  const grade = gradeFromAttempt(correct, timeMs, expectedMs);
-  const baseCard: SrsCard = cardRow ?? newCard(user.id, questionId);
-  const scheduled = schedule(baseCard, grade);
-
-  await admin.from("srs_cards").upsert(
-    {
-      id: cardRow?.id,
-      user_id: user.id,
-      question_id: questionId,
-      concept_key: null,
-      due: scheduled.card.due,
-      stability: scheduled.card.stability,
-      difficulty_fsrs: scheduled.card.difficulty_fsrs,
-      elapsed_days: scheduled.card.elapsed_days,
-      scheduled_days: scheduled.card.scheduled_days,
-      reps: scheduled.card.reps,
-      lapses: scheduled.card.lapses,
-      learning_steps: scheduled.card.learning_steps,
-      state: scheduled.card.state,
-      last_update: scheduled.card.last_update,
-    },
-    { onConflict: "user_id,question_id" },
-  );
-
-  // 5. XP (anti-fraud: min time, no-repeat via unique index, daily cap).
+  // 5–6. Atomically award XP and update level/title in PostgreSQL.
+  // The server-only RPC locks the student's profile, checks one-shot
+  // deduplication, applies the daily cap and commits both tables together.
+  // Never silently rewrite profile XP with a stale value from another request.
   let xpEarned = 0;
-  const { data: profileRow } = await admin
-    .from("profiles")
-    .select("xp, level, rank_title")
-    .eq("id", user.id)
-    .single();
-
+  let newLevel: number | undefined;
   const amount = mode === "review"
     ? FIXED_XP.reviewCard
     : questionXp({
@@ -316,145 +349,42 @@ export async function submitAttempt(input: z.infer<typeof submitSchema>): Promis
       });
 
   if (amount > 0) {
-    const { count: todayXpCount } = await admin
-      .from("xp_events")
-      .select("amount", { count: "exact", head: true })
-      .eq("user_id", user.id)
-      .eq("kind", mode === "review" ? "review" : "question")
-      .gte("created_at", todayKey());
-    // Sum today's amounts of this kind (count alone is not enough).
-    const { data: todayXpRows } = await admin
-      .from("xp_events")
-      .select("amount")
-      .eq("user_id", user.id)
-      .eq("kind", mode === "review" ? "review" : "question")
-      .gte("created_at", todayKey());
-    const alreadyToday = (todayXpRows ?? []).reduce((s, r) => s + r.amount, 0);
-    void todayXpCount;
-
-    const capped = applyDailyCap(
-      mode === "review" ? "review" : "question",
-      amount,
-      alreadyToday,
+    const { data: awarded, error: awardError } = await admin.rpc(
+      "award_study_xp",
+      {
+        p_user_id: user.id,
+        p_kind: mode === "review" ? "review" : "question",
+        p_ref_id: questionId,
+        p_requested: amount,
+        p_daily_cap: mode === "review" ? DAILY_XP_CAPS.review : DAILY_XP_CAPS.question,
+      },
     );
-    if (capped > 0) {
-      const { error: xpError } = await admin.from("xp_events").insert({
-        user_id: user.id,
-        amount: capped,
-        kind: mode === "review" ? "review" : "question",
-        ref_id: questionId,
-      });
-      // Unique violation -> no XP for repeating the same question: expected.
-      if (!xpError) xpEarned = capped;
+    if (awardError) {
+      console.error("[submitAttempt] atomic XP award failed:", awardError.message);
+    } else {
+      const result = Array.isArray(awarded) ? awarded[0] : null;
+      xpEarned = Number(result?.awarded_amount ?? 0);
+      if (xpEarned > 0 && result && result.new_level > result.old_level) {
+        newLevel = result.new_level;
+      }
     }
   }
 
-  // 6. Level up (admin write on protected columns).
-  let newLevel: number | undefined;
-  if (xpEarned > 0 && profileRow) {
-    const totalXp = profileRow.xp + xpEarned;
-    const level = levelFromXp(totalXp);
-    await admin
-      .from("profiles")
-      .update({ xp: totalXp, level, rank_title: rankTitleFromLevel(level) })
-      .eq("id", user.id);
-    if (level > profileRow.level) newLevel = level;
+  // 7. Streaks now update under the same PostgreSQL transaction as the
+  // attempt (migration 0016). Read ONLY for student feedback: no stale
+  // read-modify-write can overwrite the progress of simultaneous attempts.
+  const { data: streak, error: streakError } = await admin
+    .from("streaks")
+    .select("current, last_study_date, last_freeze_used_on")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (streakError) {
+    console.error("[submitAttempt] streak read:", streakError.message);
   }
 
-  // 7. Streak (minimum day: 10 min OR 5 questions — use today's questions).
-  const { count: todayQuestionsCount } = await admin
-    .from("attempts")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", user.id)
-    .gte("created_at", todayKey());
-  const todayQuestions = todayQuestionsCount ?? 0;
-  const { data: streakRow } = await admin
-    .from("streaks")
-    .select("*")
-    .eq("user_id", user.id)
-    .single();
-
-  const streakState: StreakState = streakRow
-    ? {
-        current: streakRow.current,
-        longest: streakRow.longest,
-        lastStudyDate: streakRow.last_study_date,
-        freezesAvailable: streakRow.freezes_available,
-        lastFreezeWeek: streakRow.last_freeze_week,
-      }
-    : {
-        current: 0,
-        longest: 0,
-        lastStudyDate: null,
-        freezesAvailable: 1,
-        lastFreezeWeek: null,
-      };
-
-  const studiedToday = countsAsStudyDay({
-    minutes: Math.round(todayQuestions * 1.2),
-    questions: todayQuestions,
-  });
-  const streakUpdate = updateStreak(streakState, studiedToday, new Date());
-
-  await admin
-    .from("streaks")
-    .upsert(
-      {
-        user_id: user.id,
-        current: streakUpdate.current,
-        longest: streakUpdate.longest,
-        freezes_available: streakUpdate.freezesAvailable,
-        last_freeze_week:
-          streakUpdate.usedFreeze || streakState.lastFreezeWeek
-            ? (streakUpdate.usedFreeze
-                ? isoWeekKeyNow()
-                : streakState.lastFreezeWeek)
-            : null,
-        last_study_date: studiedToday
-          ? todayKey()
-          : streakState.lastStudyDate,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id" },
-    );
-
-  // 8. Daily goal.
-  const { data: goalRow } = await admin
-    .from("daily_goals")
-    .select("id, target_questions, done_questions")
-    .eq("user_id", user.id)
-    .eq("date", todayKey())
-    .single();
-
-  if (goalRow) {
-    const done = goalRow.done_questions + 1;
-    await admin
-      .from("daily_goals")
-      .update({
-        done_questions: done,
-        status:
-          done >= goalRow.target_questions
-            ? "done"
-            : done > 0
-              ? "partial"
-              : "pending",
-      })
-      .eq("id", goalRow.id);
-  } else {
-    const { data: profileForGoal } = await admin
-      .from("profiles")
-      .select("daily_hours")
-      .eq("id", user.id)
-      .single();
-    await admin.from("daily_goals").insert({
-      user_id: user.id,
-      date: todayKey(),
-      target_questions: 10,
-      target_minutes: Math.round(Number(profileForGoal?.daily_hours ?? 2) * 60),
-      done_questions: 1,
-      status: "partial",
-    });
-  }
+  // 8. Daily goal progress is counted by the PostgreSQL AFTER INSERT
+  // trigger on attempts (migration 0013). It runs in the same transaction
+  // as record_practice_attempt and cannot lose concurrent increments.
 
   revalidatePath("/painel");
   revalidatePath("/estudo");
@@ -466,23 +396,16 @@ export async function submitAttempt(input: z.infer<typeof submitSchema>): Promis
     explanationMd: question.explanation_md,
     xpEarned,
     newLevel,
-    streakCurrent: streakUpdate.current,
-    streakUsedFreeze: streakUpdate.usedFreeze,
-    masteryPercent: Math.round(((masteryUpdate.elo - 400) / 1400) * 100),
+    streakCurrent: streak?.current ?? undefined,
+    streakUsedFreeze: Boolean(
+      streak?.last_study_date === new Date().toISOString().slice(0, 10)
+      && streak?.last_freeze_used_on === streak?.last_study_date,
+    ),
+    reviewSaveWarning: !srsSaved,
+    masteryPercent: mastery
+      ? Math.round(((mastery.elo - 400) / 1400) * 100)
+      : undefined,
   };
-}
-
-function isoWeekKeyNow(): string {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
-  const week1 = new Date(d.getFullYear(), 0, 4);
-  const week =
-    1 +
-    Math.round(
-      ((d.getTime() - week1.getTime()) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7,
-    );
-  return `${d.getFullYear()}-W${String(week).padStart(2, "0")}`;
 }
 
 // ---------------------------------------------------------------------------
